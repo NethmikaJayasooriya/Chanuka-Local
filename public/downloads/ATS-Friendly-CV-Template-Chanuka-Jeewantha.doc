@@ -1,0 +1,82 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>ATS-Friendly CV Template - Chanuka Jeewantha</title>
+<style>
+body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.35; color: #1a1a1a; margin: 1in; }
+h1 { font-size: 20pt; text-transform: uppercase; margin-bottom: 2pt; color: #0f172a; text-align: center; }
+.contact { text-align: center; font-size: 10pt; color: #475569; margin-bottom: 16pt; }
+h2 { font-size: 12pt; text-transform: uppercase; border-bottom: 1.5pt solid #0f172a; padding-bottom: 2pt; margin-top: 14pt; margin-bottom: 6pt; color: #0f172a; letter-spacing: 0.5pt; }
+.job-header { display: flex; justify-content: space-between; font-weight: bold; margin-top: 6pt; }
+.job-sub { display: flex; justify-content: space-between; font-style: italic; color: #334155; margin-bottom: 4pt; }
+ul { margin-top: 3pt; margin-bottom: 8pt; padding-left: 18pt; }
+li { margin-bottom: 3pt; }
+.skills-grid { margin-bottom: 6pt; }
+</style>
+</head>
+<body>
+
+<h1>YOUR FULL NAME</h1>
+<div class="contact">
+Colombo, Sri Lanka &bull; +94 77 123 4567 &bull; your.email@gmail.com &bull; linkedin.com/in/yourprofile
+</div>
+
+<h2>PROFESSIONAL SUMMARY</h2>
+<p>
+Results-driven <strong>[Your Target Job Title]</strong> with <strong>[X] years of experience</strong> in [Core Industry/Domain]. Proven track record of delivering measurable outcomes including <strong>[Key Metric 1, e.g. 25% revenue growth]</strong> and <strong>[Key Metric 2, e.g. 30% reduction in turnaround time]</strong>. Expert in [Top 3-4 Industry Skills]. Adept at leading cross-functional teams and aligning operational goals with commercial objectives.
+</p>
+
+<h2>CORE COMPETENCIES & TECHNICAL SKILLS</h2>
+<p>
+<strong>Industry Knowledge:</strong> Strategic Planning, Financial Analysis, Process Optimization, Client Stakeholder Management<br>
+<strong>Technical Tools:</strong> Microsoft Excel (Advanced), Power BI, ERP Systems (SAP/Oracle), Python, SQL, CRM Platforms<br>
+<strong>Methodologies & Certifications:</strong> Agile / Scrum, PMP Principles, Lean Six Sigma, ISO Compliance
+</p>
+
+<h2>PROFESSIONAL EXPERIENCE</h2>
+
+<div class="job-header">
+<span>COMPANY NAME (E.G. DIALOG AXIATA / MAS HOLDINGS)</span>
+<span>Colombo, Sri Lanka</span>
+</div>
+<div class="job-sub">
+<span>Senior [Your Role Title]</span>
+<span>2022 – Present</span>
+</div>
+<ul>
+<li>Spearheaded [Key Project or Department Initiative], resulting in a <strong>[X]% increase in operational efficiency</strong> within [Timeframe].</li>
+<li>Managed an annual operational budget of <strong>LKR [X] Million</strong>, cutting cost variances by <strong>[X]%</strong> through automated tracking and strategic vendor renegotiation.</li>
+<li>Directed a high-performing cross-functional team of <strong>[X] professionals</strong>, improving quarterly KPI attainment from 78% to 96%.</li>
+<li>Engineered and implemented [New Workflow or System], saving <strong>[X] hours weekly</strong> across customer support operations.</li>
+</ul>
+
+<div class="job-header">
+<span>PREVIOUS COMPANY NAME</span>
+<span>Colombo, Sri Lanka</span>
+</div>
+<div class="job-sub">
+<span>[Your Previous Role Title]</span>
+<span>2019 – 2022</span>
+</div>
+<ul>
+<li>Delivered <strong>[X]% year-on-year sales growth</strong> across [Target Market] by introducing targeted commercial incentives.</li>
+<li>Analyzed complex datasets to forecast market demand, achieving a <strong>94% accuracy rate</strong> in inventory turnover.</li>
+<li>Authored comprehensive standard operating procedures (SOPs) adopted company-wide by 150+ team members.</li>
+</ul>
+
+<h2>EDUCATION & CREDENTIALS</h2>
+<div class="job-header">
+<span>UNIVERSITY OF COLOMBO / SLIIT</span>
+<span>Sri Lanka</span>
+</div>
+<div class="job-sub">
+<span>Bachelor of Science (B.Sc.) in [Your Field], First / Second Class Honors</span>
+<span>Graduated: 2019</span>
+</div>
+
+<p style="margin-top: 14pt; font-size: 9pt; color: #64748b; text-align: center; border-top: 1pt solid #cbd5e1; padding-top: 8pt;">
+Template created by Chanuka Jeewantha (CPRW & CPCC) &bull; Sri Lanka's #1 Professional CV Writer &bull; https://chanukajeewantha.lk
+</p>
+
+</body>
+</html>

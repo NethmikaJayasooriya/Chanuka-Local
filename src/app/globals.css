@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Chanuka Jeewantha - Sri Lanka Executive Light Design System
+   Inspired by Chanuka Global:
+   - Crisp Light Paper: #f8fafd / #ffffff
+   - Deep Authority Navy: #17355c / #0f2440
+   - Radiant Warm Gold: #b9862f / #8f6419 / #fbf3e3
+   - Conversion WhatsApp Green: #25d366 / #1ea952
+   - Modern Typography: Poppins for headings & Plus Jakarta Sans
+------------------------------------------------------------------ */
+@theme {
+  --color-paper: #f8fafd;
+  --color-paper-subtle: #f1f5fa;
+  --color-surface: #ffffff;
+  --color-sand: #edf2f8;
+  
+  --color-ink: #0e1a2b;
+  --color-ink-soft: #233348;
+  --color-muted: #52637a;
+
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+
+  --color-brand: #17355c;
+  --color-brand-deep: #0f2440;
+  --color-brand-soft: #e8eff9;
+  --color-brand-light: #f0f5fc;
+
+  --color-accent: #b9862f;
+  --color-accent-deep: #8f6419;
+  --color-accent-soft: #fbf3e3;
+  --color-accent-light: #fefaf3;
+
+  --color-whatsapp: #25d366;
+  --color-whatsapp-deep: #1ea952;
+  --color-whatsapp-soft: #e8f9ef;
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-poppins: var(--font-poppins), var(--font-sans), sans-serif;
+  --font-display: var(--font-display), "Playfair Display", Georgia, serif;
+
+  --radius-card: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 85px;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-poppins);
+}
+
+::selection {
+  background-color: #e8eff9;
+  color: #17355c;
+}
+
+/* Container Utility */
+.container-custom {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 4vw, 40px);
+  padding-right: clamp(16px, 4vw, 40px);
+}
+
+/* Card Lift Micro-interaction */
+.lift-card {
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1), border-color 300ms ease;
+}
+
+.lift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -15px rgba(23, 53, 92, 0.12);
+}
+
+/* Glassmorphism Light */
+.glass-light {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+/* Badges */
+.badge-gold {
+  background: #fbf3e3;
+  color: #8f6419;
+  border: 1px solid rgba(185, 134, 47, 0.25);
+}
+
+.badge-navy {
+  background: #e8eff9;
+  color: #17355c;
+  border: 1px solid rgba(23, 53, 92, 0.15);
+}
+
+.badge-green {
+  background: #e8f9ef;
+  color: #1ea952;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+}
+
+/* Buttons */
+.btn-primary {
+  background: #17355c;
+  color: #ffffff;
+  transition: all 250ms ease;
+}
+
+.btn-primary:hover {
+  background: #0f2440;
+  box-shadow: 0 12px 28px -10px rgba(23, 53, 92, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #d4a044 0%, #b9862f 100%);
+  color: #ffffff;
+  transition: all 250ms ease;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #e0ad52 0%, #c59136 100%);
+  box-shadow: 0 12px 28px -10px rgba(185, 134, 47, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp {
+  background: #25d366;
+  color: #ffffff;
+  transition: all 250ms ease;
+}
+
+.btn-whatsapp:hover {
+  background: #1ea952;
+  box-shadow: 0 12px 28px -10px rgba(37, 211, 102, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Subtle Shimmer & Glow */
+@keyframes shimmerWave {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmerWave 2.5s infinite;
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float-gentle {
+  animation: floatGentle 4.5s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5fa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
