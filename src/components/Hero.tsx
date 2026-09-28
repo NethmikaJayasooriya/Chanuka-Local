@@ -5,27 +5,29 @@ import { site, whatsappUrl } from "@/lib/site";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden min-h-[max(640px,calc(100svh-80px))] flex items-center pt-28 pb-14 sm:pt-32 sm:pb-18 lg:pt-36 lg:pb-20">
-      {/* Background Image: Chanuka new hero portrait loaded directly with high fidelity */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <section className="relative overflow-hidden isolate min-h-[max(640px,calc(100svh-80px))] flex items-center pt-28 pb-14 sm:pt-32 sm:pb-18 lg:pt-36 lg:pb-20">
+      
+      {/* Background Image: Chanuka new hero portrait (2752x1536) loaded at z-0 */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <img
           src="/images/chanuka-new-hero.jpeg"
-          alt="Chanuka Jeewantha - Professional CV Writer Sri Lanka"
-          className="absolute inset-0 w-full h-full object-cover object-[78%_14%] sm:object-[82%_12%] lg:object-[86%_8%]"
+          alt="Chanuka Jeewantha - Sri Lanka Professional CV Writer"
+          className="w-full h-full object-cover object-[82%_15%] sm:object-[85%_12%] lg:object-[88%_10%]"
           loading="eager"
         />
 
-        {/* Ambient Gradient Wash: Crystal-clear text readability on left, vibrant portrait on right */}
+        {/* Ambient Gradient Wash: Solid white-paper on the left for text contrast, completely transparent on the right so Chanuka is clearly visible */}
         <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-b from-[#f8fafd]/98 via-[#f8fafd]/88 to-[#f8fafd]/98 md:bg-gradient-to-r md:from-[#f8fafd] md:via-[#f8fafd]/92 md:via-[50%] md:to-transparent md:to-[84%] lg:via-[44%] lg:to-[66%]"
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-b from-[#f8fafd]/95 via-[#f8fafd]/80 to-[#f8fafd]/95 md:bg-gradient-to-r md:from-[#f8fafd] md:via-[#f8fafd]/90 md:via-40% md:to-transparent md:to-75%"
         />
       </div>
 
-      <div className="container-custom relative w-full">
+      {/* Hero Content on z-10 */}
+      <div className="container-custom relative z-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
-          {/* Left Column: Headlines, Trust, CTAs, and Stats */}
+          {/* Left Column: Sales Copy & Call to Actions */}
           <div className="lg:col-span-8 max-w-2xl">
             
             {/* Executive Trust Pill */}
