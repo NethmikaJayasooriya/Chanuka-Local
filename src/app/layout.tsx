@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { MotionBanner } from "@/components/MotionBanner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
@@ -101,6 +102,7 @@ export default function RootLayout({
         <SiteStructuredData />
       </head>
       <body className="min-h-screen flex flex-col bg-[#f8fafd] text-[#0e1a2b] font-sans antialiased">
+        <MotionBanner />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

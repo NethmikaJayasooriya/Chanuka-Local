@@ -99,52 +99,52 @@ export function Header() {
 
   return (
     <>
-      {/* Floating Modern Capsule Navbar - All in ONE single line */}
+      {/* Floating Modern Capsule Navbar - Dimension-Engineered & Single-Line */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 ${
-          isScrolled ? "pt-2 sm:pt-3" : "pt-3 sm:pt-4"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-5 lg:px-6 ${
+          isScrolled ? "pt-2 sm:pt-2.5" : "pt-2.5 sm:pt-3.5"
         }`}
       >
         <div
-          className={`max-w-7xl mx-auto rounded-full transition-all duration-300 ${
+          className={`max-w-[1340px] mx-auto rounded-full transition-all duration-300 ${
             isScrolled
-              ? "bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_12px_35px_-10px_rgba(23,53,92,0.14)] py-2 px-4 sm:px-6"
-              : "bg-white/90 backdrop-blur-lg border border-slate-200/70 shadow-[0_8px_30px_-10px_rgba(23,53,92,0.08)] py-2.5 px-4 sm:px-6"
+              ? "bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_12px_35px_-10px_rgba(23,53,92,0.14)] py-1.5 sm:py-2 px-3 sm:px-5"
+              : "bg-white/90 backdrop-blur-lg border border-slate-200/75 shadow-[0_8px_30px_-10px_rgba(23,53,92,0.08)] py-2 sm:py-2.5 px-3.5 sm:px-5"
           }`}
         >
-          <div className="flex items-center justify-between gap-4 flex-nowrap w-full">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 flex-nowrap w-full">
             
-            {/* Brand Logo - Strictly 1 Line */}
+            {/* Brand Logo - Perfectly Dimensioned */}
             <Link
               href="/"
-              className="group flex items-center gap-2.5 shrink-0 select-none whitespace-nowrap"
+              className="group flex items-center gap-2 sm:gap-2.5 shrink-0 select-none whitespace-nowrap"
               aria-label="Chanuka Jeewantha Home"
             >
-              <div className="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#17355c] to-[#0f2440] flex items-center justify-center shadow-md shadow-[#17355c]/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
-                <span className="font-heading font-extrabold text-white text-xs tracking-tight">
+              <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#17355c] to-[#0f2440] flex items-center justify-center shadow-md shadow-[#17355c]/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
+                <span className="font-heading font-extrabold text-white text-xs sm:text-sm tracking-tight">
                   CJ
                 </span>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#b9862f] border-2 border-white flex items-center justify-center text-[7px] text-white font-bold">
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#b9862f] border-2 border-white flex items-center justify-center text-[6px] text-white font-bold">
                   ★
                 </span>
               </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <span className="font-heading font-extrabold text-base sm:text-lg tracking-tight text-[#0e1a2b] group-hover:text-[#17355c] transition-colors leading-none">
-                  Chanuka Jeewantha
+              <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                <span className="font-heading font-extrabold text-sm sm:text-base tracking-tight text-[#0e1a2b] group-hover:text-[#17355c] transition-colors leading-none">
+                  Chanuka<span className="hidden sm:inline"> Jeewantha</span>
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-[10px] font-bold text-[#8f6419] shrink-0">
+                <span className="px-1.5 py-0.5 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-[9.5px] font-bold text-[#8f6419] shrink-0">
                   CPRW
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation Links - Strictly 1 Line */}
-            <nav className="hidden xl:flex items-center gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/60 flex-nowrap shrink-0">
+            {/* Desktop Navigation Links - Compact & Strictly Single Line */}
+            <nav className="hidden xl:flex items-center gap-0.5 sm:gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/60 flex-nowrap shrink-0">
               
               {/* Home */}
               <Link
                 href="/"
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/") && pathname === "/"
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -161,7 +161,7 @@ export function Header() {
               >
                 <Link
                   href="/services"
-                  className={`flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                  className={`flex items-center gap-1 px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                     isRouteActive("/services") || isRouteActive("/pricing")
                       ? "bg-[#17355c] text-white shadow-xs"
                       : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -211,7 +211,7 @@ export function Header() {
               {/* Package Quiz */}
               <Link
                 href="/catalogue"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/catalogue")
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -231,7 +231,7 @@ export function Header() {
               >
                 <Link
                   href="/resources"
-                  className={`flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                  className={`flex items-center gap-1 px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                     isRouteActive("/resources") ||
                     isRouteActive("/free-ats-cv-template") ||
                     isRouteActive("/free-ats-cv-checklist") ||
@@ -284,7 +284,7 @@ export function Header() {
               {/* Books */}
               <Link
                 href="/ebooks"
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/ebooks")
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -296,7 +296,7 @@ export function Header() {
               {/* Reviews */}
               <Link
                 href="/reviews"
-                className={`flex items-center gap-1 px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`flex items-center gap-1 px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/reviews")
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -309,7 +309,7 @@ export function Header() {
               {/* About */}
               <Link
                 href="/about"
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/about")
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -321,7 +321,7 @@ export function Header() {
               {/* Contact */}
               <Link
                 href="/contact"
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 py-1.5 text-[12.5px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 ${
                   isRouteActive("/contact")
                     ? "bg-[#17355c] text-white shadow-xs"
                     : "text-[#334155] hover:text-[#17355c] hover:bg-white/80"
@@ -332,11 +332,11 @@ export function Header() {
 
             </nav>
 
-            {/* Right Action Area - Strictly 1 Line */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
+            {/* Right Action Area - Dimension-Proof & Fit Guaranteed */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap">
               
-              {/* Live Status Pill */}
-              <div className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800 whitespace-nowrap">
+              {/* Live Status Indicator - Shown on wide screens */}
+              <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[10.5px] font-semibold text-emerald-800 whitespace-nowrap">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -344,25 +344,26 @@ export function Header() {
                 <span>Active Intakes</span>
               </div>
 
-              {/* Primary WhatsApp Action Button */}
+              {/* Primary WhatsApp Action Button - Perfectly Sized */}
               <a
                 href={whatsappUrl("Hi Chanuka, I would like to consult you regarding my CV and career progression.")}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#25d366] hover:bg-[#1ea952] text-white font-bold text-xs sm:text-[13px] flex items-center gap-2 shadow-md shadow-[#25d366]/25 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap shrink-0"
+                className="group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#25d366] hover:bg-[#1ea952] text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#25d366]/25 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap shrink-0"
               >
-                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.203c.043.071.043.418-.101.823z" />
                 </svg>
-                <span>WhatsApp Fast Intake</span>
+                <span className="hidden sm:inline">WhatsApp Fast Intake</span>
+                <span className="inline sm:hidden">WhatsApp</span>
               </a>
 
-              {/* Mobile Burger Toggle (visible below xl breakpoint) */}
+              {/* Mobile Burger Toggle (below xl) */}
               <button
                 type="button"
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
                 aria-label="Toggle Navigation Menu"
-                className="xl:hidden p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0e1a2b] transition-colors shrink-0"
+                className="xl:hidden p-1.5 sm:p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0e1a2b] transition-colors shrink-0"
               >
                 {isMobileOpen ? (
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
