@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
     default: "Sri Lanka's No.1 Professional CV Writer | Chanuka Jeewantha (CPRW & CPCC)",
-    template: "%s | Chanuka Jeewantha",
+    template: "%s",
   },
   description:
     "Sri Lanka's trusted CPRW & CPCC certified CV writer. High-impact ATS friendly CV writing, LinkedIn optimization, cover letters, and overseas job packages from LKR 1,490.",

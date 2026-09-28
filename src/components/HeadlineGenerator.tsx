@@ -50,7 +50,7 @@ export function HeadlineGenerator() {
   };
 
   return (
-    <div className="rounded-3xl bg-white border border-[#e2e8f0] p-6 sm:p-10 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.1)] relative overflow-hidden">
+    <div className="rounded-3xl bg-white border border-[#e2e8f0] p-4 sm:p-8 lg:p-10 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.1)] relative overflow-hidden break-words">
       <div className="max-w-2xl mx-auto text-center mb-8">
         <span className="px-3.5 py-1 rounded-full bg-[#fbf3e3] text-[#8f6419] text-xs font-bold border border-[#b9862f]/30">
           FREE INTERACTIVE CAREER TOOL

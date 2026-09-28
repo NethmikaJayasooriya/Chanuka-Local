@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { GOOGLE_REVIEWS, GoogleReview } from "@/lib/testimonials";
 import { site, whatsappUrl } from "@/lib/site";
 
-export function ReviewsSection() {
+export function ReviewsSection({ hideHeader = false }: { hideHeader?: boolean } = {}) {
   const [filter, setFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, number>>({});
@@ -38,22 +38,29 @@ export function ReviewsSection() {
   }, [filter, searchQuery]);
 
   return (
-    <section className="py-16 sm:py-20 bg-white relative overflow-hidden border-t border-slate-200" id="reviews">
-      <div className="container-custom relative z-10">
+    <section
+      className={`relative overflow-hidden ${
+        hideHeader ? "py-4 sm:py-6" : "py-16 sm:py-20 bg-white border-t border-slate-200"
+      }`}
+      id="reviews"
+    >
+      <div className={hideHeader ? "w-full relative z-10" : "container-custom relative z-10"}>
         
-        {/* Section Heading */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-xs font-bold text-[#8f6419] mb-3">
-            <span>⭐</span>
-            <span>450+ Verified Google Business Endorsements</span>
+        {/* Section Heading - Hidden when hideHeader is true */}
+        {!hideHeader && (
+          <div className="text-center max-w-3xl mx-auto mb-10 px-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-[11px] sm:text-xs font-bold text-[#8f6419] mb-3 max-w-full text-center">
+              <span>⭐</span>
+              <span>450+ Verified Google Business Endorsements</span>
+            </div>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-[44px] font-bold text-[#0e1a2b] tracking-tight break-words">
+              Client Outcomes &amp; <span className="text-[#17355c]">Google Reviews</span>
+            </h2>
+            <p className="text-sm sm:text-base text-[#52637a] mt-2.5 leading-relaxed">
+              Authentic, verified reviews from corporate managers, software engineers, and overseas applicants who transformed their careers with Chanuka Jeewantha.
+            </p>
           </div>
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-[44px] font-bold text-[#0e1a2b] tracking-tight">
-            Client Outcomes &amp; <span className="text-[#17355c]">Google Reviews</span>
-          </h2>
-          <p className="text-sm sm:text-base text-[#52637a] mt-2.5 leading-relaxed">
-            Authentic, verified reviews from corporate managers, software engineers, and overseas applicants who transformed their careers with Chanuka Jeewantha.
-          </p>
-        </div>
+        )}
 
         {/* Google Business Profile Header Card */}
         <div className="max-w-5xl mx-auto rounded-3xl bg-[#f8fafd] border border-slate-200/90 p-5 sm:p-8 shadow-xs mb-10">
@@ -263,7 +270,7 @@ export function ReviewsSection() {
                   </div>
 
                   {/* Stars & Relative Timestamp Row */}
-                  <div className="flex items-center gap-2 mb-2.5">
+                  <div className="flex flex-wrap items-center gap-2 mb-2.5">
                     <div className="flex text-[#fbbc04] text-xs">
                       {"★★★★★".split("").map((_, i) => (
                         <span key={i}>★</span>

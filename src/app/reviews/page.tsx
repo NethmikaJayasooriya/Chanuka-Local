@@ -24,7 +24,7 @@ export default function ReviewsPage() {
             <span className="flex h-2 w-2 rounded-full bg-[#1ea952] animate-pulse" />
             <span>Official Google Business Profile Reviews</span>
           </div>
-          <h1 className="font-heading text-3xl sm:text-5xl font-extrabold text-[#0e1a2b] tracking-tight leading-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0e1a2b] tracking-tight leading-tight break-words">
             Sri Lanka&apos;s Highest Rated <span className="text-[#17355c]">Career Strategist</span>.
           </h1>
           <p className="text-sm sm:text-base text-[#52637a] mt-3 leading-relaxed">
@@ -33,7 +33,7 @@ export default function ReviewsPage() {
         </div>
 
         {/* Google Reviews Interactive Showcase */}
-        <ReviewsSection />
+        <ReviewsSection hideHeader={true} />
 
       </div>
     </div>

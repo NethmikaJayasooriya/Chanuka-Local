@@ -21,7 +21,7 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -99,25 +99,25 @@ export function Header() {
 
   return (
     <>
-      {/* Floating Modern Capsule Navbar - Wide Executive Island */}
+      {/* Floating Modern Capsule Navbar - Ultra-Responsive on Mobile & Desktop */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-3 sm:px-6 lg:px-8 ${
-          isScrolled ? "pt-2 sm:pt-2.5" : "pt-2.5 sm:pt-3.5"
+        className={`fixed left-0 right-0 z-40 transition-all duration-300 px-2 sm:px-5 lg:px-8 ${
+          isScrolled ? "top-1 sm:top-2" : "top-8 sm:top-9"
         }`}
       >
         <div
           className={`w-full max-w-[1680px] mx-auto rounded-full transition-all duration-300 ${
             isScrolled
-              ? "bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_12px_35px_-10px_rgba(23,53,92,0.14)] py-2 px-4 sm:px-7"
-              : "bg-white/90 backdrop-blur-lg border border-slate-200/75 shadow-[0_8px_30px_-10px_rgba(23,53,92,0.08)] py-2.5 px-4 sm:px-8"
+              ? "bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_12px_35px_-10px_rgba(23,53,92,0.14)] py-1.5 sm:py-2 px-3 sm:px-6"
+              : "bg-white/90 backdrop-blur-lg border border-slate-200/75 shadow-[0_8px_30px_-10px_rgba(23,53,92,0.08)] py-2 sm:py-2.5 px-3 sm:px-7"
           }`}
         >
-          <div className="flex items-center justify-between gap-4 flex-nowrap w-full">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 flex-nowrap w-full">
             
-            {/* Brand Logo - Perfectly Dimensioned */}
+            {/* Brand Logo - Compact on mobile, full on desktop */}
             <Link
               href="/"
-              className="group flex items-center gap-2 sm:gap-2.5 shrink-0 select-none whitespace-nowrap"
+              className="group flex items-center gap-1.5 sm:gap-2.5 shrink-0 select-none whitespace-nowrap"
               aria-label="Chanuka Jeewantha Home"
             >
               <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#17355c] to-[#0f2440] flex items-center justify-center shadow-md shadow-[#17355c]/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
@@ -128,17 +128,17 @@ export function Header() {
                   ★
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
                 <span className="font-heading font-extrabold text-sm sm:text-base tracking-tight text-[#0e1a2b] group-hover:text-[#17355c] transition-colors leading-none">
                   Chanuka<span className="hidden sm:inline"> Jeewantha</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-[9.5px] font-bold text-[#8f6419] shrink-0">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-[9.5px] font-bold text-[#8f6419] shrink-0">
                   CPRW
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation Links - Spacious & Single Line */}
+            {/* Desktop Navigation Links (xl and above) */}
             <nav className="hidden xl:flex items-center gap-1 sm:gap-1.5 bg-slate-100/70 p-1 rounded-full border border-slate-200/60 flex-nowrap shrink-0">
               
               {/* Home */}
@@ -332,10 +332,10 @@ export function Header() {
 
             </nav>
 
-            {/* Right Action Area - Spacious & Luxurious */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
+            {/* Right Action Area - Guaranteed Fit on Mobile & Desktop */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 whitespace-nowrap">
               
-              {/* Live Status Indicator */}
+              {/* Live Status Indicator - Hidden on mobile & tablet */}
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-semibold text-emerald-800 whitespace-nowrap">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -344,18 +344,18 @@ export function Header() {
                 <span>Active Intakes</span>
               </div>
 
-              {/* Primary WhatsApp Action Button */}
+              {/* WhatsApp Action Button - Icon on mobile, full pill on tablet/desktop */}
               <a
                 href={whatsappUrl("Hi Chanuka, I would like to consult you regarding my CV and career progression.")}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#25d366] hover:bg-[#1ea952] text-white font-bold text-xs sm:text-[13px] flex items-center gap-2 shadow-md shadow-[#25d366]/25 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap shrink-0"
+                aria-label="Contact Chanuka on WhatsApp"
+                className="group relative sm:px-4 py-2 sm:py-2 rounded-full bg-[#25d366] hover:bg-[#1ea952] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#25d366]/25 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] whitespace-nowrap shrink-0 w-8 h-8 sm:w-auto sm:h-auto"
               >
                 <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.299.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.203c.043.071.043.418-.101.823z" />
                 </svg>
                 <span className="hidden sm:inline">WhatsApp Fast Intake</span>
-                <span className="inline sm:hidden">WhatsApp</span>
               </a>
 
               {/* Mobile Burger Toggle (below xl) */}
@@ -363,14 +363,14 @@ export function Header() {
                 type="button"
                 onClick={() => setIsMobileOpen(!isMobileOpen)}
                 aria-label="Toggle Navigation Menu"
-                className="xl:hidden p-1.5 sm:p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0e1a2b] transition-colors shrink-0"
+                className="xl:hidden w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-[#0e1a2b] transition-colors shrink-0"
               >
                 {isMobileOpen ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 )}
@@ -384,7 +384,7 @@ export function Header() {
 
       {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-40 xl:hidden animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 xl:hidden animate-in fade-in duration-200">
           {/* Backdrop Blur */}
           <div
             className="fixed inset-0 bg-[#0e1a2b]/40 backdrop-blur-sm"
@@ -392,7 +392,7 @@ export function Header() {
           />
 
           {/* Drawer Card */}
-          <div className="fixed top-20 left-4 right-4 max-h-[82vh] overflow-y-auto rounded-3xl bg-white border border-slate-200 p-5 shadow-2xl animate-in slide-in-from-top-4 duration-300">
+          <div className="fixed top-20 left-3 right-3 max-h-[82vh] overflow-y-auto rounded-3xl bg-white border border-slate-200 p-5 shadow-2xl animate-in slide-in-from-top-4 duration-300">
             
             {/* Header in Drawer */}
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">

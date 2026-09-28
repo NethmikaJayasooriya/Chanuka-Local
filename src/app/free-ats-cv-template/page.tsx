@@ -20,14 +20,14 @@ export default function FreeAtsCvTemplatePage() {
           <span className="text-[#17355c] font-semibold">Free ATS CV Template</span>
         </div>
 
-        <div className="max-w-4xl mx-auto rounded-3xl bg-white border border-[#e2e8f0] p-8 sm:p-12 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.1)]">
+        <div className="max-w-4xl mx-auto rounded-3xl bg-white border border-[#e2e8f0] p-5 sm:p-10 lg:p-12 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.1)] break-words">
           <span className="px-3.5 py-1 rounded-full bg-[#e8f9ef] text-[#1ea952] text-xs font-bold border border-[#25d366]/30">
             100% Free Download
           </span>
-          <h1 className="font-heading text-3xl sm:text-5xl font-extrabold text-[#0e1a2b] mt-3.5 mb-3 leading-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0e1a2b] mt-3.5 mb-3 leading-tight break-words">
             Download Your Free <span className="text-[#17355c]">ATS-Friendly CV Template</span>
           </h1>
-          <p className="text-sm sm:text-base text-[#52637a] leading-relaxed mb-8">
+          <p className="text-xs sm:text-base text-[#52637a] leading-relaxed mb-8">
             Engineered by CPRW-certified specialist Chanuka Jeewantha to guarantee 100% parsing accuracy across Taleo, Workday, Greenhouse, and Lever. Fully editable in Microsoft Word (.docx) and Google Docs.
           </p>
 

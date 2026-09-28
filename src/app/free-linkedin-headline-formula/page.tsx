@@ -25,22 +25,22 @@ export default function FreeLinkedinFormulaPage() {
           <span className="px-3.5 py-1 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-xs font-bold text-[#8f6419]">
             Recruiter Discovery Formula
           </span>
-          <h1 className="font-heading text-3xl sm:text-5xl font-extrabold text-[#0e1a2b] mt-3 leading-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0e1a2b] mt-3 leading-tight break-words">
             The High-Converting LinkedIn <span className="text-[#17355c]">Headline Formula</span>
           </h1>
-          <p className="text-sm sm:text-base text-[#52637a] mt-2.5 leading-relaxed">
+          <p className="text-xs sm:text-base text-[#52637a] mt-2.5 leading-relaxed">
             Recruiters don't scroll past generic headlines like "Looking for new opportunities" or "Senior Officer at ABC Bank". Use our proven 3-pillar formula below.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto mb-12 p-6 rounded-3xl bg-white border border-[#e2e8f0] text-xs sm:text-sm text-[#233348] space-y-3 shadow-xs">
+        <div className="max-w-4xl mx-auto mb-12 p-5 sm:p-8 rounded-3xl bg-white border border-[#e2e8f0] text-xs sm:text-sm text-[#233348] space-y-3 shadow-xs break-words">
           <h3 className="font-heading text-xs font-bold text-[#17355c] uppercase tracking-wider">
             The 3-Pillar LinkedIn Headline Formula:
           </h3>
-          <p className="p-3.5 rounded-xl bg-[#f0f5fc] border border-[#d8e5f5] font-mono text-[#17355c] text-xs sm:text-sm">
+          <p className="p-3.5 rounded-xl bg-[#f0f5fc] border border-[#d8e5f5] font-mono text-[#17355c] text-xs sm:text-sm break-words">
             [Target Role Title] | [Core Specialization & Keywords] | [Quantified Commercial Impact or Passion]
           </p>
-          <p className="text-[#52637a] text-xs">
+          <p className="text-[#52637a] text-xs break-words">
             Example: <em>Lead Cloud Architect | AWS & Kubernetes Specialist | Scaled FinTech Platforms to 2M+ Users with 99.9% Uptime</em>
           </p>
         </div>

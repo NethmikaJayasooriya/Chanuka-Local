@@ -136,7 +136,7 @@ I'd like to get started with this package. What are the next steps?`;
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto rounded-3xl bg-white border border-[#e2e8f0] shadow-[0_20px_50px_-20px_rgba(23,53,92,0.12)] p-6 sm:p-10 relative overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto rounded-3xl bg-white border border-[#e2e8f0] shadow-[0_20px_50px_-20px_rgba(23,53,92,0.12)] p-4 sm:p-8 lg:p-10 relative overflow-hidden break-words">
       
       {/* Progress Header */}
       <div className="mb-7">
