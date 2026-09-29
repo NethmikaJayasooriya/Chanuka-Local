@@ -1,22 +1,30 @@
 export const site = {
   name: "Chanuka Jeewantha",
-  domain: "chanukajeewantha.com",
-  url: "https://chanukajeewantha.com",
-  tagline: "CV, LinkedIn and career branding for professionals competing worldwide",
-  email: "info@chanukajeewantha.com",
+  domain: "chanukajeewantha.lk",
+  url: "https://chanukajeewantha.lk",
+  phone: "+94 77 390 2230",
+  phoneRaw: "94773902230",
+  tagline: "CV, LinkedIn and career branding for professionals competing in Sri Lanka & worldwide",
+  email: "cjwagaarachchi@gmail.com",
   rating: {
     score: "4.9",
-    count: "107",
+    count: "450+",
     label: "Google reviews",
   },
   reviewsUrl: "https://share.google/ur2XItxcmhKNt8QL3",
   stats: [
-    { value: "1,700+", label: "Professionals served" },
-    { value: "40+", label: "Countries served" },
+    { value: "10,000+", label: "CVs & Resumes Crafted" },
+    { value: "450+", label: "5-Star Reviews" },
     { value: "24h", label: "Fastest delivery" },
     { value: "4.9/5", label: "Average rating" },
   ],
 } as const;
+
+export function whatsappUrl(message?: string): string {
+  const base = `https://wa.me/${site.phoneRaw}`;
+  if (!message) return base;
+  return `${base}?text=${encodeURIComponent(message)}`;
+}
 
 export function emailLink(subject: string, body?: string): string {
   const params = new URLSearchParams();
@@ -25,3 +33,4 @@ export function emailLink(subject: string, body?: string): string {
   const q = params.toString();
   return `mailto:${site.email}${q ? `?${q}` : ""}`;
 }
+

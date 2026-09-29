@@ -1,44 +1,56 @@
 /**
- * PRICING SOURCE OF TRUTH
+ * SRI LANKA PRICING SOURCE OF TRUTH (LKR)
  * ------------------------------------------------------------------
- * Base prices are USD and come from the existing Signature Series
- * catalogue on the current site. Three experience levels are used here,
- * mapped from the six-level catalogue:
+ * Official Sri Lanka market pricing for Chanuka Jeewantha Portfolio:
+ * 
+ * 1. Starter Pack (Essentials, Students / Fresh Graduates · Less than 1 year):
+ *    - ATS CV Writing: LKR 3,950
+ *    - Cover Letter Writing: LKR 2,950
+ *    - LinkedIn Optimization: LKR 3,950
+ *    -> Total: LKR 10,850
  *
- *   under-2   -> "Fresh Graduate"        column
- *   3-to-9    -> "Professional"          column
- *   over-10   -> "Senior Professional"   column
+ * 2. Career Pack (Signature, Professionals · 1-9 years):
+ *    - ATS CV Writing: LKR 13,500
+ *    - Cover Letter Writing: LKR 8,500
+ *    - LinkedIn Optimization: LKR 13,500
+ *    - Foreign Job CV: LKR 17,500
+ *    -> Total: LKR 53,000
  *
- * The catalogue also holds Executive (449) and C-Suite (749) pricing for
- * CV and LinkedIn. If the 10+ tier should sit at executive level instead,
- * change `over-10` in BASE_PRICES to 449 / 349 / 449 and nothing else
- * needs to be touched anywhere in the site.
- *
- * Bundle discounts follow the existing bundle rules:
- *   any two services   -> 20% off the combined price
- *   all three services -> 30% off the combined price
+ * 3. Executive Pack (Signature, Executives · More than 9 years):
+ *    - ATS CV Writing: LKR 19,500
+ *    - Foreign Job CV: LKR 28,500
+ *    - LinkedIn Optimization: LKR 19,500
+ *    - Cover Letter Writing: LKR 13,500
+ *    - 1-Hour Strategy Consultation: LKR 27,500
+ *    -> Total: LKR 108,500
  */
 
-export type ServiceId = "cv" | "cover-letter" | "linkedin";
+export type ServiceId = "cv" | "cover-letter" | "linkedin" | "foreign-cv" | "consultation";
 export type LevelId = "under-2" | "3-to-9" | "over-10";
 export type DeliveryId = "normal" | "fast" | "ultra";
 
 export const services: Record<ServiceId, { name: string; short: string }> = {
-  cv: { name: "ATS Friendly CV", short: "CV" },
+  cv: { name: "ATS CV Writing", short: "ATS CV" },
   "cover-letter": { name: "Cover Letter Writing", short: "Cover Letter" },
-  linkedin: { name: "LinkedIn Account Optimization", short: "LinkedIn" },
+  linkedin: { name: "LinkedIn Optimization", short: "LinkedIn" },
+  "foreign-cv": { name: "Foreign Job CV", short: "Foreign Job CV" },
+  consultation: { name: "1-Hour Strategy Consultation", short: "Consultation" },
 };
 
 export const BASE_PRICES: Record<ServiceId, Record<LevelId, number>> = {
-  cv: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
-  "cover-letter": { "under-2": 79, "3-to-9": 119, "over-10": 159 },
-  linkedin: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+  cv: { "under-2": 3950, "3-to-9": 13500, "over-10": 19500 },
+  "cover-letter": { "under-2": 2950, "3-to-9": 8500, "over-10": 13500 },
+  linkedin: { "under-2": 3950, "3-to-9": 13500, "over-10": 19500 },
+  "foreign-cv": { "under-2": 5950, "3-to-9": 17500, "over-10": 28500 },
+  consultation: { "under-2": 7500, "3-to-9": 15000, "over-10": 27500 },
 };
 
 export const BUNDLE_DISCOUNT: Record<number, number> = {
   1: 0,
-  2: 0.2,
-  3: 0.3,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
 };
 
 export type Package = {
@@ -51,54 +63,85 @@ export type Package = {
 
 export const packages: Package[] = [
   {
-    id: "ats-cv",
-    name: "ATS Friendly CV",
-    includes: ["cv"],
-    blurb: "A recruiter-ready CV built to pass applicant tracking systems.",
+    id: "complete",
+    name: "Full Career Pack",
+    includes: ["cv", "cover-letter", "linkedin"],
+    blurb: "The complete, all-inclusive suite aligned directly with your career level.",
+    popular: true,
   },
   {
-    id: "cover-letter",
-    name: "Cover Letter Writing",
-    includes: ["cover-letter"],
-    blurb: "A tailored letter that speaks to the role, not to everyone.",
+    id: "ats-cv",
+    name: "ATS CV Writing",
+    includes: ["cv"],
+    blurb: "100% recruiter-ready, ATS-compliant CV built to pass screening engines.",
   },
   {
     id: "linkedin",
     name: "LinkedIn Optimization",
     includes: ["linkedin"],
-    blurb: "A profile rewritten so recruiters find you and stay on the page.",
+    blurb: "Complete profile makeover (headline, about, skills) for maximum search visibility.",
   },
   {
-    id: "cv-cover-letter",
-    name: "CV + Cover Letter",
-    includes: ["cv", "cover-letter"],
-    blurb: "The complete application pair for a specific target role.",
+    id: "cover-letter",
+    name: "Cover Letter Writing",
+    includes: ["cover-letter"],
+    blurb: "Role-specific, persuasive pitch letter highlighting your value proposition.",
+  },
+  {
+    id: "foreign-cv",
+    name: "Foreign Job CV",
+    includes: ["foreign-cv"],
+    blurb: "Country-targeted format for Gulf/Middle East, UK, Australia, Europe & remote USD roles.",
+  },
+  {
+    id: "consultation",
+    name: "1-Hour Strategy Consultation",
+    includes: ["consultation"],
+    blurb: "Direct 1-on-1 career strategy & interview consultation session with Chanuka.",
   },
   {
     id: "cv-linkedin",
     name: "CV + LinkedIn",
     includes: ["cv", "linkedin"],
-    blurb: "Apply and get found. The two places every recruiter looks.",
+    blurb: "Apply and get discovered. The two essentials every recruiter reviews.",
     popular: true,
   },
   {
-    id: "cover-letter-linkedin",
-    name: "Cover Letter + LinkedIn",
-    includes: ["cover-letter", "linkedin"],
-    blurb: "For professionals whose CV is already working.",
-  },
-  {
-    id: "complete",
-    name: "CV + Cover Letter + LinkedIn",
-    includes: ["cv", "cover-letter", "linkedin"],
-    blurb: "The full career brand, written as one consistent story.",
+    id: "cv-cover-letter",
+    name: "CV + Cover Letter",
+    includes: ["cv", "cover-letter"],
+    blurb: "The complete application pair tailored for high-priority vacancies.",
   },
 ];
 
-export const levels: Array<{ id: LevelId; name: string; hint: string }> = [
-  { id: "under-2", name: "Under 2 years", hint: "Students, graduates, first roles" },
-  { id: "3-to-9", name: "3 to 9 years", hint: "Established professionals and specialists" },
-  { id: "over-10", name: "10+ years", hint: "Senior, management and leadership roles" },
+export const levels: Array<{
+  id: LevelId;
+  name: string;
+  hint: string;
+  eyebrow: string;
+  packName: string;
+}> = [
+  {
+    id: "under-2",
+    name: "Starter Pack",
+    hint: "Students / Fresh Graduates · Less than 1 year",
+    eyebrow: "ESSENTIALS",
+    packName: "Starter Pack",
+  },
+  {
+    id: "3-to-9",
+    name: "Career Pack",
+    hint: "Professionals · 1-9 years",
+    eyebrow: "SIGNATURE",
+    packName: "Career Pack",
+  },
+  {
+    id: "over-10",
+    name: "Executive Pack",
+    hint: "Executives · More than 9 years",
+    eyebrow: "SIGNATURE",
+    packName: "Executive Pack",
+  },
 ];
 
 export const deliveries: Array<{
@@ -108,10 +151,28 @@ export const deliveries: Array<{
   surcharge: number;
   note: string;
 }> = [
-  { id: "normal", name: "Standard", window: "5 to 7 days", surcharge: 0, note: "Included" },
-  { id: "fast", name: "Fast", window: "2 to 3 days", surcharge: 0.2, note: "" },
-  { id: "ultra", name: "Ultra fast", window: "Within 24 hours", surcharge: 0.5, note: "" },
+  { id: "normal", name: "Standard", window: "48 to 72 hours", surcharge: 0, note: "Included" },
+  { id: "fast", name: "Priority Express", window: "24 to 48 hours", surcharge: 0, note: "" },
+  { id: "ultra", name: "VIP 24-Hour Express", window: "Within 24 hours", surcharge: 0, note: "" },
 ];
+
+export function getPackageIncludes(pkg: Package, level: LevelId): ServiceId[] {
+  if (pkg.id === "complete") {
+    if (level === "under-2") return ["cv", "cover-letter", "linkedin"];
+    if (level === "3-to-9") return ["cv", "cover-letter", "linkedin", "foreign-cv"];
+    return ["cv", "foreign-cv", "linkedin", "cover-letter", "consultation"];
+  }
+  return pkg.includes;
+}
+
+export function getPackageDisplayName(pkg: Package, level: LevelId): string {
+  if (pkg.id === "complete") {
+    if (level === "under-2") return "Starter Pack";
+    if (level === "3-to-9") return "Career Pack";
+    return "Executive Pack";
+  }
+  return pkg.name;
+}
 
 export type Quote = {
   listPrice: number;
@@ -120,11 +181,19 @@ export type Quote = {
   deliveryFee: number;
   total: number;
   discountPercent: number;
+  includedServices: ServiceId[];
+  serviceBreakdown: Array<{ serviceId: ServiceId; name: string; price: number }>;
 };
 
 export function quote(pkg: Package, level: LevelId, delivery: DeliveryId): Quote {
-  const listPrice = pkg.includes.reduce((sum, s) => sum + BASE_PRICES[s][level], 0);
-  const discount = BUNDLE_DISCOUNT[pkg.includes.length] ?? 0;
+  const incs = getPackageIncludes(pkg, level);
+  const serviceBreakdown = incs.map((s) => ({
+    serviceId: s,
+    name: services[s]?.name ?? s,
+    price: BASE_PRICES[s]?.[level] ?? 0,
+  }));
+  const listPrice = serviceBreakdown.reduce((sum, item) => sum + item.price, 0);
+  const discount = BUNDLE_DISCOUNT[incs.length] ?? 0;
   const subtotal = Math.round(listPrice * (1 - discount));
   const surcharge = deliveries.find((d) => d.id === delivery)?.surcharge ?? 0;
   const deliveryFee = Math.round(subtotal * surcharge);
@@ -136,11 +205,17 @@ export function quote(pkg: Package, level: LevelId, delivery: DeliveryId): Quote
     deliveryFee,
     total: subtotal + deliveryFee,
     discountPercent: Math.round(discount * 100),
+    includedServices: incs,
+    serviceBreakdown,
   };
 }
 
+export function formatLKR(value: number): string {
+  return `LKR ${value.toLocaleString("en-US")}`;
+}
+
 export function usd(value: number): string {
-  return `$${value.toLocaleString("en-US")}`;
+  return formatLKR(value);
 }
 
 /** Cheapest total for a package, used for the "from" price on cards. */
