@@ -1,25 +1,20 @@
-import type { Metadata, Viewport } from "next";
-import { Poppins, Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
-import { MotionBanner } from "@/components/MotionBanner";
-import { Header } from "@/components/Header";
+import type { Metadata } from "next";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { Footer } from "@/components/Footer";
-import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
-import { SiteStructuredData } from "@/components/JsonLd";
+import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/Seo";
+import { siteGraphLd } from "@/lib/seo";
+import { RevealInit } from "@/components/RevealInit";
+import { StickyBar } from "@/components/StickyBar";
+import { ConsentAnalytics } from "@/components/ConsentAnalytics";
 import { site } from "@/lib/site";
 import "./globals.css";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const display = Playfair_Display({
@@ -29,84 +24,84 @@ const display = Playfair_Display({
   weight: ["600", "700", "800"],
 });
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: "#f8fafd",
-};
-
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "Sri Lanka's No.1 Professional CV Writer | Chanuka Jeewantha (CPRW & CPCC)",
-    template: "%s",
+    default: "Professional CV Writing for International Careers | Chanuka Jeewantha",
+    template: "%s | Chanuka Jeewantha",
   },
   description:
-    "Sri Lanka's trusted CPRW & CPCC certified CV writer. High-impact ATS friendly CV writing, LinkedIn optimization, cover letters, and overseas job packages from LKR 1,490.",
-  keywords: [
-    "Chanuka Jeewantha",
-    "Professional CV Writer Sri Lanka",
-    "ATS Friendly CV Sri Lanka",
-    "CV writing services Colombo",
-    "LinkedIn optimization Sri Lanka",
-    "Resume writer Sri Lanka",
-    "Executive CV writing",
-    "Gulf job CV writer",
-    "Australia migration CV",
-  ],
-  authors: [{ name: "Chanuka Jeewantha", url: site.url }],
-  creator: "Chanuka Jeewantha",
-  publisher: "Chanuka Jeewantha",
+    "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally. Written for the market you are applying into. Delivery from 24 hours.",
+  applicationName: site.name,
+  authors: [{ name: site.name, url: `${site.url}/about/chanuka-jeewantha` }],
+  creator: site.name,
+  publisher: site.name,
+  category: "Career services",
+  formatDetection: { email: false, telephone: false, address: false },
   openGraph: {
     type: "website",
-    locale: "en_LK",
-    url: site.url,
-    title: "Sri Lanka's No.1 Professional CV Writer | Chanuka Jeewantha",
+    siteName: site.name,
+    locale: "en_GB",
+    title: "Professional CV Writing for International Careers",
     description:
-      "Pass recruitment filters and land 3x more interviews with certified ATS resumes and LinkedIn branding.",
-    siteName: "Chanuka Jeewantha",
+      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
     images: [
       {
-        url: "/images/hero-chanuka.jpg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Chanuka Jeewantha - Professional CV Writer Sri Lanka",
+        alt: "Chanuka Jeewantha — CV, LinkedIn and career branding",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chanuka Jeewantha | Professional CV Writer Sri Lanka",
-    description: "Certified Professional Resume Writer (CPRW) & Career Coach (CPCC).",
-    images: ["/images/hero-chanuka.jpg"],
+    title: "Professional CV Writing for International Careers",
+    description:
+      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
+    images: ["/og-image.png"],
   },
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/icons/icon-192.svg",
+  robots: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" },
+  verification: {
+    // Bing Webmaster Tools site verification (renders <meta name="msvalidate.01" ...>)
+    other: { "msvalidate.01": "7B0FD319711D2F6A1E4649C72DC92F65" },
   },
+  // Canonical + hreflang are set per page (never inherited from here),
+  // so no page silently canonicalises to the home page.
 };
+
+/**
+ * Sets data-js before first paint so the scroll-reveal hidden state
+ * only ever applies when JavaScript is running. With JS off, and for
+ * any crawler that does not execute scripts, every section renders
+ * visible.
+ */
+const jsFlag = `document.documentElement.setAttribute("data-js","1");window.__revealFallback=setTimeout(function(){document.documentElement.removeAttribute("data-js")},2500)`;
+
+// Google Analytics 4. Override the property with NEXT_PUBLIC_GA_ID if needed.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-JBG5EY2YXW";
+const gaEnabled = process.env.NODE_ENV === "production" && !!GA_ID;
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en-LK"
-      className={`${poppins.variable} ${sans.variable} ${display.variable}`}
+      lang="en"
+      className={`${sans.variable} ${display.variable}`}
+      suppressHydrationWarning
     >
       <head>
-        <SiteStructuredData />
+        <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
+        <JsonLd data={siteGraphLd()} />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#f8fafd] text-[#0e1a2b] font-sans antialiased">
-        <MotionBanner />
+      <body suppressHydrationWarning>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
         <Footer />
-        <WhatsAppFloatingButton />
+        <StickyBar />
+        <RevealInit />
+        {gaEnabled && <ConsentAnalytics gaId={GA_ID} />}
       </body>
     </html>
   );

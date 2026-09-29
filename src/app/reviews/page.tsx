@@ -1,41 +1,75 @@
-import Link from "next/link";
-import { ReviewsSection } from "@/components/ReviewsSection";
+import { pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
+import { ConversionFooter } from "@/components/ConversionFooter";
+import { PageHeader } from "@/components/PageHeader";
+import { Reviews } from "@/components/Reviews";
+import { site } from "@/lib/site";
 
-export const metadata = {
-  title: "450+ Verified Google Reviews & Client Outcomes | Chanuka Jeewantha",
-  description:
-    "Explore 458+ verified 5-star Google Business reviews from Sri Lankan professionals and expatriates who transformed their careers with CPRW specialist Chanuka Jeewantha.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Reviews",
+  description: `Rated ${site.rating.score} across ${site.rating.count} Google reviews. Read what professionals say after working with Chanuka Jeewantha.`,
+  path: "/reviews",
+});
+
+const outcomes = [
+  {
+    stat: "2 to 6 weeks",
+    label: "Typical time to first interview callback after the rewrite",
+  },
+  {
+    stat: "40+",
+    label: "Countries clients have applied into",
+  },
+  {
+    stat: "1 round",
+    label: "Revisions included with every package, used by most clients once",
+  },
+];
 
 export default function ReviewsPage() {
   return (
-    <div className="pt-24 sm:pt-28 pb-16 sm:pb-20 bg-[#f8fafd]">
-      <div className="container-custom">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[#52637a] mb-6 font-medium">
-          <Link href="/" className="hover:text-[#17355c]">Home</Link>
-          <span>/</span>
-          <span className="text-[#b9862f] font-semibold">Google Reviews &amp; Client Proof</span>
-        </div>
+    <>
+      <PageHeader
+        eyebrow="Reviews"
+        title="What people say after the rewrite."
+        lead="Every review is a real, verified review left on Google by a client who paid for the service and went on to apply with the documents."
+        crumbs={[{ label: "Reviews" }]}
+        primary={{ href: "/#build", label: "Build your package" }}
+      />
 
-        {/* Hero Header with Google Verification Badge */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-2xs text-xs font-bold text-[#17355c] mb-3">
-            <span className="flex h-2 w-2 rounded-full bg-[#1ea952] animate-pulse" />
-            <span>Official Google Business Profile Reviews</span>
+      <Reviews />
+
+      <section className="py-14 lg:py-20">
+        <div className="container-page">
+          <p className="eyebrow">In practice</p>
+          <h2 className="display mt-3 text-[clamp(1.6rem,3.2vw,2.2rem)] text-ink">
+            What tends to change.
+          </h2>
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            {outcomes.map((o) => (
+              <div key={o.stat} className="rounded-[14px] border border-line bg-surface p-7">
+                <p className="display text-[26px] text-ink">{o.stat}</p>
+                <p className="mt-2.5 text-[13.5px] leading-relaxed text-muted">{o.label}</p>
+              </div>
+            ))}
           </div>
-          <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0e1a2b] tracking-tight leading-tight break-words">
-            Sri Lanka&apos;s Highest Rated <span className="text-[#17355c]">Career Strategist</span>.
-          </h1>
-          <p className="text-sm sm:text-base text-[#52637a] mt-3 leading-relaxed">
-            Over 450+ verified 5-star Google endorsements across Sri Lanka&apos;s leading conglomerates and global destinations (Australia, UAE, UK, Canada).
+          <p className="mt-6 max-w-2xl text-[13.5px] leading-relaxed text-muted">
+            These are observed ranges across past clients, not a promise. A better document
+            raises your response rate. It does not replace applying, and it cannot control
+            whether a role was already filled internally.
           </p>
         </div>
+      </section>
 
-        {/* Google Reviews Interactive Showcase */}
-        <ReviewsSection hideHeader={true} />
-
-      </div>
-    </div>
+      <ConversionFooter
+        heading="Join them."
+        related={[
+          { href: "/packages", label: "Packages and pricing" },
+          { href: "/services", label: "All services" },
+          { href: "/about", label: "About Chanuka" },
+          { href: "/how-it-works", label: "How it works" },
+        ]}
+      />
+    </>
   );
 }

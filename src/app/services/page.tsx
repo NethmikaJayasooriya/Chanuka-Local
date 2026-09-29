@@ -1,115 +1,75 @@
+import { pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { SERVICES } from "@/lib/services";
-import { PricingCalculator } from "@/components/PricingCalculator";
-import { formatLKR } from "@/lib/pricing";
-import { whatsappUrl } from "@/lib/site";
+import { ConversionFooter } from "@/components/ConversionFooter";
+import { PageHeader } from "@/components/PageHeader";
+import { BASE_PRICES, usd } from "@/lib/pricing";
+import { servicePages } from "@/lib/services";
 
-export const metadata = {
-  title: "Career Services & Pricing in Sri Lanka | Chanuka Jeewantha",
-  description:
-    "Explore our complete suite of ATS CV writing, LinkedIn optimization, cover letter tailoring, and overseas relocation packages in Sri Lanka.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Services",
+  description: "CV writing, LinkedIn optimisation, cover letters, CV review and career strategy for professionals targeting international roles.",
+  path: "/services",
+});
 
-export default function ServicesPage() {
+export default function ServicesHubPage() {
   return (
-    <div className="pt-28 pb-20 bg-[#f8fafd]">
-      <div className="container-custom">
-        
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[#52637a] mb-6">
-          <Link href="/" className="hover:text-[#17355c]">Home</Link>
-          <span>/</span>
-          <span className="text-[#17355c] font-semibold">Services & Solutions</span>
-        </div>
+    <>
+      <PageHeader
+        eyebrow="Services"
+        title="Five services. One consistent story about you."
+        lead="Your CV, your letter and your profile should say the same thing. Each service works on its own, and they work considerably better together."
+        crumbs={[{ label: "Services" }]}
+        primary={{ href: "/#build", label: "Build your package" }}
+        secondary={{ href: "/packages", label: "See packages" }}
+      />
 
-        {/* Hero Banner */}
-        <div className="rounded-3xl bg-gradient-to-br from-[#17355c] to-[#0f2440] text-white p-5 sm:p-10 lg:p-12 mb-10 sm:mb-14 shadow-xl">
-          <div className="max-w-3xl">
-            <span className="text-xs uppercase font-bold tracking-widest text-[#fbf3e3]">
-              Modern Recruitment Solutions
-            </span>
-            <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold mt-3 leading-tight break-words">
-              Career Development Services Built for Modern Hiring Systems.
-            </h1>
-            <p className="text-xs sm:text-base text-white/80 mt-3 leading-relaxed">
-              Whether you are applying for your first corporate job in Colombo, eyeing an executive promotion, or preparing to relocate to Dubai, Australia, or the UK — every document is engineered to pass algorithmic filters and captivate hiring executives.
-            </p>
-          </div>
-        </div>
+      <section className="py-14 lg:py-20">
+        <div className="container-page grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {servicePages.map((s, i) => {
+            const from = s.packageService ? BASE_PRICES[s.packageService]["under-2"] : null;
+            return (
+              <Link
+                key={s.slug}
+                href={`/${s.slug}`}
+                className="group flex h-full flex-col rounded-[14px] border border-line bg-surface p-7 transition-colors hover:border-brand"
+              >
+                <span className="num-badge h-6 px-2.5 rounded-md bg-accent-soft border border-accent/25 text-[11px] text-accent-deep">
+                  0{i + 1}
+                </span>
+                <h2 className="display mt-3 text-[20px] leading-snug text-ink">{s.name}</h2>
+                <p className="mt-3 flex-1 text-[14px] leading-relaxed text-muted">{s.lead}</p>
 
-        {/* Services Deep Dive */}
-        <div className="space-y-12 mb-20 max-w-5xl mx-auto">
-          {SERVICES.map((srv, idx) => (
-            <div
-              key={srv.id}
-              id={srv.slug}
-              className="rounded-3xl bg-white border border-[#e2e8f0] hover:border-[#17355c]/30 p-6 sm:p-10 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.08)] transition-all"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#e2e8f0] gap-4 mb-6">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#b9862f]">
-                    Service 0{idx + 1} • Starting From {formatLKR(srv.startingPriceLKR)}
+                <div className="mt-6 flex items-center justify-between border-t border-line pt-5">
+                  <span className="text-[13.5px] text-muted">
+                    {from ? (
+                      <>
+                        From <span className="font-semibold text-ink">{usd(from)}</span>
+                      </>
+                    ) : (
+                      "On enquiry"
+                    )}
                   </span>
-                  <h2 className="font-heading text-2xl sm:text-3xl font-bold text-[#0e1a2b] mt-1">
-                    {srv.title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-[#17355c] mt-1 font-semibold">
-                    {srv.subtitle}
-                  </p>
+                  <span className="text-[13.5px] font-semibold text-brand transition-transform group-hover:translate-x-0.5">
+                    View →
+                  </span>
                 </div>
-
-                <a
-                  href={whatsappUrl(`Hi Chanuka, I would like to order your ${srv.title} service.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-2.5 rounded-full btn-whatsapp font-bold text-xs whitespace-nowrap self-start sm:self-auto shadow-md"
-                >
-                  Order on WhatsApp
-                </a>
-              </div>
-
-              <div className="space-y-3 text-xs sm:text-sm text-[#52637a] leading-relaxed mb-7">
-                <p>{srv.overview}</p>
-                <p className="text-[#0e1a2b] font-medium">{srv.whyItMatters}</p>
-              </div>
-
-              {/* Deliverables Grid */}
-              <div className="mb-7 p-5 rounded-2xl bg-[#f8fafd] border border-[#e2e8f0]">
-                <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-[#17355c] mb-3">
-                  What You Receive (Deliverables):
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {srv.deliverables.map((deliv, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-[#233348]">
-                      <span className="text-[#1ea952] font-bold">✓</span>
-                      <span>{deliv}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Process Steps */}
-              <div>
-                <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-[#0e1a2b] mb-3">
-                  How the Process Works:
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  {srv.processSteps.map((step, i) => (
-                    <div key={i} className="p-3.5 rounded-xl bg-[#f8fafd] border border-[#e2e8f0]">
-                      <p className="font-heading text-xs font-bold text-[#17355c] mb-1">{step.title}</p>
-                      <p className="text-[11.5px] text-[#52637a] leading-snug">{step.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
+              </Link>
+            );
+          })}
         </div>
+      </section>
 
-        {/* Pricing Calculator Component */}
-        <PricingCalculator />
-
-      </div>
-    </div>
+      <ConversionFooter
+        heading="Not sure which one you need?"
+        body="Build a package and the price updates as you choose, or send a message and we will work out what actually moves your search forward."
+        related={[
+          { href: "/packages", label: "Packages and pricing" },
+          { href: "/how-it-works", label: "How it works" },
+          { href: "/reviews", label: "Reviews" },
+          { href: "/about", label: "About Chanuka" },
+        ]}
+      />
+    </>
   );
 }

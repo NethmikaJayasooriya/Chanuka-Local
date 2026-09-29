@@ -1,173 +1,291 @@
-export interface ServiceItem {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string;
-  icon: string;
-  startingPriceLKR: number;
-  overview: string;
-  whyItMatters: string;
-  deliverables: string[];
-  processSteps: { title: string; desc: string }[];
-  faqs: { q: string; a: string }[];
-}
+import type { ServiceId } from "./pricing";
 
-export const SERVICES: ServiceItem[] = [
+export type ServicePage = {
+  slug: string;
+  name: string;
+  /** Links this page to the configurator when the service is sold in packages. */
+  packageService?: ServiceId;
+  title: string;
+  lead: string;
+  metaTitle: string;
+  metaDescription: string;
+  /** What the client actually receives. */
+  deliverables: string[];
+  /** The work behind the deliverable. */
+  includes: Array<{ heading: string; body: string }>;
+  whoFor: string[];
+  faq: Array<{ q: string; a: string }>;
+  related: Array<{ href: string; label: string }>;
+};
+
+export const servicePages: ServicePage[] = [
   {
-    id: "ats-cv",
-    slug: "ats-friendly-cv-writing",
-    title: "ATS-Friendly Professional CV Writing",
-    subtitle: "Engineered to pass recruitment filters and compel hiring managers within 6 seconds",
-    icon: "file-text",
-    startingPriceLKR: 3950,
-    overview:
-      "Over 75% of resumes in Sri Lanka and abroad are rejected before a human recruiter even sees them because Applicant Tracking Systems (ATS) cannot parse them. Chanuka rebuilds your CV with clean typography, strategic industry keywords, and quantifiable achievements that secure interview calls.",
-    whyItMatters:
-      "Modern hiring teams receive hundreds of applicants. A design with heavy graphics, tables, or unindexed terminology gets discarded by software. Our CPRW-aligned methodology ensures 100% ATS score without sacrificing visual elegance.",
+    slug: "cv-writing",
+    name: "ATS Friendly CV",
+    packageService: "cv",
+    title: "CV writing that gets past the filter and holds a recruiter's attention.",
+    lead: "Most CVs are rejected before a person reads them, and the ones that survive get about seven seconds of attention. Your CV is rewritten to clear the first gate and earn the second.",
+    metaTitle: "ATS CV Writing Service",
+    metaDescription:
+      "Professional ATS-optimised CV writing for international roles. Achievement-led content, clean parseable formatting, delivery from 24 hours.",
     deliverables: [
-      "Custom 1 or 2-page ATS-optimized CV in editable Word (.docx)",
-      "Recruiter-ready formatted PDF preserving layout fidelity",
-      "Executive summary tailored to your next career target",
-      "Action-verb and metric-driven bullet points (demonstrating ROI and growth)",
-      "Targeted skills matrix aligned with live market job listings",
-      "14 to 30 days of free revisions based on package tier",
+      "Your CV in Word and PDF, ready to send",
+      "A version formatted for online applications and one for direct sending",
+      "A short note on how to tailor it per application",
+      "One full revision round",
     ],
-    processSteps: [
+    includes: [
       {
-        title: "1. Intake & Deep Career Audit",
-        desc: "Share your current CV and target job roles. We analyze career gaps, target keywords, and strengths via WhatsApp or email.",
+        heading: "Positioning before writing",
+        body: "Before a word is written, we settle what role you are targeting, in which market, and at what level. A CV written without that decision reads as a list of jobs rather than a case for one.",
       },
       {
-        title: "2. Strategic Re-Architecting",
-        desc: "Chanuka crafts your narrative, stripping away redundant fluff and replacing passive tasks with measurable achievements.",
+        heading: "Achievement-led content",
+        body: "Responsibilities describe the job. Achievements describe you. Every bullet is rebuilt around what changed because you were there, with numbers wherever the work allows them.",
       },
       {
-        title: "3. ATS Parsing Simulation",
-        desc: "We run your draft through ATS simulators to guarantee high keyword match and clean section parsing.",
+        heading: "ATS-safe structure",
+        body: "Standard section headings, no text trapped in images or graphics, no critical information inside tables, and a keyword strategy drawn from real job descriptions in your field.",
       },
       {
-        title: "4. Review & Final Delivery",
-        desc: "You receive your draft, request tweaks, and receive ready-to-apply Word and PDF versions.",
+        heading: "Market conventions",
+        body: "A UK CV, an Australian resume and a Gulf CV differ on length, photos, personal details and tone. Yours is written for the market you named, not a generic international template.",
       },
     ],
-    faqs: [
+    whoFor: [
+      "Professionals applying to roles abroad",
+      "Candidates getting no response despite relevant experience",
+      "People changing industry or function",
+      "Senior candidates whose CV has not kept up with their scope",
+    ],
+    faq: [
       {
-        q: "What is an ATS and do Sri Lankan companies really use it?",
-        a: "Yes. Major Sri Lankan conglomerates (Dialog, John Keells, MAS, Hemas, Hayleys), banks, IT firms (Virtusa, IFS, LSEG), and multinational subsidiaries use ATS software like Workday, Taleo, SAP SuccessFactors, and Lever to parse incoming job applications.",
+        q: "Will this guarantee my CV passes ATS?",
+        a: "No one can promise a specific system's result, and anyone who does is selling you something. What is guaranteed is that nothing in the document will be the reason it fails: the structure, formatting and keyword strategy are all built for machine parsing first.",
       },
       {
-        q: "How fast can I get my new CV?",
-        a: "Standard turnaround is 48 to 72 hours. Need it urgently for an impending deadline? Our 24-hour VIP express option is available upon request.",
+        q: "How long does it take?",
+        a: "Standard delivery is 5 to 7 days. Fast delivery is 2 to 3 days and ultra fast delivery is within 24 hours. The 24-hour option has limited weekly capacity, so it is worth confirming availability before ordering.",
       },
+      {
+        q: "What do you need from me?",
+        a: "Your current CV, the target role and market, and a link to one or two job adverts you would actually apply to. If you do not have a CV, a detailed work history is enough to start.",
+      },
+    ],
+    related: [
+      { href: "/linkedin-optimisation", label: "LinkedIn Optimization" },
+      { href: "/cover-letter-writing", label: "Cover Letter Writing" },
+      { href: "/packages", label: "Packages and pricing" },
+      { href: "/how-it-works", label: "How it works" },
     ],
   },
   {
-    id: "linkedin",
-    slug: "linkedin-account-optimization",
-    title: "LinkedIn Profile Optimization & Personal Branding",
-    subtitle: "Turn your LinkedIn into a 24/7 inbound recruiter magnet that attracts headhunters",
-    icon: "linkedin",
-    startingPriceLKR: 3950,
-    overview:
-      "87% of recruiters in Sri Lanka and internationally use LinkedIn to actively headhunt talent who aren't even applying for vacancies. If your profile is just a digital copy of your job duties, you are missing out on high-paying opportunities.",
-    whyItMatters:
-      "LinkedIn's search algorithm prioritizes specific keyword positions, headline structures, and profile completeness. We write a high-converting headline, compelling About narrative, and skill endorsements that position you as an industry authority.",
+    slug: "linkedin-optimisation",
+    name: "LinkedIn Optimization",
+    packageService: "linkedin",
+    title: "A LinkedIn profile recruiters can find, and want to keep reading.",
+    lead: "Recruiters search LinkedIn with keywords and judge in seconds. Being on the platform is not the same as being findable, and being findable is not the same as being convincing.",
+    metaTitle: "LinkedIn Profile Optimization Service",
+    metaDescription:
+      "LinkedIn profile optimisation for professionals targeting international roles. Headline, About and experience rewritten for recruiter search.",
     deliverables: [
-      "High-CTR headline that pops in recruiter search results",
-      "Engaging 1st-person Storytelling 'About / Summary' section",
-      "Achievement-focused Experience section bullet points",
-      "Top 50 search-optimized skills categorized for maximum endorsements",
-      "Step-by-step PDF guide on how to update your profile in under 10 minutes",
-      "Bonus: Outreach scripts to message recruiters and hiring managers directly",
+      "Rewritten headline, About section and experience entries",
+      "A keyword set matched to your target roles and market",
+      "Skills and section order recommendations",
+      "One full revision round",
     ],
-    processSteps: [
+    includes: [
       {
-        title: "1. Profile Analysis",
-        desc: "Review of your current profile strength, headline visibility, and industry alignment.",
+        heading: "Search visibility",
+        body: "Recruiters find candidates through keyword search. Your headline, About section and job titles are rebuilt around the terms actually used in your target market, not the internal job titles your employer invented.",
       },
       {
-        title: "2. Keyword & Competitor Research",
-        desc: "Identify the top search queries recruiters use in your niche to discover talent.",
+        heading: "A headline that does work",
+        body: "The headline is the one line that appears next to your name everywhere on the platform. It gets written as positioning, not as a job title.",
       },
       {
-        title: "3. Copywriting & Delivery",
-        desc: "You receive a complete plug-and-play document containing headlines, bio, and experience bullets ready to copy-paste.",
+        heading: "An About section people finish",
+        body: "Written in your voice, in first person, with a clear opening line, evidence in the middle and a reason to make contact at the end.",
+      },
+      {
+        heading: "Consistency with your CV",
+        body: "Your CV and your profile should tell the same story with the same numbers. When they disagree, a recruiter notices.",
       },
     ],
-    faqs: [
+    whoFor: [
+      "Professionals who want to be approached rather than apply",
+      "Candidates whose profile has not been touched in years",
+      "Senior people building visibility in a new market",
+      "Anyone whose CV is working but whose profile is not",
+    ],
+    faq: [
       {
-        q: "Do you need my LinkedIn password?",
-        a: "No! We never ask for your confidential password. We provide a beautifully formatted master document with exact text and screenshot instructions so you can update it yourself safely.",
+        q: "Do you update the profile for me?",
+        a: "You receive the full written content and clear placement instructions. Account access is never requested, because handing over credentials to anyone is a bad habit worth keeping.",
       },
+      {
+        q: "How soon will I see results?",
+        a: "Profile views usually move within the first two weeks. Recruiter approaches depend on your field and market, and are a matter of months rather than days.",
+      },
+    ],
+    related: [
+      { href: "/cv-writing", label: "ATS Friendly CV" },
+      { href: "/cover-letter-writing", label: "Cover Letter Writing" },
+      { href: "/packages", label: "Packages and pricing" },
+      { href: "/reviews", label: "Reviews" },
     ],
   },
   {
-    id: "cover-letter",
-    slug: "professional-cover-letter-writing",
-    title: "Tailored Professional Cover Letter Writing",
-    subtitle: "A persuasive, value-driven letter that hooks the hiring manager before page one of your CV",
-    icon: "mail",
-    startingPriceLKR: 2950,
-    overview:
-      "Generic cover letters copied from the internet get deleted immediately. A custom cover letter bridges the gap between your previous achievements and why you are uniquely qualified to solve the employer's current problems.",
-    whyItMatters:
-      "When two candidates have similar qualifications, the cover letter is often the deciding factor in who gets called for an interview. We tailor your story to demonstrate passion, cultural fit, and undeniable value.",
+    slug: "cover-letter-writing",
+    name: "Cover Letter Writing",
+    packageService: "cover-letter",
+    title: "A letter written for one role, not a template with the name swapped in.",
+    lead: "A cover letter is either the most wasted page in your application or the one that explains why you, specifically, for this role. The difference is whether it was written for the advert in front of you.",
+    metaTitle: "Professional Cover Letter Writing",
+    metaDescription:
+      "Tailored cover letter writing for a specific role and employer. Written to the job description, matched to your target market's tone.",
     deliverables: [
-      "Custom 1-page cover letter tailored to your specific role or industry",
-      "Editable Microsoft Word format allowing you to adapt it for future roles",
-      "Compelling hook opening that grabs attention in the first 2 sentences",
-      "Bullet-point achievement highlights matching job description criteria",
+      "A cover letter tailored to one target role",
+      "A reusable structure you can adapt for future applications",
+      "Guidance on what to change per application and what to leave alone",
+      "One full revision round",
     ],
-    processSteps: [
+    includes: [
       {
-        title: "1. Job Specification Matching",
-        desc: "We analyze the job ad or target role you want to apply for.",
+        heading: "Written to the advert",
+        body: "The job description is read properly and the letter answers what it actually asks for, in the order the employer raised it.",
       },
       {
-        title: "2. Value Proposition Synthesis",
-        desc: "We extract 2-3 key accomplishments from your career that directly address the employer's needs.",
+        heading: "A reason, not a summary",
+        body: "Repeating your CV in paragraphs wastes the page. The letter explains the decision: why this role, why this employer, why now.",
+      },
+      {
+        heading: "Tone for the market",
+        body: "A UK letter, a Gulf letter and a US letter carry different levels of formality. Yours is pitched for where you are sending it.",
       },
     ],
-    faqs: [
+    whoFor: [
+      "Candidates applying to a specific role they care about",
+      "Career changers who need to explain the move",
+      "Applicants with a gap or an unusual path to address",
+    ],
+    faq: [
       {
-        q: "Can I reuse this letter for multiple jobs?",
-        a: "Yes! We structure the letter with clearly indicated brackets so you can quickly swap company names and role titles for similar positions.",
+        q: "Can I reuse it for other applications?",
+        a: "Yes, and you are shown exactly which parts to change. The structure and the evidence stay; the role-specific paragraph is rewritten each time.",
       },
+      {
+        q: "Are cover letters still read?",
+        a: "Not always, and rarely first. But when a hiring manager is choosing between two similar CVs, it is often the only thing that separates them.",
+      },
+    ],
+    related: [
+      { href: "/cv-writing", label: "ATS Friendly CV" },
+      { href: "/linkedin-optimisation", label: "LinkedIn Optimization" },
+      { href: "/packages", label: "Packages and pricing" },
     ],
   },
   {
-    id: "international",
-    slug: "foreign-job-and-relocation-package",
-    title: "Foreign Job & Relocation Packages",
-    subtitle: "Specialized CV and LinkedIn tailoring for Gulf/UAE, UK, Australia, Europe & Remote USD roles",
-    icon: "globe",
-    startingPriceLKR: 24500,
-    overview:
-      "Applying overseas from Sri Lanka has unique challenges. International employers and immigration consultants have strict expectations regarding formats, visa status disclosure, and currency/scale contextualization.",
-    whyItMatters:
-      "European CVs (Europass / UK standard) differ radically from Middle East (UAE/Qatar) or North American resumes. Chanuka understands the nuances of international hiring corridors to give you a genuine competitive edge.",
+    slug: "cv-review",
+    name: "CV Review",
+    title: "An honest read of the CV you already have.",
+    lead: "Sometimes the document is closer than you think and needs direction rather than a rewrite. A review tells you what is working, what is costing you interviews, and whether a rewrite is worth paying for.",
+    metaTitle: "Professional CV Review and Critique",
+    metaDescription:
+      "A detailed written critique of your existing CV: ATS readability, structure, achievements, positioning and market fit, with clear next steps.",
     deliverables: [
-      "Country-specific formatted resume (Gulf, UK, Australia, Canada, or EU)",
-      "Salary and project metric contextualization for international understanding",
-      "Globalized LinkedIn profile positioning for overseas recruiters",
-      "Visa-friendly cover letter explaining relocation timeline and availability",
-      "Guidance on top authentic international job portals and recruiter networking strategies",
+      "A written critique of your CV, section by section",
+      "An ATS readability assessment",
+      "A prioritised list of what to fix first",
+      "A clear recommendation on whether a rewrite is needed",
     ],
-    processSteps: [
+    includes: [
       {
-        title: "1. Country & Visa Corridor Assessment",
-        desc: "Clarify your target destination and job category (IT, Nursing, Engineering, Hospitality, Finance).",
+        heading: "Section by section",
+        body: "Every part of the document is assessed against what a recruiter in your target market expects to see there.",
       },
       {
-        title: "2. Terminology Localization",
-        desc: "Translate Sri Lankan job titles and qualifications into globally recognized equivalents.",
+        heading: "Prioritised, not exhaustive",
+        body: "A list of forty small problems helps nobody. You get the handful of changes that would actually move the result, in order.",
+      },
+      {
+        heading: "An honest recommendation",
+        body: "If your CV needs an afternoon of your own work rather than a paid rewrite, that is what the review will say.",
       },
     ],
-    faqs: [
+    whoFor: [
+      "Candidates who want a second opinion before spending more",
+      "People whose CV worked before and has stopped working",
+      "Anyone unsure whether the CV or the applications are the problem",
+    ],
+    faq: [
       {
-        q: "Which countries do you have experience writing for?",
-        a: "We have helped Sri Lankan professionals successfully secure positions in Dubai/UAE, Saudi Arabia, Qatar, UK, Australia, New Zealand, Canada, Germany, Singapore, and 100% remote US/EU companies.",
+        q: "Do you rewrite anything in a review?",
+        a: "A review is written feedback, with examples of how specific lines could be rewritten. The full rewrite is the CV writing service.",
       },
+      {
+        q: "Can the review fee go towards a rewrite?",
+        a: "Yes. If you order a CV rewrite within 30 days of a review, the review fee is deducted.",
+      },
+    ],
+    related: [
+      { href: "/cv-samples", label: "CV Samples & Formats" },
+      { href: "/cv-writing", label: "ATS Friendly CV" },
+      { href: "/packages", label: "Packages and pricing" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+  {
+    slug: "career-strategy",
+    name: "Career Strategy",
+    title: "A conversation about where you are going, before you rewrite anything.",
+    lead: "Documents solve a positioning problem. If the positioning itself is unresolved, no rewrite fixes it. A strategy session settles the target first.",
+    metaTitle: "Career Strategy Consultation",
+    metaDescription:
+      "A one-to-one career strategy session on target roles, markets, positioning and the practical next steps for your search.",
+    deliverables: [
+      "A live one-to-one session",
+      "A written summary of what was agreed",
+      "A shortlist of target roles and markets",
+      "Practical next steps in order",
+    ],
+    includes: [
+      {
+        heading: "Target definition",
+        body: "Which roles, which markets, which level. Most stalled searches are aimed at three incompatible targets at once.",
+      },
+      {
+        heading: "Gap assessment",
+        body: "What your profile currently supports, and what it would need to support the target you actually want.",
+      },
+      {
+        heading: "A sequence, not a wish list",
+        body: "You leave with the order of operations: what to do this month, what can wait, and what is not worth doing at all.",
+      },
+    ],
+    whoFor: [
+      "People deciding between two directions",
+      "Candidates planning a move abroad",
+      "Senior professionals planning the next step rather than the next job",
+    ],
+    faq: [
+      {
+        q: "How long is the session?",
+        a: "Sessions run 30 or 60 minutes. Most people getting a full picture of a move abroad take the 60-minute option.",
+      },
+      {
+        q: "Is this included in a package?",
+        a: "The Executive and full-package tiers include a session. It can also be booked on its own.",
+      },
+    ],
+    related: [
+      { href: "/cv-writing", label: "ATS Friendly CV" },
+      { href: "/how-it-works", label: "How it works" },
+      { href: "/contact", label: "Contact" },
     ],
   },
 ];
+
+export function getService(slug: string): ServicePage | undefined {
+  return servicePages.find((s) => s.slug === slug);
+}

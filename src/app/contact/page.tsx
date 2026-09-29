@@ -1,122 +1,110 @@
+import { pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { site, whatsappUrl } from "@/lib/site";
-import { ContactForm } from "@/components/ContactForm";
+import { PageHeader } from "@/components/PageHeader";
+import { site } from "@/lib/site";
+import { MailIcon } from "@/components/CountryFlags";
 
-export const metadata = {
-  title: "Contact Chanuka Jeewantha | WhatsApp & Inquiries Sri Lanka",
-  description:
-    "Get in touch directly with CPRW-certified CV writer Chanuka Jeewantha. Connect via WhatsApp (+94 77 390 2230) or send your CV for an express review.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Contact",
+  description: "Ask a question about CV writing, LinkedIn optimisation or cover letters. Replies come from Chanuka directly, usually within 12 hours.",
+  path: "/contact",
+});
+
+const channels = [
+  {
+    label: "Official Client Email",
+    value: site.email,
+    note: "Primary channel for CV reviews, package advice, and consultation requests. Answered directly by Chanuka.",
+    href: `mailto:${site.email}?subject=${encodeURIComponent("Client Inquiry - International Career Branding")}`,
+  },
+];
 
 export default function ContactPage() {
   return (
-    <div className="pt-28 pb-20 bg-[#f8fafd]">
-      <div className="container-custom">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[#52637a] mb-6">
-          <Link href="/" className="hover:text-[#17355c]">Home</Link>
-          <span>/</span>
-          <span className="text-[#17355c] font-semibold">Contact & Consultations</span>
-        </div>
+    <>
+      <PageHeader
+        eyebrow="Contact"
+        title="Ask before you order. That is what it is for."
+        lead="Questions about which package fits, whether your deadline is possible, or whether you need a rewrite at all. The reply comes from me, usually within 12 hours."
+        crumbs={[{ label: "Contact" }]}
+      />
 
-        {/* Hero Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="px-3.5 py-1 rounded-full bg-[#fbf3e3] border border-[#b9862f]/30 text-xs font-bold text-[#8f6419]">
-            Direct 1-on-1 Communication
-          </span>
-          <h1 className="font-heading text-3xl sm:text-5xl font-extrabold text-[#0e1a2b] mt-3 leading-tight">
-            Let's Discuss Your <span className="text-[#17355c]">Next Career Move</span>.
-          </h1>
-          <p className="text-xs sm:text-sm text-[#52637a] mt-2.5 leading-relaxed">
-            Have an urgent application deadline? Send a WhatsApp message with your current CV for an immediate consultation.
-          </p>
-        </div>
-
-        {/* Contact Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-5xl mx-auto">
-          
-          {/* Left Column: Direct WhatsApp & Info */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* WhatsApp Priority Card */}
-            <div className="rounded-3xl bg-white border border-[#25d366]/40 p-6 sm:p-8 shadow-[0_20px_50px_-20px_rgba(37,211,102,0.15)]">
-              <div className="flex items-center gap-3.5 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#e8f9ef] flex items-center justify-center text-2xl">
-                  💬
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-[#1ea952] tracking-wider block">
-                    Fastest Response Channel
-                  </span>
-                  <h3 className="font-heading text-lg font-bold text-[#0e1a2b]">
-                    WhatsApp Orders & Inquiries
-                  </h3>
-                </div>
-              </div>
-
-              <p className="text-xs text-[#52637a] mb-6 leading-relaxed">
-                Connect directly with Chanuka. You can attach your existing CV or document drafts directly in chat for an initial review.
-              </p>
-
-              <a
-                href={whatsappUrl("Hi Chanuka, I would like to get my CV reviewed and ask about your services.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3.5 rounded-full btn-whatsapp font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md hover:scale-105"
-              >
-                <span>Chat on WhatsApp (+94 77 390 2230)</span>
-              </a>
-              <span className="text-[11px] text-center text-[#52637a] block mt-2">
-                Typical reply time: Under 15-30 minutes during business hours
-              </span>
-            </div>
-
-            {/* Direct Details Box */}
-            <div className="p-6 rounded-3xl bg-white border border-[#e2e8f0] space-y-4 text-xs text-[#233348] shadow-2xs">
-              <div className="flex items-start gap-3">
-                <span className="text-base text-[#17355c]">📍</span>
-                <div>
-                  <strong className="text-[#0e1a2b] block">Location:</strong>
-                  <span>Colombo, Sri Lanka (Available Islandwide & Overseas)</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <span className="text-base text-[#17355c]">✉️</span>
-                <div>
-                  <strong className="text-[#0e1a2b] block">Official Email:</strong>
-                  <a href={`mailto:${site.email}`} className="text-[#17355c] hover:underline font-semibold">
-                    {site.email}
+      <section className="py-10 sm:py-14 lg:py-20">
+        <div className="container-page grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <div>
+            <h2 className="display text-[22px] text-ink">Direct channels</h2>
+            <ul className="mt-6 space-y-4">
+              {channels.map((c) => (
+                <li key={c.label}>
+                  <a
+                    href={c.href}
+                    className="flex items-start gap-4 rounded-[14px] border border-line bg-surface p-5 sm:p-6 transition-all hover:border-brand hover:shadow-xs"
+                  >
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-accent-soft border border-accent/25 flex items-center justify-center text-accent-deep mt-0.5">
+                      <MailIcon className="h-5 w-5 text-accent" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-muted">
+                        {c.label}
+                      </p>
+                      <p className="font-sans font-bold mt-1 text-[16px] sm:text-[19px] text-ink break-all sm:break-normal">{c.value}</p>
+                      <p className="mt-1.5 text-[13.5px] text-muted">{c.note}</p>
+                    </div>
                   </a>
-                </div>
-              </div>
+                </li>
+              ))}
+            </ul>
 
-              <div className="flex items-start gap-3">
-                <span className="text-base text-[#17355c]">⏰</span>
-                <div>
-                  <strong className="text-[#0e1a2b] block">Working Hours:</strong>
-                  <span>Monday - Saturday: 8:30 AM - 8:30 PM (SLST)</span>
-                </div>
-              </div>
+            <div className="mt-8 rounded-[14px] border border-line bg-sand/50 p-5 sm:p-6">
+              <h3 className="text-[14.5px] font-semibold text-ink">
+                Already know what you need?
+              </h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-muted">
+                You do not need to contact me first. Build your package, see the price and
+                order. The brief is collected after checkout.
+              </p>
+              <Link
+                href="/#build"
+                className="mt-4 block sm:inline-block w-full sm:w-auto text-center rounded-full bg-brand px-6 py-3 text-[14px] font-semibold text-paper transition-colors hover:bg-brand-deep"
+              >
+                Build your package
+              </Link>
             </div>
-
           </div>
 
-          {/* Right Column: Direct Intake Message Form */}
-          <div className="lg:col-span-7 rounded-3xl bg-white border border-[#e2e8f0] p-6 sm:p-10 shadow-[0_20px_50px_-20px_rgba(23,53,92,0.08)]">
-            <h3 className="font-heading text-xl font-bold text-[#0e1a2b] mb-1.5">
-              Send a Quick Career Inquiry
-            </h3>
-            <p className="text-xs text-[#52637a] mb-6">
-              Fill in your details and click send. It will open WhatsApp with your pre-formatted inquiry ready to send!
+          <div>
+            <h2 className="display text-[22px] text-ink">What to include</h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-muted">
+              A useful first message answers these four things. With them, you get a real
+              answer instead of a request for more information.
             </p>
+            <ol className="mt-6 divide-y divide-line border-y border-line">
+              {[
+                ["Your target role", "The job title you are actually applying to."],
+                ["Your target market", "The country you are applying into, wherever it is."],
+                ["Your experience", "Roughly how many years, and at what level."],
+                ["Your deadline", "If an advert closes soon, say so in the first message."],
+              ].map(([title, body], i) => (
+                <li key={title} className="flex gap-4 py-4">
+                  <span className="num-badge h-6 px-2 rounded-md bg-accent-soft border border-accent/25 text-[11px] text-accent-deep shrink-0 mt-0.5">
+                    0{i + 1}
+                  </span>
+                  <div>
+                    <p className="text-[14.5px] font-semibold text-ink">{title}</p>
+                    <p className="mt-1 text-[13.5px] leading-relaxed text-muted">{body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
 
-            <ContactForm />
+            <p className="mt-6 text-[13px] leading-relaxed text-muted">
+              Remote service, clients in 40+ countries. Messages are answered in order, and
+              a reply within 12 hours is the standard, not a promise made per message.
+            </p>
           </div>
-
         </div>
-
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
