@@ -150,10 +150,4 @@ export type Resource = {
 /** AEO retrofit for existing entities: keyed by slug. */
 export type AeoFields = { quickAnswer: string; faqs: FaqItem[] };
 
-import type { CountryMarket } from "@/lib/countries";
 
-/** Everything for one country mini-site, written by one author pass. */
-export type CountryBundleFull = CountryBundle & {
-  /** Full, corrected country hub entry for /{country}. No testimonials. */
-  market: CountryMarket;
-};

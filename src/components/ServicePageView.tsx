@@ -2,7 +2,6 @@ import { ConversionFooter } from "./ConversionFooter";
 import Link from "next/link";
 import { PageHeader } from "./PageHeader";
 import { JsonLd } from "./Seo";
-import { COUNTRY_BUNDLES } from "@/lib/country-content";
 import { serviceLd } from "@/lib/seo";
 import { BASE_PRICES, usd } from "@/lib/pricing";
 import type { ServicePage } from "@/lib/services";
@@ -150,29 +149,6 @@ export function ServicePageView({ service }: { service: ServicePage }) {
           </div>
         </div>
       </section>
-
-      {COUNTRY_BUNDLES.some((b) => b.services.some((x) => x.service === service.slug)) && (
-        <section className="border-t border-line py-12 sm:py-14">
-          <div className="container-page">
-            <p className="eyebrow reveal">By market</p>
-            <h2 className="display reveal d1 mt-3 text-[clamp(1.5rem,3vw,2rem)] text-ink">
-              {service.name}, written for the country you are applying in.
-            </h2>
-            <ul className="reveal d2 mt-7 flex flex-wrap gap-2.5">
-              {COUNTRY_BUNDLES.filter((b) => b.services.some((x) => x.service === service.slug)).map((b) => (
-                <li key={b.country}>
-                  <Link
-                    href={`/${b.country}/${service.slug}`}
-                    className="inline-block rounded-full border border-line bg-surface px-4 py-2 text-[13.5px] text-ink-soft transition-colors hover:border-brand hover:text-brand"
-                  >
-                    {b.market.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
 
       <ConversionFooter
         heading={`Start your ${service.name}.`}

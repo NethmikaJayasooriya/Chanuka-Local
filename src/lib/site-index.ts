@@ -1,7 +1,5 @@
 import { articles, ARTICLE_CATEGORIES } from "@/lib/articles";
 import { careerLevels, careerSituations } from "@/lib/career-stages";
-import { corridors } from "@/lib/corridors";
-import { COUNTRY_BUNDLES, countryPaths } from "@/lib/country-content";
 import { resources } from "@/lib/content/resources";
 import { cvSamples } from "@/lib/cv-samples";
 import { industries } from "@/lib/industries";
@@ -34,12 +32,10 @@ export function sitemapGroups(): Record<string, IndexEntry[]> {
         "/about/chanuka-jeewantha",
         "/faq",
         "/contact",
-        "/countries",
         "/job-roles",
         "/industries",
         "/career-levels",
         "/career-situations",
-        "/international-job-seekers",
         "/cv-samples",
         "/career-advice",
         "/resources",
@@ -58,16 +54,12 @@ export function sitemapGroups(): Record<string, IndexEntry[]> {
       ...careerSituations.map((s) => e(`/career-situations/${s.slug}`, s.updated ?? SITE_UPDATED, 0.7)),
       ...cvSamples.map((s) => e(`/cv-samples/${s.slug}`, SITE_UPDATED, 0.6)),
     ],
-    international: corridors.map((c) => e(`/international-job-seekers/${c.slug}`, SITE_UPDATED, 0.6)),
     articles: [
       ...ARTICLE_CATEGORIES.map((c) => e(`/career-advice/${c.slug}`, SITE_UPDATED, 0.5)),
       ...articles.map((a) => e(`/career-advice/${a.slug}`, a.updated, 0.6)),
     ],
     resources: resources.map((r) => e(`/resources/${r.slug}`, r.updated, 0.6)),
   };
-  for (const b of COUNTRY_BUNDLES) {
-    groups[`country-${b.country}`] = countryPaths(b.country).map((p, i) => e(p, SITE_UPDATED, i === 0 ? 0.9 : 0.7));
-  }
   return groups;
 }
 

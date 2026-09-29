@@ -1,6 +1,5 @@
 import { articles } from "@/lib/articles";
 import { careerLevels, careerSituations } from "@/lib/career-stages";
-import { COUNTRY_BUNDLES } from "@/lib/country-content";
 import { resources } from "@/lib/content/resources";
 import { industries } from "@/lib/industries";
 import { jobRoles } from "@/lib/job-roles";
@@ -25,7 +24,7 @@ function facts(): string {
     `- Prices (USD, all markets): CV or resume $${BASE_PRICES.cv["under-2"]} (under 2 years), $${BASE_PRICES.cv["3-to-9"]} (3 to 9 years), $${BASE_PRICES.cv["over-10"]} (10+ years). LinkedIn: $${BASE_PRICES.linkedin["under-2"]} / $${BASE_PRICES.linkedin["3-to-9"]} / $${BASE_PRICES.linkedin["over-10"]}. Cover letter: $${BASE_PRICES["cover-letter"]["under-2"]} / $${BASE_PRICES["cover-letter"]["3-to-9"]} / $${BASE_PRICES["cover-letter"]["over-10"]}.`,
     `- Bundles: 2 services save ${pct(BUNDLE_DISCOUNT[2] ?? 0)}, 3 services save ${pct(BUNDLE_DISCOUNT[3] ?? 0)}.`,
     `- Delivery: ${d}. One revision round included. Editable Word and PDF files.`,
-    `- Markets with dedicated guidance: ${COUNTRY_BUNDLES.map((b) => b.market.name).join(", ")}; clients worldwide, fully remote.`,
+    `- Clients worldwide, fully remote.`,
     `- Order: ${abs("/order")}. Contact: ${site.email}.`,
   ].join("\n");
 }
@@ -36,7 +35,7 @@ export function llmsTxt(): string {
   out.push(`# ${site.name}`);
   out.push("");
   out.push(
-    `> Founder-led CV, resume, cover letter and LinkedIn writing for professionals applying worldwide, with market-specific guidance for the UK, USA, Australia, Canada, New Zealand, UAE and Singapore. Every document is written personally by Chanuka Jeewantha.`,
+    `> Founder-led CV, resume, cover letter and LinkedIn writing for professionals applying worldwide. Every document is written personally by Chanuka Jeewantha.`,
   );
   out.push("");
   out.push("## Key facts");
@@ -50,15 +49,7 @@ export function llmsTxt(): string {
   out.push(L("How it works", "/how-it-works"));
   out.push(L("About the author", "/about/chanuka-jeewantha"));
   out.push("");
-  out.push("## Country guides");
-  for (const b of COUNTRY_BUNDLES) {
-    out.push(L(b.market.name, `/${b.country}`, b.market.quickAnswer ?? b.market.metaDescription));
-    for (const s of b.services) out.push(L(s.h1, `/${b.country}/${s.service}`, s.metaDescription));
-    for (const a of b.articles) out.push(L(a.title, `/${b.country}/career-advice/${a.slug}`, a.excerpt));
-    out.push(L(b.ijsHub.h1, `/${b.country}/international-job-seekers`, b.ijsHub.metaDescription));
-    for (const o of b.origins) out.push(L(o.h1, `/${b.country}/international-job-seekers/from-${o.origin}`, o.metaDescription));
-  }
-  out.push("");
+
   out.push("## Career advice");
   for (const a of articles) out.push(L(a.title, `/career-advice/${a.slug}`, a.excerpt));
   out.push("");
@@ -96,14 +87,7 @@ export function llmsFullTxt(): string {
   out.push("## Key facts");
   out.push(facts());
   out.push("");
-  out.push("## Countries");
-  for (const b of COUNTRY_BUNDLES) {
-    block(b.market.name, `/${b.country}`, b.market.quickAnswer, b.market.faqs);
-    for (const s of b.services) block(s.h1, `/${b.country}/${s.service}`, s.quickAnswer, s.faqs);
-    for (const a of b.articles) block(a.title, `/${b.country}/career-advice/${a.slug}`, a.quickAnswer, a.faqs);
-    block(b.ijsHub.h1, `/${b.country}/international-job-seekers`, b.ijsHub.quickAnswer, b.ijsHub.faqs);
-    for (const o of b.origins) block(o.h1, `/${b.country}/international-job-seekers/from-${o.origin}`, o.quickAnswer, o.faqs);
-  }
+
   out.push("## Career advice");
   for (const a of articles) block(a.title, `/career-advice/${a.slug}`, a.quickAnswer, a.faqs);
   out.push("## Job roles");

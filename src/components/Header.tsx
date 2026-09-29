@@ -3,19 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CountryFlagIcon, GlobeIcon } from "./CountryFlags";
 import { AccountLink } from "@/components/account/AccountLink";
-
-const markets = [
-  { slug: "global", label: "Global", href: "/" },
-  { slug: "uk", label: "United Kingdom", href: "/uk" },
-  { slug: "usa", label: "United States", href: "/usa" },
-  { slug: "australia", label: "Australia", href: "/australia" },
-  { slug: "canada", label: "Canada", href: "/canada" },
-  { slug: "new-zealand", label: "New Zealand", href: "/new-zealand" },
-  { slug: "uae", label: "United Arab Emirates", href: "/uae" },
-  { slug: "singapore", label: "Singapore", href: "/singapore" },
-];
 
 const servicesList = [
   { label: "ATS Friendly CV", href: "/cv-writing", desc: "Built to beat parsers and grab hiring managers" },
@@ -54,9 +42,6 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Determine current active market
-  const currentMarket = markets.find((m) => m.href !== "/" && pathname.startsWith(m.href)) ?? markets[0];
-
   // Active-tab detection for the desktop nav
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
@@ -88,53 +73,6 @@ export function Header() {
               <span className="text-accent text-[22px] sm:text-[26px] leading-none ml-0.5 font-bold">.</span>
             </span>
           </Link>
-
-          {/* Desktop Country Switcher Pill */}
-          <div className="relative hidden md:block" ref={navRef}>
-            <button
-              onClick={() => setActiveDropdown(activeDropdown === "markets" ? null : "markets")}
-              className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-[12px] font-semibold text-ink-soft hover:border-brand hover:text-brand transition-colors"
-              aria-expanded={activeDropdown === "markets"}
-            >
-              <CountryFlagIcon slug={currentMarket.slug} className="h-3.5 w-5" />
-              <span>{currentMarket.label}</span>
-              <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 text-muted">
-                <path d="M4.5 6l3.5 3.5L11.5 6" />
-              </svg>
-            </button>
-
-            {activeDropdown === "markets" && (
-              <div className="absolute left-0 mt-2 w-56 rounded-2xl border border-line bg-paper p-2 shadow-xl z-50 animate-fade-in">
-                <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
-                  Choose Target Market
-                </div>
-                <div className="space-y-0.5">
-                  {markets.map((m) => (
-                    <Link
-                      key={m.href}
-                      href={m.href}
-                      className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] transition-colors ${
-                        (m.href === "/" && pathname === "/") || (m.href !== "/" && pathname.startsWith(m.href))
-                          ? "bg-sand font-semibold text-brand"
-                          : "text-ink-soft hover:bg-surface hover:text-ink"
-                      }`}
-                    >
-                      <CountryFlagIcon slug={m.slug} className="h-3.5 w-5" />
-                      <span>{m.label}</span>
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-1 border-t border-line pt-1">
-                  <Link
-                    href="/countries"
-                    className="block rounded-xl px-3 py-1.5 text-[12px] font-medium text-brand hover:bg-surface transition-colors"
-                  >
-                    View all market guides →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Desktop Navigation */}
@@ -226,28 +164,7 @@ export function Header() {
             aria-hidden="true"
           />
           <div className="relative z-50 border-t border-line bg-paper px-5 py-6 space-y-5 animate-fade-in max-h-[calc(100svh-64px)] overflow-y-auto shadow-2xl lg:hidden">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Target Market</p>
-              <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {markets.map((m) => (
-                  <Link
-                    key={m.href}
-                    href={m.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-2 rounded-xl border p-2.5 text-[12.5px] transition-colors ${
-                      (m.href === "/" && pathname === "/") || (m.href !== "/" && pathname.startsWith(m.href))
-                        ? "border-brand bg-brand-soft/70 font-semibold text-brand"
-                        : "border-line bg-surface text-ink hover:border-brand/40"
-                    }`}
-                  >
-                    <CountryFlagIcon slug={m.slug} className="h-3.5 w-5 shrink-0" />
-                    <span className="truncate">{m.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2 border-t border-line pt-4">
+            <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Explore & Guidance</p>
               <div className="grid grid-cols-2 gap-1.5 text-[13.5px] font-medium text-ink-soft">
                 <Link href="/packages" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Packages & Pricing</Link>
@@ -257,7 +174,6 @@ export function Header() {
                 <Link href="/about" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">About Chanuka</Link>
                 <Link href="/contact" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Contact Directly</Link>
                 <Link href="/job-roles" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Job Roles Hub</Link>
-                <Link href="/countries" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Market Directory</Link>
                 <Link href="/cv-samples" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">CV Samples</Link>
                 <Link href="/resources" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Free Checklists</Link>
               </div>

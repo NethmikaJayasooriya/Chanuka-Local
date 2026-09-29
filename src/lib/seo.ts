@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { COUNTRY_BUNDLES } from "@/lib/country-content";
 import { site } from "@/lib/site";
 
 /**
@@ -19,30 +18,8 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/chanukajeewantha";
 
 export const abs = (path: string) => (path.startsWith("http") ? path : `${BASE_URL}${path === "/" ? "" : path}`);
 
-/** hreflang locale per country slug. */
-export const COUNTRY_LOCALES: Record<string, string> = {
-  uk: "en-GB",
-  usa: "en-US",
-  australia: "en-AU",
-  canada: "en-CA",
-  "new-zealand": "en-NZ",
-  uae: "en-AE",
-  singapore: "en-SG",
-};
-
-/**
- * hreflang cluster for a page that has genuine regional equivalents.
- * `globalPath` is the international version (also x-default);
- * `countryPath(c)` builds the regional URL for country c.
- */
-export function regionalCluster(globalPath: string, countryPath: (c: string) => string): Record<string, string> {
-  const langs: Record<string, string> = { "x-default": globalPath, en: globalPath };
-  for (const b of COUNTRY_BUNDLES) langs[COUNTRY_LOCALES[b.country]] = countryPath(b.country);
-  return langs;
-}
-
-export const homeCluster = () => regionalCluster("/", (c) => `/${c}`);
-export const serviceCluster = (service: string) => regionalCluster(`/${service}`, (c) => `/${c}/${service}`);
+export const homeCluster = () => ({ "x-default": "/", en: "/" });
+export const serviceCluster = (service: string) => ({ "x-default": `/${service}`, en: `/${service}` });
 
 export function pageMetadata({
   title,
@@ -204,7 +181,6 @@ export function itemListLd(name: string, items: Array<{ name: string; path: stri
 
 /** Site-wide entity graph: organisation, founder/author and website. */
 export function siteGraphLd() {
-  const areas = COUNTRY_BUNDLES.map((b) => ({ "@type": "Country", name: b.market.name }));
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -222,7 +198,7 @@ export function siteGraphLd() {
         founder: { "@id": PERSON_ID },
         priceRange: "$79 to $502 USD",
         currenciesAccepted: "USD",
-        areaServed: [{ "@type": "Place", name: "Worldwide" }, ...areas],
+        areaServed: [{ "@type": "Place", name: "Worldwide" }],
         knowsLanguage: "en",
         sameAs: [LINKEDIN_URL, site.reviewsUrl],
         aggregateRating: {
