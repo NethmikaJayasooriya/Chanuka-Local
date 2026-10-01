@@ -19,7 +19,23 @@ export function Header() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [scrollState, setScrollState] = useState<"top" | "hero" | "page">("top");
   const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleScroll() {
+      const y = window.scrollY;
+      if (y <= 20) {
+        setScrollState("top");
+      } else if (y <= 750) {
+        setScrollState("hero");
+      } else {
+        setScrollState("page");
+      }
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close dropdowns on route change or outside click
   useEffect(() => {
@@ -51,22 +67,45 @@ export function Header() {
   const labelCls = (active: boolean) =>
     `border-b-2 pb-0.5 ${active ? "border-brand font-semibold" : "border-transparent"}`;
 
+  const isHome = pathname === "/";
+  const isMobileDarkHero = isHome && scrollState !== "page" && !mobileOpen;
+
+  // Header background classes on mobile vs desktop
+  let headerMobileCls = "max-lg:bg-transparent max-lg:border-transparent max-lg:backdrop-blur-none";
+  if (mobileOpen) {
+    headerMobileCls = "bg-paper border-b border-line";
+  } else if (isHome) {
+    if (scrollState === "hero") {
+      headerMobileCls = "max-lg:bg-black/90 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-white/10 max-lg:shadow-lg";
+    } else if (scrollState === "page") {
+      headerMobileCls = "max-lg:bg-paper/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line max-lg:shadow-2xs";
+    }
+  } else if (scrollState !== "top") {
+    headerMobileCls = "max-lg:bg-paper/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line max-lg:shadow-2xs";
+  }
+
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-50 transition-colors duration-200 ${headerMobileCls} lg:border-b lg:border-line lg:bg-paper/95 lg:backdrop-blur-md`}
+    >
       <div className="container-page flex h-16 items-center justify-between gap-2 sm:gap-4">
         {/* Logo with distinctive accent dot */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <Link
             href="/"
             aria-label="Chanuka Jeewantha home"
-            className="group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold text-ink hover:opacity-95 transition-opacity shrink-0"
+            className={`group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold transition-colors shrink-0 ${
+              isMobileDarkHero ? "text-[#f0ece1]" : "text-ink"
+            }`}
           >
             <img
               src="/logo-mark.png"
               alt=""
               width={476}
               height={310}
-              className="brand-mark shrink-0"
+              className={`brand-mark shrink-0 transition-all ${
+                isMobileDarkHero ? "brightness-[2.2] contrast-125" : ""
+              }`}
             />
             <span className="flex items-baseline">
               <span className="tracking-[-0.03em] font-extrabold">Chanuka Jeewantha</span>
@@ -129,7 +168,7 @@ export function Header() {
           <AccountLink className="hidden lg:inline-flex text-[13px] font-semibold text-ink-soft hover:text-brand transition-colors" />
           <Link
             href="/order"
-            className="hidden min-[390px]:inline-flex rounded-full bg-brand px-3.5 py-2 sm:px-5 sm:py-2.5 text-[12.5px] sm:text-[13.5px] font-semibold text-paper shadow-xs hover:bg-brand-deep transition-colors whitespace-nowrap"
+            className="hidden lg:inline-flex rounded-full bg-brand px-3.5 py-2 sm:px-5 sm:py-2.5 text-[12.5px] sm:text-[13.5px] font-semibold text-paper shadow-xs hover:bg-brand-deep transition-colors whitespace-nowrap"
           >
             <span>Start order</span>
           </Link>
@@ -138,7 +177,11 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface text-ink-soft hover:text-ink hover:border-brand/40 transition-colors shadow-2xs"
+            className={`lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border transition-colors shadow-2xs ${
+              isMobileDarkHero
+                ? "border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20"
+                : "border-ink/15 bg-white/75 text-ink backdrop-blur-md hover:text-brand hover:border-brand/40"
+            }`}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
           >

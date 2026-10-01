@@ -49,35 +49,76 @@ const proofPoints = [
  * Google reviews badge on the left and four proof tiles on the right, in
  * one calm glass panel. Keeps the hero look identical across the site.
  */
-export function TrustRibbon({ className = "" }: { className?: string }) {
+export function ProofTiles({
+  dark = false,
+  className = "",
+}: {
+  dark?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`grid min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2 ${className}`}>
+      {proofPoints.map((item) => (
+        <div
+          key={item.title}
+          className={`flex min-w-0 items-start gap-3 rounded-[16px] p-3.5 transition-colors ${
+            dark
+              ? "border border-white/8 bg-white/[0.03]"
+              : "border border-white/60 bg-white/55 max-lg:bg-white/40 shadow-2xs"
+          }`}
+        >
+          <div
+            className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] ${
+              dark ? "bg-[#c5b59a]/15 text-[#c5b59a]" : "bg-accent/15 text-accent"
+            }`}
+          >
+            {item.icon}
+          </div>
+          <div className="min-w-0">
+            <div
+              className={`text-[13px] font-semibold leading-snug sm:text-[13.5px] ${
+                dark ? "text-[#f0ece1]" : "text-ink"
+              }`}
+            >
+              {item.title}
+            </div>
+            <div
+              className={`mt-0.5 text-[11.5px] leading-snug sm:text-[12px] ${
+                dark ? "text-[#a39c8e]" : "text-muted"
+              }`}
+            >
+              {item.subtitle}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function TrustRibbon({
+  className = "",
+  dark = false,
+}: {
+  className?: string;
+  dark?: boolean;
+}) {
   return (
     <div
-      className={`rounded-[24px] border border-white/70 bg-white/88 p-4 shadow-[0_24px_60px_-36px_rgb(14_26_43/0.48)] backdrop-blur-md sm:p-5 ${className}`}
+      className={`rounded-[24px] p-4 backdrop-blur-md sm:p-5 transition-colors ${
+        dark
+          ? "border border-white/12 bg-white/[0.04] shadow-2xl"
+          : "border border-white/80 bg-white/40 max-lg:bg-white/30 shadow-[0_20px_50px_-30px_rgb(14_26_43/0.25)]"
+      } ${className}`}
     >
       <div className="grid min-w-0 gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-center md:gap-6 lg:grid-cols-[220px_1px_minmax(0,1fr)]">
-        <GoogleBadge />
-        <div className="hidden h-24 w-px bg-line/90 lg:block" aria-hidden />
+        <GoogleBadge dark={dark} />
+        <div
+          className={`hidden h-24 w-px lg:block ${dark ? "bg-white/10" : "bg-line/90"}`}
+          aria-hidden
+        />
 
-        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 lg:gap-2.5">
-          {proofPoints.map((item) => (
-            <div
-              key={item.title}
-              className="flex min-w-0 items-start gap-2.5 rounded-[14px] border border-line/70 bg-paper/80 p-3"
-            >
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-accent/15 text-accent">
-                {item.icon}
-              </div>
-              <div className="min-w-0">
-                <div className="text-[13px] font-semibold leading-snug text-ink sm:text-[13.5px]">
-                  {item.title}
-                </div>
-                <div className="mt-0.5 text-[11.5px] leading-snug text-muted sm:text-[12px]">
-                  {item.subtitle}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProofTiles dark={dark} className="lg:grid-cols-4 lg:gap-2.5" />
       </div>
     </div>
   );
