@@ -94,8 +94,8 @@ export function Header() {
           <Link
             href="/"
             aria-label="Chanuka Jeewantha home"
-            className={`group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold transition-colors shrink-0 ${
-              isMobileDarkHero ? "text-[#f0ece1]" : "text-ink"
+            className={`group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold transition-colors shrink-0 text-ink ${
+              isMobileDarkHero ? "max-lg:text-[#f0ece1]" : ""
             }`}
           >
             <img
@@ -104,7 +104,7 @@ export function Header() {
               width={476}
               height={310}
               className={`brand-mark shrink-0 transition-all ${
-                isMobileDarkHero ? "brightness-[2.2] contrast-125" : ""
+                isMobileDarkHero ? "max-lg:brightness-[2.2] max-lg:contrast-125" : ""
               }`}
             />
             <span className="flex items-baseline">

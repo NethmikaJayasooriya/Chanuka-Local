@@ -129,14 +129,14 @@ export function Hero() {
       {/* DESKTOP HERO (Original warm editorial layout preserved)                  */}
       {/* ========================================================================= */}
       <section className="relative isolate overflow-hidden border-b border-line bg-[#efe4d9] hidden lg:block">
-        <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden bg-[#d7bfa9]">
+        <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden bg-[#cab29d]">
           <Image
             src="/images/chanuka-hero-hq.png"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-contain object-right"
+            className="object-cover object-right"
             quality={95}
           />
         </div>
