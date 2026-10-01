@@ -12,7 +12,7 @@ export function Hero() {
       {/* ========================================================================= */}
       {/* MOBILE HERO (Marcus Lorenzet High-End Editorial Dark Layout)               */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-black text-[#f0ece1] -mt-16 pt-16 lg:hidden border-b border-white/10">
+      <section className="relative isolate overflow-hidden bg-black text-[#f0ece1] -mt-16 pt-16 lg:hidden">
         {/* Maximized background portrait spanning full top to eliminate any header seams */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] sm:h-[680px] overflow-hidden -z-10 bg-black">
           <Image
@@ -29,10 +29,10 @@ export function Hero() {
             aria-hidden
             className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 via-black/10 to-transparent"
           />
-          {/* Soft chest contrast so white shirt doesn't wash out text while portrait remains vibrant */}
+          {/* Smooth chest contrast scrim strictly below the chin (top-[235px]) */}
           <div
             aria-hidden
-            className="absolute inset-x-0 top-[260px] bottom-0 bg-gradient-to-b from-transparent via-black/35 to-black/80"
+            className="absolute inset-x-0 top-[235px] bottom-0 bg-gradient-to-b from-transparent via-black/50 via-20% to-black/85"
           />
           {/* Gentle bottom transition into the action buttons */}
           <div
@@ -44,7 +44,7 @@ export function Hero() {
         <div className="container-page relative pt-[245px] pb-12 sm:pt-[285px]">
           <div className="max-w-[540px]">
             {/* Intro text (matches "Hey, I'm Marcus...") */}
-            <p className="max-w-[340px] text-[15px] sm:text-[16px] leading-[1.65] text-[#b8b2a5] font-normal tracking-normal [text-shadow:_0_1px_8px_rgba(0,0,0,0.95)]">
+            <p className="max-w-[340px] text-[15px] sm:text-[16px] leading-[1.65] text-[#f5efe6] font-medium tracking-normal [text-shadow:_0_2px_12px_rgba(0,0,0,1),_0_1px_3px_rgba(0,0,0,1)]">
               Hey, I&apos;m Chanuka. I write ATS-optimised CVs and career branding to land interviews in the markets you are applying to.
             </p>
 

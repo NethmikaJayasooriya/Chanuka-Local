@@ -35,7 +35,7 @@ const stats = [
 
 export function TrustBar() {
   return (
-    <section className="relative overflow-hidden border-y border-white/10 bg-brand-deep shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]">
+    <section id="trust-bar" className="relative overflow-hidden border-y border-white/10 bg-brand-deep shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-100%,rgba(185,134,47,0.28),transparent_58%)]"

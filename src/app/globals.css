@@ -43,8 +43,10 @@
   --radius-card: 14px;
 }
 
-* {
-  border-color: var(--color-line);
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
 }
 
 html {
