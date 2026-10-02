@@ -68,25 +68,24 @@ export function Header() {
     `border-b-2 pb-0.5 ${active ? "border-brand font-semibold" : "border-transparent"}`;
 
   const isHome = pathname === "/";
-  const isMobileDarkHero = isHome && scrollState !== "page" && !mobileOpen;
 
-  // Header background classes on mobile vs desktop
-  let headerMobileCls = "max-lg:bg-transparent max-lg:border-transparent max-lg:backdrop-blur-none";
+  // Header background classes: transparent in hero, solid paper when scrolled past
+  let headerCls = "border-b border-line bg-paper/95 backdrop-blur-md shadow-2xs";
   if (mobileOpen) {
-    headerMobileCls = "bg-paper border-b border-line";
+    headerCls = "bg-paper border-b border-line";
   } else if (isHome) {
-    if (scrollState === "hero") {
-      headerMobileCls = "max-lg:bg-black/90 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-white/10 max-lg:shadow-lg";
-    } else if (scrollState === "page") {
-      headerMobileCls = "max-lg:bg-paper/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line max-lg:shadow-2xs";
+    if (scrollState === "top") {
+      headerCls = "bg-transparent border-b border-transparent backdrop-blur-none";
+    } else if (scrollState === "hero") {
+      headerCls = "bg-paper/70 backdrop-blur-md border-b border-line/50 shadow-2xs";
+    } else {
+      headerCls = "bg-paper/95 backdrop-blur-md border-b border-line shadow-2xs";
     }
-  } else if (scrollState !== "top") {
-    headerMobileCls = "max-lg:bg-paper/95 max-lg:backdrop-blur-md max-lg:border-b max-lg:border-line max-lg:shadow-2xs";
   }
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-colors duration-200 ${headerMobileCls} lg:border-b lg:border-line lg:bg-paper/95 lg:backdrop-blur-md`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${headerCls}`}
     >
       <div className="container-page flex h-16 items-center justify-between gap-2 sm:gap-4">
         {/* Logo with distinctive accent dot */}
@@ -94,18 +93,14 @@ export function Header() {
           <Link
             href="/"
             aria-label="Chanuka Jeewantha home"
-            className={`group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold transition-colors shrink-0 text-ink ${
-              isMobileDarkHero ? "max-lg:text-[#f0ece1]" : ""
-            }`}
+            className="group flex items-center gap-2 sm:gap-2.5 tracking-tight font-display text-[17px] sm:text-[23px] font-bold transition-colors shrink-0 text-ink"
           >
             <img
               src="/logo-mark.png"
               alt=""
               width={476}
               height={310}
-              className={`brand-mark shrink-0 transition-all ${
-                isMobileDarkHero ? "max-lg:brightness-[2.2] max-lg:contrast-125" : ""
-              }`}
+              className="brand-mark shrink-0 transition-all"
             />
             <span className="flex items-baseline">
               <span className="tracking-[-0.03em] font-extrabold">Chanuka Jeewantha</span>
@@ -177,11 +172,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className={`lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border transition-colors shadow-2xs ${
-              isMobileDarkHero
-                ? "border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20"
-                : "border-ink/15 bg-white/75 text-ink backdrop-blur-md hover:text-brand hover:border-brand/40"
-            }`}
+            className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface/85 text-ink backdrop-blur-md hover:text-brand hover:border-brand/40 transition-colors shadow-2xs"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
           >

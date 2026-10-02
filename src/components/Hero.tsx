@@ -12,47 +12,37 @@ export function Hero() {
       {/* ========================================================================= */}
       {/* MOBILE HERO (Marcus Lorenzet High-End Editorial Dark Layout)               */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden bg-black text-[#f0ece1] -mt-16 pt-16 lg:hidden">
-        {/* Maximized background portrait spanning full top to eliminate any header seams */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[600px] sm:h-[680px] overflow-hidden -z-10 bg-black">
+      <section className="relative isolate overflow-hidden bg-[#efe4d9] text-ink lg:hidden border-b border-line -mt-16 pt-16">
+        {/* Maximized background portrait spanning top with smooth warm blend */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[540px] sm:h-[600px] overflow-hidden -z-10 bg-[#cab29d]">
           <Image
-            src="/images/chanuka-portrait.jpg"
+            src="/images/chanuka-hero-hq.png"
             alt="Chanuka Jeewantha"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_32px] sm:object-[center_40px] scale-[1.26] sm:scale-120"
+            className="object-cover object-[74%_0%] scale-[1.15] origin-[74%_0%] sm:scale-[1.1] sm:object-[85%_0%] sm:origin-[85%_0%]"
             quality={95}
           />
-          {/* Subtle top vignette for header legibility */}
+          {/* Smooth warm transition from below the collar into the section background */}
           <div
             aria-hidden
-            className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 via-black/10 to-transparent"
-          />
-          {/* Smooth chest contrast scrim strictly below the chin (top-[235px]) */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-[235px] bottom-0 bg-gradient-to-b from-transparent via-black/50 via-20% to-black/85"
-          />
-          {/* Gentle bottom transition into the action buttons */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent"
+            className="absolute inset-x-0 top-[230px] sm:top-[280px] bottom-0 bg-gradient-to-b from-transparent via-[#efe4d9]/90 via-35% to-[#efe4d9]"
           />
         </div>
 
-        <div className="container-page relative pt-[245px] pb-12 sm:pt-[285px]">
-          <div className="max-w-[540px]">
-            {/* Intro text (matches "Hey, I'm Marcus...") */}
-            <p className="max-w-[340px] text-[15px] sm:text-[16px] leading-[1.65] text-[#f5efe6] font-medium tracking-normal [text-shadow:_0_2px_12px_rgba(0,0,0,1),_0_1px_3px_rgba(0,0,0,1)]">
+        <div className="container-page relative pt-[240px] sm:pt-[260px] pb-10 sm:pb-12">
+          <div className="max-w-[540px] sm:max-w-[460px] md:max-w-[500px]">
+            {/* Intro text */}
+            <p className="max-w-[340px] sm:max-w-[380px] text-[15px] sm:text-[16px] leading-[1.65] text-ink font-medium tracking-normal">
               Hey, I&apos;m Chanuka. I write ATS-optimised CVs and career branding to land interviews in the markets you are applying to.
             </p>
 
-            {/* Stylized Signature Headline (matches "WEBSITES & DIGITAL PRODUCTS ↓") */}
+            {/* Stylized Signature Headline */}
             <div className="mt-2.5 sm:mt-3">
-              <h1 className="font-extrabold uppercase tracking-[-0.035em] text-[#e8dfd1] [text-shadow:_0_2px_14px_rgba(0,0,0,0.95)]">
-                {/* Top line: LAND INTERVIEWS & (same size as Global Markets) */}
-                <span className="block text-[clamp(2.1rem,9.2vw,3.5rem)] font-black tracking-[-0.035em] leading-[0.92]">
+              <h1 className="font-extrabold uppercase tracking-[-0.035em] text-ink">
+                {/* Top line: LAND INTERVIEWS & */}
+                <span className="block text-[clamp(1.65rem,8.2vw,3.5rem)] font-black tracking-[-0.035em] leading-[0.92] text-ink">
                   Land Interviews &amp;
                 </span>
 
@@ -60,22 +50,22 @@ export function Hero() {
                 <div className="mt-2.5 grid grid-cols-[auto_1fr] items-start gap-3 sm:gap-4">
                   {/* Left Column: Proof stats */}
                   <div className="pt-1 sm:pt-1.5 text-left space-y-1 self-start">
-                    <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-[#9f988a] uppercase leading-tight whitespace-nowrap">
+                    <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-muted uppercase leading-tight whitespace-nowrap">
                       450+ 5-Star Reviews
                     </p>
-                    <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-[#9f988a] uppercase leading-tight whitespace-nowrap">
+                    <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-muted uppercase leading-tight whitespace-nowrap">
                       10+ Years Experience
                     </p>
                   </div>
 
                   {/* Right Column: GLOBAL MARKETS ↓ */}
                   <div className="text-right leading-[0.88]">
-                    <span className="block -translate-x-5 sm:-translate-x-6 whitespace-nowrap text-[clamp(2.1rem,9.2vw,3.5rem)] font-black">
+                    <span className="block -translate-x-3 sm:-translate-x-6 whitespace-nowrap text-[clamp(1.65rem,8.2vw,3.5rem)] font-black text-ink">
                       Global
                     </span>
-                    <span className="flex items-center justify-end gap-2 mt-2 sm:mt-2.5 text-[clamp(2.1rem,9.2vw,3.5rem)] font-black">
+                    <span className="flex items-center justify-end gap-2 mt-2 sm:mt-2.5 text-[clamp(1.65rem,8.2vw,3.5rem)] font-black text-ink">
                       <span>Markets</span>
-                      <span className="inline-flex items-center justify-center text-[#c5b59a]">
+                      <span className="inline-flex items-center justify-center text-accent">
                         <svg
                           className="w-[0.76em] h-[0.76em] translate-y-[-0.02em]"
                           viewBox="0 0 24 24"
@@ -96,31 +86,36 @@ export function Hero() {
               </h1>
             </div>
 
-            {/* Two Action Buttons (placed right after the text) */}
-            <div className="mt-7 flex flex-col gap-3">
+            {/* Action Buttons: Stacked on phone, side-by-side on tablet */}
+            <div className="mt-6 sm:mt-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
               <a
                 href="#build"
-                className="group flex min-h-12 w-full items-center justify-center rounded-full bg-[#c5b59a] px-6 py-3.5 text-center text-[15px] font-bold text-[#090a0d] shadow-[0_12px_28px_-10px_rgba(197,181,154,0.45)] transition-all hover:bg-[#d8cbbb] active:scale-[0.99]"
+                className="group flex min-h-12 w-full sm:w-auto items-center justify-center rounded-full bg-brand px-7 py-3.5 text-center text-[15px] font-bold text-paper shadow-[0_12px_28px_-10px_rgba(23,53,92,0.45)] transition-all hover:bg-brand-deep active:scale-[0.99]"
               >
                 <span>Build your package</span>
               </a>
               <Link
                 href="/packages"
-                className="flex min-h-12 w-full items-center justify-center rounded-full border border-[#c5b59a]/35 bg-white/[0.04] px-6 py-3.5 text-center text-[15px] font-semibold text-[#e8dfd1] backdrop-blur-md transition-all hover:border-[#c5b59a] hover:bg-white/[0.08]"
+                className="flex min-h-12 w-full sm:w-auto items-center justify-center rounded-full border border-line-strong bg-white/90 px-6 py-3.5 text-center text-[15px] font-semibold text-ink shadow-2xs backdrop-blur-md transition-all hover:border-brand hover:text-brand"
               >
                 See packages &amp; prices →
               </Link>
             </div>
           </div>
 
-          {/* Section 1: Google Reviews Section (Borderless & Transparent) */}
-          <div className="mt-4 sm:mt-5 flex flex-col items-center justify-center">
-            <GoogleBadge dark />
+          {/* Phone layout (< 640px): Centered Google review badge + ProofTiles card */}
+          <div className="sm:hidden mt-6 space-y-5">
+            <div className="flex flex-col items-center justify-center">
+              <GoogleBadge />
+            </div>
+            <div className="rounded-[24px] border border-white/80 bg-white/60 p-4 backdrop-blur-md shadow-lg">
+              <ProofTiles />
+            </div>
           </div>
 
-          {/* Section 2: ATS-Tested Formatting & Guarantees Card */}
-          <div className="mt-4 rounded-[24px] border border-white/12 bg-white/[0.04] p-4 sm:p-5 backdrop-blur-md shadow-2xl">
-            <ProofTiles dark />
+          {/* Tablet layout (640px to 1023px): Unified horizontal TrustRibbon */}
+          <div className="hidden sm:block mt-8">
+            <TrustRibbon />
           </div>
         </div>
       </section>
@@ -128,7 +123,7 @@ export function Hero() {
       {/* ========================================================================= */}
       {/* DESKTOP HERO (Original warm editorial layout preserved)                  */}
       {/* ========================================================================= */}
-      <section className="relative isolate overflow-hidden border-b border-line bg-[#efe4d9] hidden lg:block">
+      <section className="relative isolate overflow-hidden border-b border-line bg-[#efe4d9] hidden lg:block -mt-16 pt-16">
         <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden bg-[#cab29d]">
           <Image
             src="/images/chanuka-hero-hq.png"
@@ -136,25 +131,25 @@ export function Hero() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-right"
+            className="object-cover object-[right_top]"
             quality={95}
           />
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(249,250,252,0.99)_0%,rgba(249,250,252,0.97)_34%,rgba(249,250,252,0.58)_48%,rgba(249,250,252,0.05)_62%,transparent_72%)]"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,#efe4d9_0%,#efe4d9_26%,rgba(239,228,217,0.85)_36%,rgba(239,228,217,0.15)_46%,transparent_54%)]"
         />
 
-        <div className="container-page relative pb-10 pt-16 xl:pt-20">
-          <div className="max-w-[720px]">
+        <div className="container-page relative pb-8 pt-12 xl:pt-16 2xl:pt-20 xl:pb-10">
+          <div className="max-w-[460px] xl:max-w-[580px] 2xl:max-w-[700px]">
             <ReviewsPill className="rise mb-5" />
             <div className="mb-5 h-1 w-14 rounded-full bg-accent sm:mb-6" aria-hidden />
 
-            <h1 className="display rise max-w-[16ch] text-[clamp(2.15rem,5vw,4.25rem)] font-bold leading-[1.05] tracking-tight text-ink">
+            <h1 className="display rise max-w-[14ch] xl:max-w-[15ch] 2xl:max-w-[16ch] text-[clamp(2.15rem,3.4vw,4.25rem)] font-bold leading-[1.08] tracking-tight text-ink">
               Land interviews in the markets you are applying to.
             </h1>
 
-            <p className="rise d1 mt-5 max-w-[640px] text-[16px] leading-[1.75] text-muted sm:mt-6 sm:text-[17px]">
+            <p className="rise d1 mt-5 max-w-[420px] xl:max-w-[520px] 2xl:max-w-[640px] text-[16px] leading-[1.75] text-muted sm:mt-6 sm:text-[17px]">
               ATS-optimised CVs, cover letters and LinkedIn profiles for professionals
               competing internationally, written for the market you are applying into.
               Choose your package, your experience level and how fast you need it.
@@ -176,7 +171,7 @@ export function Hero() {
             </div>
           </div>
 
-          <TrustRibbon className="rise d3 mt-14" />
+          <TrustRibbon className="rise d3 mt-7 xl:mt-11 2xl:mt-14" />
         </div>
       </section>
     </>

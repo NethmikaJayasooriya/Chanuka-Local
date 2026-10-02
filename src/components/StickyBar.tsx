@@ -58,9 +58,7 @@ export function StickyBar() {
     return null;
   }
 
-  const barThemeCls = inHero
-    ? "border-t-0 bg-black/95 shadow-2xl"
-    : "border-t border-line bg-paper/95 shadow-lg";
+  const barThemeCls = "border-t border-line bg-paper/95 shadow-lg";
 
   return (
     <div
