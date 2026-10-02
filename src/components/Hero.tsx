@@ -32,7 +32,7 @@ export function Hero() {
         </div>
 
         <div className="container-page relative pt-[240px] sm:pt-[260px] pb-10 sm:pb-12">
-          <div className="max-w-[540px] sm:max-w-[460px] md:max-w-[500px]">
+          <div className="max-w-[540px]">
             {/* Intro text */}
             <p className="max-w-[340px] sm:max-w-[380px] text-[15px] sm:text-[16px] leading-[1.65] text-ink font-medium tracking-normal">
               Hey, I&apos;m Chanuka. I write ATS-optimised CVs and career branding to land interviews in the markets you are applying to.
@@ -42,7 +42,7 @@ export function Hero() {
             <div className="mt-2.5 sm:mt-3">
               <h1 className="font-extrabold uppercase tracking-[-0.035em] text-ink">
                 {/* Top line: LAND INTERVIEWS & */}
-                <span className="block text-[clamp(1.65rem,8.2vw,3.5rem)] font-black tracking-[-0.035em] leading-[0.92] text-ink">
+                <span className="block whitespace-nowrap text-[clamp(1.65rem,8.2vw,3.5rem)] font-black tracking-[-0.035em] leading-[0.92] text-ink">
                   Land Interviews &amp;
                 </span>
 
