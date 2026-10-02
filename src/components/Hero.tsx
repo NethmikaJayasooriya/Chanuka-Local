@@ -21,7 +21,7 @@ export function Hero() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[74%_0%] scale-[1.15] origin-[74%_0%] sm:scale-[1.1] sm:object-[85%_0%] sm:origin-[85%_0%]"
+            className="object-cover object-[75.3%_0%] scale-[1.15] origin-[75.3%_0%] sm:scale-[1.1] sm:object-[85%_0%] sm:origin-[85%_0%]"
             quality={95}
           />
           {/* Smooth warm transition from below the collar into the section background */}
