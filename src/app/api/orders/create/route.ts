@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SITE_KEY } from "@/lib/site";
 import { supabaseConfigured } from "@/lib/supabase/guard";
 import { deliveries, levels, packages, quote, type DeliveryId, type LevelId } from "@/lib/pricing";
 
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
   const { data, error } = await db
     .from("orders")
     .insert({
+      site: SITE_KEY,
       user_id: user.id,
       package_id: pkg.id,
       package_name: pkg.name,

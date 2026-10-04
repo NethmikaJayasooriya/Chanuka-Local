@@ -20,6 +20,9 @@ export const site = {
   ],
 } as const;
 
+/** Which site this build is. Tags DB rows so one Supabase project serves both sites. */
+export const SITE_KEY = "lk" as const;
+
 export function whatsappUrl(message?: string): string {
   const base = `https://wa.me/${site.phoneRaw}`;
   if (!message) return base;

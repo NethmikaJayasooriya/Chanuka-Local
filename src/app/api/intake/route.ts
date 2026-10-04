@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SITE_KEY } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/guard";
 
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
           const { data } = await db
             .from("orders")
             .insert({
+              site: SITE_KEY,
               user_id: userId,
               package_id: o.package_id ?? null,
               package_name: o.package_name ?? null,
@@ -72,6 +74,7 @@ export async function POST(request: Request) {
     }
 
     const record: Record<string, unknown> = {
+      site: SITE_KEY,
       order_id: orderId,
       user_id: userId,
       order_summary: String(form.get("order_summary") ?? ""),

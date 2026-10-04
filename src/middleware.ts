@@ -10,6 +10,12 @@ export async function middleware(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // The .lk site has no admin of its own. Staff manage both sites from the
+  // .com admin dashboard (same shared database). Send any /admin visit there.
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    return NextResponse.redirect("https://chanukajeewantha.com/admin");
+  }
+
   let response = NextResponse.next({ request });
 
   if (!url || !anon) return response;

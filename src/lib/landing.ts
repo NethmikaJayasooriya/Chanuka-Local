@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseConfigured } from "@/lib/supabase/guard";
+import { SITE_KEY } from "@/lib/site";
 
 /**
  * SEO landing pages authored in the admin panel. Each targets one
@@ -97,6 +98,7 @@ export async function getPublishedLanding(
     .eq("section", section)
     .eq("slug", slug)
     .eq("status", "published")
+    .eq("site", SITE_KEY)
     .maybeSingle();
   return (data as LandingPage | null) ?? null;
 }
@@ -111,6 +113,6 @@ export function landingCoverUrl(path: string | null): string | null {
 /** Public: all published landing pages (for sitemaps). */
 export async function getPublishedLandings(): Promise<Array<Pick<LandingPage, "section" | "slug" | "updated_at">>> {
   if (!supabaseConfigured()) return [];
-  const { data } = await anon().from("landing_pages").select("section,slug,updated_at").eq("status", "published").eq("noindex", false);
+  const { data } = await anon().from("landing_pages").select("section,slug,updated_at").eq("status", "published").eq("site", SITE_KEY).eq("noindex", false);
   return (data as Array<Pick<LandingPage, "section" | "slug" | "updated_at">> | null) ?? [];
 }

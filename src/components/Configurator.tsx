@@ -18,6 +18,9 @@ import { whatsappUrl } from "@/lib/site";
 export function Configurator() {
   // Step expansion state: 1 = Career Level, 2 = Package Options, 3 = Turnaround Speed
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | null>(1);
+  // Which steps the visitor has actually chosen (so the green ticks only
+  // appear as they progress, not all filled in from the start).
+  const [done, setDone] = useState<{ 1: boolean; 2: boolean; 3: boolean }>({ 1: false, 2: false, 3: false });
 
   // Configuration state
   const [level, setLevel] = useState<LevelId>("3-to-9");
@@ -74,6 +77,7 @@ export function Configurator() {
 
   const handleSelectLevel = (newLevel: LevelId) => {
     setLevel(newLevel);
+    setDone((d) => ({ ...d, 1: true }));
     // Smoothly progress to step 2 if step 1 was open
     if (activeStep === 1) {
       setActiveStep(2);
@@ -82,6 +86,7 @@ export function Configurator() {
 
   const handleSelectPackage = (newPkgId: string) => {
     setPackageId(newPkgId);
+    setDone((d) => ({ ...d, 2: true }));
     // Smoothly progress to step 3 if step 2 was open
     if (activeStep === 2) {
       setActiveStep(3);
@@ -90,6 +95,7 @@ export function Configurator() {
 
   const handleSelectDelivery = (newDelivery: DeliveryId) => {
     setDelivery(newDelivery);
+    setDone((d) => ({ ...d, 3: true }));
   };
 
   const handleTabChange = (newTab: "bundles" | "singles") => {
@@ -152,8 +158,8 @@ export function Configurator() {
                     aria-expanded={activeStep === 1}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold">
-                        ✓
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[1] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
+                        {done[1] ? "✓" : "1"}
                       </span>
                       <div className="truncate">
                         <span className="text-[13px] font-bold text-ink block leading-tight">
@@ -248,8 +254,8 @@ export function Configurator() {
                     aria-expanded={activeStep === 2}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold">
-                        ✓
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[2] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
+                        {done[2] ? "✓" : "2"}
                       </span>
                       <div className="truncate">
                         <span className="text-[13px] font-bold text-ink block leading-tight">
@@ -397,8 +403,8 @@ export function Configurator() {
                     aria-expanded={activeStep === 3}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white text-[11px] font-bold">
-                        ✓
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[3] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
+                        {done[3] ? "✓" : "3"}
                       </span>
                       <div className="truncate">
                         <span className="text-[13px] font-bold text-ink block leading-tight">
@@ -545,26 +551,24 @@ export function Configurator() {
               </div>
             </div>
 
-            {/* Bottom: Direct WhatsApp Discuss Button & Order Option */}
+            {/* Bottom: order/payment flow is primary, WhatsApp is the backup */}
             <div className="mt-6 pt-4 border-t border-line">
+              <Link
+                href={orderHref}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand hover:bg-brand-deep text-paper font-bold py-3.5 px-6 shadow-md hover:shadow-lg transition-all text-[15px] cursor-pointer"
+              >
+                <span>Continue to order</span>
+                <span>→</span>
+              </Link>
+
               <a
                 href={whatsappDiscussUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#c5a869] hover:bg-[#b59654] text-white font-bold py-3.5 px-6 shadow-md hover:shadow-lg transition-all text-[15px] cursor-pointer"
+                className="mt-2.5 w-full flex items-center justify-center gap-2 rounded-2xl border border-line-strong bg-surface hover:border-brand text-ink font-semibold py-3 px-6 transition-colors text-[14px] cursor-pointer"
               >
-                <span>Discuss This Package</span>
+                <span>Or discuss on WhatsApp</span>
               </a>
-
-              <div className="mt-3 text-center">
-                <Link
-                  href={orderHref}
-                  className="text-[12px] font-semibold text-muted hover:text-brand transition-colors inline-flex items-center gap-1"
-                >
-                  <span>Or proceed to online intake brief</span>
-                  <span>→</span>
-                </Link>
-              </div>
             </div>
           </aside>
         </div>

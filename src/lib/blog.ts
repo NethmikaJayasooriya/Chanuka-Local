@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseConfigured } from "@/lib/supabase/guard";
+import { SITE_KEY } from "@/lib/site";
 
 /**
  * Public blog reads. Posts are authored in the admin panel and stored in
@@ -43,6 +44,7 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
     .from("blog_posts")
     .select(COLS)
     .eq("status", "published")
+    .eq("site", SITE_KEY)
     .order("published_at", { ascending: false });
   return (data as BlogPost[] | null) ?? [];
 }
@@ -53,6 +55,7 @@ export async function getPublishedPost(slug: string): Promise<BlogPost | null> {
     .from("blog_posts")
     .select(COLS)
     .eq("status", "published")
+    .eq("site", SITE_KEY)
     .eq("slug", slug)
     .maybeSingle();
   return (data as BlogPost | null) ?? null;
