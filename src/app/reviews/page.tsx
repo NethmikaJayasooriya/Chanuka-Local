@@ -6,7 +6,7 @@ import { Reviews } from "@/components/Reviews";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Reviews",
+  title: `Reviews: ${site.rating.score} from ${site.rating.count} Google Reviews`,
   description: `Rated ${site.rating.score} across ${site.rating.count} Google reviews. Read what professionals say after working with Chanuka Jeewantha.`,
   path: "/reviews",
 });

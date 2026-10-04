@@ -34,7 +34,7 @@ export const levelsExtra: CareerLevel[] = [
       "Applying for a summer internship with a CV written for a graduate scheme",
     ],
     quickAnswer:
-      "A student CV should lead with your course, expected graduation date and the one or two projects or jobs that best prove you can do the work you are applying for. Keep it to one page, write part-time work as real experience, and state your availability. Chanuka writes student CVs from $129, for internships, placements and part-time roles.",
+      "A student CV should lead with your course, expected graduation date and the one or two projects or jobs that best prove you can do the work you are applying for. Keep it to one page, write part-time work as real experience, and state your availability. Chanuka writes student CVs from LKR 3,950, for internships, placements and part-time roles.",
     faqs: [
       {
         q: "How do I write a CV as a student with no experience?",
@@ -82,7 +82,7 @@ export const levelsExtra: CareerLevel[] = [
       "Short early roles listed with no hint of why each move happened",
     ],
     quickAnswer:
-      "An entry-level CV, for someone with up to two years in work, should lead with your current or most recent job and show what you learned and took on in it, not your education. Apprenticeships and on-the-job qualifications count as real credentials. Chanuka writes entry-level CVs from $129 for people making their first job move, with or without a degree.",
+      "An entry-level CV, for someone with up to two years in work, should lead with your current or most recent job and show what you learned and took on in it, not your education. Apprenticeships and on-the-job qualifications count as real credentials. Chanuka writes entry-level CVs from LKR 3,950 for people making their first job move, with or without a degree.",
     faqs: [
       {
         q: "How do I write a CV with only one year of experience?",
@@ -178,7 +178,7 @@ export const levelsExtra: CareerLevel[] = [
       "Leaving out who you reported to and which leadership team you sat on",
     ],
     quickAnswer:
-      "A director CV should show the function you owned, the budget or P&L you were accountable for, the strategy you set and the commercial results that followed. Write for the leadership team you would join: fewer operational tasks, more decisions, trade-offs and company-level outcomes. Chanuka writes director CVs at the $279 tier, for heads of function moving up or across.",
+      "A director CV should show the function you owned, the budget or P&L you were accountable for, the strategy you set and the commercial results that followed. Write for the leadership team you would join: fewer operational tasks, more decisions, trade-offs and company-level outcomes. Chanuka writes director CVs at the Executive tier (LKR 19,500), for heads of function moving up or across.",
     faqs: [
       {
         q: "How do I write a CV for a director role?",
@@ -226,7 +226,7 @@ export const levelsExtra: CareerLevel[] = [
       "A CV that contradicts the LinkedIn profile the search consultant has already read",
     ],
     quickAnswer:
-      "A C-suite CV should show the enterprise results you were accountable for, the mandate a board or investors gave you, and how you governed while delivering it. It is written for chairs, investors and executive search firms, so it leads with value created and major decisions, not functional detail. Chanuka writes C-suite CVs for CEOs, CFOs, COOs and CTOs at the $279 tier.",
+      "A C-suite CV should show the enterprise results you were accountable for, the mandate a board or investors gave you, and how you governed while delivering it. It is written for chairs, investors and executive search firms, so it leads with value created and major decisions, not functional detail. Chanuka writes C-suite CVs for CEOs, CFOs, COOs and CTOs at the Executive tier (LKR 19,500).",
     faqs: [
       {
         q: "How is a C-suite CV different from an executive CV?",

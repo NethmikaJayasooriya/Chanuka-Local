@@ -19,12 +19,13 @@ const columns = [
   {
     title: "Guidance",
     links: [
+      { label: "CV format Sri Lanka", href: "/cv-format-sri-lanka" },
+      { label: "CV format සිංහලෙන්", href: "/cv-format-sinhala" },
+      { label: "Foreign job CV", href: "/foreign-job-cv-sri-lanka" },
+      { label: "Choosing a CV writer", href: "/how-to-choose-a-cv-writer-sri-lanka" },
       { label: "Job roles", href: "/job-roles" },
       { label: "Industries", href: "/industries" },
-      { label: "Career levels", href: "/career-levels" },
-      { label: "Career situations", href: "/career-situations" },
       { label: "Career advice", href: "/career-advice" },
-      { label: "Free resources", href: "/resources" },
     ],
   },
   {

@@ -4,6 +4,7 @@ import { resources } from "@/lib/content/resources";
 import { cvSamples } from "@/lib/cv-samples";
 import { industries } from "@/lib/industries";
 import { jobRoles } from "@/lib/job-roles";
+import { lkGuides } from "@/lib/content/lk";
 
 /**
  * SITE INDEX
@@ -14,7 +15,7 @@ import { jobRoles } from "@/lib/job-roles";
  * (blog posts, SEO landing pages) are appended at request time.
  */
 
-export const SITE_UPDATED = "2026-09-27";
+export const SITE_UPDATED = "2026-10-04";
 
 export type IndexEntry = { path: string; lastmod: string; priority: number };
 
@@ -22,6 +23,7 @@ const e = (path: string, lastmod = SITE_UPDATED, priority = 0.6): IndexEntry => 
 
 export function sitemapGroups(): Record<string, IndexEntry[]> {
   const groups: Record<string, IndexEntry[]> = {
+    "sri-lanka-guides": lkGuides.map((g) => e(`/${g.slug}`, g.updated, 0.9)),
     "global-pages": [
       e("/", SITE_UPDATED, 1),
       ...["/cv-writing", "/linkedin-optimisation", "/cover-letter-writing", "/packages", "/services", "/cv-review", "/career-strategy"].map((p) => e(p, SITE_UPDATED, 0.9)),

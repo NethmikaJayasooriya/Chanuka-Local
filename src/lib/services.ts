@@ -25,9 +25,9 @@ export const servicePages: ServicePage[] = [
     packageService: "cv",
     title: "CV writing that gets past the filter and holds a recruiter's attention.",
     lead: "Most CVs are rejected before a person reads them, and the ones that survive get about seven seconds of attention. Your CV is rewritten to clear the first gate and earn the second.",
-    metaTitle: "ATS CV Writing Service",
+    metaTitle: "CV Writing Service in Sri Lanka | ATS CV from LKR 3,950",
     metaDescription:
-      "Professional ATS-optimised CV writing for international roles. Achievement-led content, clean parseable formatting, delivery from 24 hours.",
+      "CPRW certified ATS CV writing in Sri Lanka for private sector, banking, IT and foreign jobs. Written personally by Chanuka Jeewantha, delivery from 24 hours.",
     deliverables: [
       "Your CV in Word and PDF, ready to send",
       "A version formatted for online applications and one for direct sending",
@@ -49,7 +49,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         heading: "Market conventions",
-        body: "A UK CV, an Australian resume and a Gulf CV differ on length, photos, personal details and tone. Yours is written for the market you named, not a generic international template.",
+        body: "A CV for a Colombo employer, a Gulf company and a UK recruiter differ on length, photo, personal details and tone. Yours is written for the employer and country you named, not a generic template.",
       },
     ],
     whoFor: [
@@ -65,7 +65,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         q: "How long does it take?",
-        a: "Standard delivery is 5 to 7 days. Fast delivery is 2 to 3 days and ultra fast delivery is within 24 hours. The 24-hour option has limited weekly capacity, so it is worth confirming availability before ordering.",
+        a: "Standard delivery is 48 to 72 hours. Priority Express is 24 to 48 hours and the VIP option delivers within 24 hours. The 24-hour option has limited weekly capacity, so it is worth confirming availability on WhatsApp before ordering.",
       },
       {
         q: "What do you need from me?",
@@ -85,9 +85,9 @@ export const servicePages: ServicePage[] = [
     packageService: "linkedin",
     title: "A LinkedIn profile recruiters can find, and want to keep reading.",
     lead: "Recruiters search LinkedIn with keywords and judge in seconds. Being on the platform is not the same as being findable, and being findable is not the same as being convincing.",
-    metaTitle: "LinkedIn Profile Optimization Service",
+    metaTitle: "LinkedIn Profile Optimisation in Sri Lanka",
     metaDescription:
-      "LinkedIn profile optimisation for professionals targeting international roles. Headline, About and experience rewritten for recruiter search.",
+      "LinkedIn profile optimisation in Sri Lanka. Headline, About and experience rewritten so recruiters in Sri Lanka and overseas find you. From LKR 3,950.",
     deliverables: [
       "Rewritten headline, About section and experience entries",
       "A keyword set matched to your target roles and market",
@@ -141,9 +141,9 @@ export const servicePages: ServicePage[] = [
     packageService: "cover-letter",
     title: "A letter written for one role, not a template with the name swapped in.",
     lead: "A cover letter is either the most wasted page in your application or the one that explains why you, specifically, for this role. The difference is whether it was written for the advert in front of you.",
-    metaTitle: "Professional Cover Letter Writing",
+    metaTitle: "Cover Letter Writing Service in Sri Lanka",
     metaDescription:
-      "Tailored cover letter writing for a specific role and employer. Written to the job description, matched to your target market's tone.",
+      "Cover letter writing in Sri Lanka for a specific role and employer, written to the job description in the tone that employer expects. From LKR 2,950.",
     deliverables: [
       "A cover letter tailored to one target role",
       "A reusable structure you can adapt for future applications",
@@ -190,7 +190,7 @@ export const servicePages: ServicePage[] = [
     name: "CV Review",
     title: "An honest read of the CV you already have.",
     lead: "Sometimes the document is closer than you think and needs direction rather than a rewrite. A review tells you what is working, what is costing you interviews, and whether a rewrite is worth paying for.",
-    metaTitle: "Professional CV Review and Critique",
+    metaTitle: "CV Review in Sri Lanka: Professional CV Critique",
     metaDescription:
       "A detailed written critique of your existing CV: ATS readability, structure, achievements, positioning and market fit, with clear next steps.",
     deliverables: [

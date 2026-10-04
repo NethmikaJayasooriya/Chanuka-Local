@@ -8,15 +8,16 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "About Chanuka Jeewantha",
-  description: "Founder-led career branding. Eight years writing CVs, cover letters and LinkedIn profiles for graduates through to C-suite, for professionals competing anywhere in the world.",
+  description: "CPRW and CPCC certified CV writer in Sri Lanka. 8+ years and 5,000+ CVs written for graduates through to executives, for jobs in Sri Lanka and overseas.",
   path: "/about",
 });
 
 const facts: Array<[string, string]> = [
   ["Founded", "Founder-led practice, every document written personally"],
   ["Experience", "8+ years in career branding and CV writing"],
-  ["Clients", "1,700+ professionals"],
-  ["Reach", "Worldwide, remote"],
+  ["Certifications", "CPRW and CPCC"],
+  ["CVs written", "5,000+"],
+  ["Based in", "Sri Lanka, island-wide online service"],
   ["Rating", `${site.rating.score} from ${site.rating.count} Google reviews`],
   ["LinkedIn", "30,000+ followers built on the platform I optimise for clients"],
 ];
@@ -91,8 +92,8 @@ export default function AboutPage() {
     <>
       <PageHeader
         eyebrow="About"
-        title="Chanuka Jeewantha, career branding specialist."
-        lead="I help professionals present themselves clearly, confidently and competitively, in whichever market they are applying into. Around 1,700 people have used the service so far, and every document has been written personally."
+        title="Chanuka Jeewantha, CPRW certified CV writer in Sri Lanka."
+        lead="I help Sri Lankan professionals present themselves clearly, confidently and competitively, for jobs at home and abroad. More than 5,000 CVs so far, and every document has been written personally."
         crumbs={[{ label: "About" }]}
         primary={{ href: "/#build", label: "Build your package" }}
         secondary={{ href: "/reviews", label: "Read reviews" }}

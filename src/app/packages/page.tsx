@@ -7,7 +7,7 @@ import { deliveries, levels, formatLKR } from "@/lib/pricing";
 import { whatsappUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Packages and pricing",
+  title: "CV Writing Prices in Sri Lanka (LKR Packages)",
   description:
     "Published Sri Lanka package pricing across three career levels. Every price is final with no hidden fees or discovery calls required.",
   path: "/packages",

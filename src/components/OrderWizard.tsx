@@ -539,7 +539,7 @@ Notes: ${details.notes || "-"}`;
             <span className="stat-number text-[32px] leading-none text-ink">{usd(q.total)}</span>
           </div>
           <p className="mt-4 text-center text-[12px] leading-relaxed text-muted">
-            Prices in USD. Nothing is added at checkout.
+            Prices in LKR. Nothing is added at checkout.
           </p>
         </div>
       </aside>

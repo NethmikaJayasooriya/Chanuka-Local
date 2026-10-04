@@ -8,6 +8,7 @@ import { AccountLink } from "@/components/account/AccountLink";
 const servicesList = [
   { label: "ATS Friendly CV", href: "/cv-writing", desc: "Built to beat parsers and grab hiring managers" },
   { label: "LinkedIn Optimization", href: "/linkedin-optimisation", desc: "Profile rewritten so recruiters find you" },
+  { label: "Foreign Job CV", href: "/foreign-job-cv-sri-lanka", desc: "Gulf, UK, Europe, Australia and Canada formats" },
   { label: "Cover Letter Writing", href: "/cover-letter-writing", desc: "Targeted to specific roles and companies" },
   { label: "CV Review & Audit", href: "/cv-review", desc: "1:1 review and ATS compliance audit" },
   { label: "Career Strategy", href: "/career-strategy", desc: "Senior and executive positioning strategy" },
@@ -209,6 +210,7 @@ export function Header() {
                 <Link href="/contact" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Contact Directly</Link>
                 <Link href="/job-roles" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Job Roles Hub</Link>
                 <Link href="/cv-samples" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">CV Samples</Link>
+                <Link href="/cv-format-sri-lanka" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">CV Format Guide</Link>
                 <Link href="/resources" onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-surface hover:text-brand transition-colors">Free Checklists</Link>
               </div>
             </div>

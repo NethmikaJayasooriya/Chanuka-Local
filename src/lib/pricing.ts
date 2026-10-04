@@ -91,7 +91,7 @@ export const packages: Package[] = [
     id: "foreign-cv",
     name: "Foreign Job CV",
     includes: ["foreign-cv"],
-    blurb: "Country-targeted format for Gulf/Middle East, UK, Australia, Europe & remote USD roles.",
+    blurb: "Country-targeted CV for the Gulf/Middle East, UK, Australia, Canada, Europe and remote roles.",
   },
   {
     id: "consultation",

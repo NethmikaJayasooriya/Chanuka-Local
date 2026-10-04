@@ -139,7 +139,7 @@ export default async function CheckoutPage({
 
               <ul className="mt-6 sm:mt-7 space-y-2 border-t border-line pt-5 sm:pt-6 text-[13px] sm:text-[13.5px] text-muted">
                 <li>Track this order any time from your <Link href="/dashboard" className="font-medium text-ink underline underline-offset-2">dashboard</Link>.</li>
-                <li>Prices are in USD and include everything listed.</li>
+                <li>Prices are in Sri Lankan rupees (LKR) and include everything listed.</li>
                 <li>Cancellation and refunds are covered by the <Link href="/refund-policy" className="font-medium text-ink underline underline-offset-2">refund policy</Link>.</li>
               </ul>
             </div>
@@ -173,11 +173,11 @@ export default async function CheckoutPage({
           <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
             <h2 className="display text-[19px] sm:text-[21px] text-ink">Payment</h2>
             <p className="mt-1.5 sm:mt-2 text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-              Card payment in USD. Your receipt and order number arrive by email immediately, and the CV upload step opens straight after.
+              Payment in LKR by bank transfer for now. Your order number arrives by email, and the CV upload step opens straight after.
             </p>
             <div className="mt-5 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
               <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-                The secure card and PayPal checkout connects here once the merchant account is live. Until then, you are invoiced directly, then you complete your brief so the writing can start.
+                Secure online card payment (PayHere) connects here once the merchant account is live. Until then, you are invoiced directly, then you complete your brief so the writing can start.
               </p>
               <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <Link href={`/intake?package=${pkg.id}&level=${level}&delivery=${delivery}`} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper transition-all hover:bg-brand-deep">

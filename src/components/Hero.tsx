@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ReviewsPill } from "./ReviewsPill";
 import { GoogleBadge } from "./GoogleBadge";
 import { TrustRibbon, ProofTiles } from "./TrustRibbon";
+import { site } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -35,7 +36,7 @@ export function Hero() {
           <div className="max-w-[540px]">
             {/* Intro text */}
             <p className="max-w-[340px] sm:max-w-[380px] text-[15px] sm:text-[16px] leading-[1.65] text-ink font-medium tracking-normal">
-              Hey, I&apos;m Chanuka. I write ATS-optimised CVs and career branding to land interviews in the markets you are applying to.
+              Hey, I&apos;m Chanuka, a CPRW certified CV writer in Sri Lanka. I write ATS-optimised CVs that land interviews at home and abroad.
             </p>
 
             {/* Stylized Signature Headline */}
@@ -51,20 +52,20 @@ export function Hero() {
                   {/* Left Column: Proof stats */}
                   <div className="pt-1 sm:pt-1.5 text-left space-y-1 self-start">
                     <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-muted uppercase leading-tight whitespace-nowrap">
-                      450+ 5-Star Reviews
+                      {site.rating.count} Google Reviews
                     </p>
                     <p className="text-[10.5px] sm:text-[11.5px] font-bold tracking-wider text-muted uppercase leading-tight whitespace-nowrap">
-                      10+ Years Experience
+                      {site.yearsExperience} Years Experience
                     </p>
                   </div>
 
                   {/* Right Column: GLOBAL MARKETS ↓ */}
                   <div className="text-right leading-[0.88]">
                     <span className="block -translate-x-3 sm:-translate-x-6 whitespace-nowrap text-[clamp(1.65rem,8.2vw,3.5rem)] font-black text-ink">
-                      Global
+                      Sri Lanka
                     </span>
                     <span className="flex items-center justify-end gap-2 mt-2 sm:mt-2.5 text-[clamp(1.65rem,8.2vw,3.5rem)] font-black text-ink">
-                      <span>Markets</span>
+                      <span>&amp; Abroad</span>
                       <span className="inline-flex items-center justify-center text-accent">
                         <svg
                           className="w-[0.76em] h-[0.76em] translate-y-[-0.02em]"
@@ -145,13 +146,16 @@ export function Hero() {
             <ReviewsPill className="rise mb-5" />
             <div className="mb-5 h-1 w-14 rounded-full bg-accent sm:mb-6" aria-hidden />
 
+            <p className="rise mb-3 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-accent-deep">
+              CPRW &amp; CPCC certified CV writer · Sri Lanka
+            </p>
             <h1 className="display rise max-w-[14ch] xl:max-w-[15ch] 2xl:max-w-[16ch] text-[clamp(2.15rem,3.4vw,4.25rem)] font-bold leading-[1.08] tracking-tight text-ink">
-              Land interviews in the markets you are applying to.
+              Land interviews in Sri Lanka and abroad.
             </h1>
 
             <p className="rise d1 mt-5 max-w-[420px] xl:max-w-[520px] 2xl:max-w-[640px] text-[16px] leading-[1.75] text-muted sm:mt-6 sm:text-[17px]">
-              ATS-optimised CVs, cover letters and LinkedIn profiles for professionals
-              competing internationally, written for the market you are applying into.
+              CV writing in Sri Lanka for private sector, banking, IT, government and
+              foreign jobs, written personally by Chanuka. {site.cvsWritten} CVs over {site.yearsExperience} years.
               Choose your package, your experience level and how fast you need it.
             </p>
 

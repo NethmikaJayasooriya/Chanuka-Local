@@ -913,7 +913,7 @@ export const articlesB: Article[] = [
         heading: "How Chanuka works",
         paragraphs: [
           "For transparency, since this guide appears on his site: every CV, cover letter and LinkedIn profile here is written personally by Chanuka Jeewantha, never outsourced. You choose a package and pay, complete a brief and upload your current CV, and Chanuka writes the documents. You receive a draft, have one revision round included, and get final files in editable Word and PDF formats.",
-          "CV writing is priced by experience level: $129 for under two years, $189 for three to nine years, and $279 for ten or more years and executive roles. Standard delivery is five to seven days, with faster options available at an additional charge. That is the full model. Use the questions above to compare it fairly with any other option you are considering.",
+          "CV writing is priced by experience level: LKR 3,950 for students and fresh graduates, LKR 13,500 for one to nine years, and LKR 19,500 for more than nine years and executive roles. Standard delivery is 48 to 72 hours, with 24-hour options available. That is the full model. Use the questions above to compare it fairly with any other option you are considering.",
         ],
       },
       {

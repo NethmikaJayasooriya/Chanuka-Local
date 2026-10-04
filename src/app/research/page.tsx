@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/PageHeader";
 
 export const metadata: Metadata = pageMetadata({
   title: "Insights and field notes",
-  description: "Patterns from a decade of writing CVs for international careers: what actually gets candidates filtered, how markets differ, and where good applicants lose to weaker ones.",
+  description: "Patterns from 8+ years and 5,000+ CVs written for Sri Lankan job seekers at home and abroad: what gets candidates filtered, how markets differ, and where good applicants lose.",
   path: "/research",
 });
 
@@ -47,7 +47,7 @@ export default function ResearchPage() {
       <PageHeader
         eyebrow="Insights"
         title="What a decade of CVs actually teaches you."
-        lead="These are field notes, not a formal study: patterns observed across years of writing CVs for professionals competing internationally. They are qualitative and drawn from the practice, offered because they are useful, not because they are dressed up as statistics."
+        lead="These are field notes, not a formal study: patterns observed across years of writing CVs for Sri Lankan professionals applying at home and abroad. They are qualitative and drawn from the practice, offered because they are useful, not because they are dressed up as statistics."
         crumbs={[{ label: "Insights" }]}
       />
 

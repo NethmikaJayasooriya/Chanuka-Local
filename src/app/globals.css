@@ -315,3 +315,18 @@ html[data-js="1"] .reveal.is-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Sinhala pages: Latin glyphs keep the site fonts, Sinhala glyphs fall back to Noto Sans Sinhala. */
+:lang(si) {
+  font-family: var(--font-sans), var(--font-sinhala), "Iskoola Pota", "Sinhala Sangam MN", system-ui, sans-serif;
+  line-height: 1.75;
+}
+:lang(si) .display {
+  font-family: var(--font-display), var(--font-sinhala), "Iskoola Pota", "Sinhala Sangam MN", serif;
+  line-height: 1.35;
+}
+/* Letter-spacing breaks Sinhala conjuncts apart, so labels on Sinhala pages keep normal spacing. */
+:lang(si) .eyebrow,
+:lang(si) [class*="tracking-"] {
+  letter-spacing: normal !important;
+}

@@ -27,11 +27,11 @@ const display = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "Professional CV Writing for International Careers | Chanuka Jeewantha",
+    default: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
     template: "%s | Chanuka Jeewantha",
   },
   description:
-    "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally. Written for the market you are applying into. Delivery from 24 hours.",
+    "Sri Lanka's CPRW and CPCC certified CV writer. ATS CVs, foreign job CVs, LinkedIn and cover letters in LKR, written personally by Chanuka Jeewantha. Delivery from 24 hours.",
   applicationName: site.name,
   authors: [{ name: site.name, url: `${site.url}/about/chanuka-jeewantha` }],
   creator: site.name,
@@ -41,24 +41,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    locale: "en_GB",
-    title: "Professional CV Writing for International Careers",
+    locale: "en_LK",
+    title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
     description:
-      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
+      "CPRW and CPCC certified CV writing, foreign job CVs and LinkedIn optimisation in Sri Lanka. 4.9 from 107 Google reviews.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Chanuka Jeewantha — CV, LinkedIn and career branding",
+        alt: "Chanuka Jeewantha, CPRW certified CV writer in Sri Lanka",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Professional CV Writing for International Careers",
+    title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
     description:
-      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
+      "CPRW and CPCC certified CV writing, foreign job CVs and LinkedIn optimisation in Sri Lanka. 4.9 from 107 Google reviews.",
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" },
@@ -87,7 +87,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en"
+      lang="en-LK"
       className={`${sans.variable} ${display.variable}`}
       suppressHydrationWarning
     >

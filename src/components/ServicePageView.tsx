@@ -46,8 +46,8 @@ export function ServicePageView({ service }: { service: ServicePage }) {
           description: service.metaDescription,
           path: `/${service.slug}`,
           serviceType: service.name,
-          lowPrice: service.packageService ? BASE_PRICES[service.packageService]["under-2"] : 79,
-          highPrice: service.packageService ? BASE_PRICES[service.packageService]["over-10"] : 279,
+          lowPrice: service.packageService ? BASE_PRICES[service.packageService]["under-2"] : undefined,
+          highPrice: service.packageService ? BASE_PRICES[service.packageService]["over-10"] : undefined,
         })}
       />
 

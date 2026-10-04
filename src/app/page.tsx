@@ -6,14 +6,15 @@ import { Hero } from "@/components/Hero";
 import { Process } from "@/components/Process";
 import { Reviews } from "@/components/Reviews";
 import { Services } from "@/components/Services";
+import { SriLankaGuides } from "@/components/SriLankaGuides";
 import { TrustBar } from "@/components/TrustBar";
 
 
 export const metadata = pageMetadata({
-  title: "Professional CV Writing for International Careers | Chanuka Jeewantha",
+  title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha, CPRW",
   absoluteTitle: true,
   description:
-    "Founder-written, ATS-optimised CVs, resumes, cover letters and LinkedIn profiles for professionals applying in the UK, USA, Australia, Canada, NZ, UAE and Singapore.",
+    "CPRW & CPCC certified CV writer in Sri Lanka. ATS CVs from LKR 3,950, foreign job CVs and LinkedIn, written personally by Chanuka. 4.9 from 107 Google reviews.",
   path: "/",
   languages: homeCluster(),
 });
@@ -27,6 +28,7 @@ export default function HomePage() {
       <Services />
       <Process />
       <Reviews />
+      <SriLankaGuides />
       <Faq />
       <CtaBand />
     </>

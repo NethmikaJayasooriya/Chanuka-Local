@@ -99,7 +99,7 @@ export default function ContactPage() {
             </ol>
 
             <p className="mt-6 text-[13px] leading-relaxed text-muted">
-              Remote service, clients in 40+ countries. Messages are answered in order, and
+              Online service across Sri Lanka and for Sri Lankans overseas. Messages are answered in order, and
               a reply within 12 hours is the standard, not a promise made per message.
             </p>
           </div>

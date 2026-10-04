@@ -7,8 +7,8 @@ import { BASE_PRICES, usd } from "@/lib/pricing";
 import { servicePages } from "@/lib/services";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Services",
-  description: "CV writing, LinkedIn optimisation, cover letters, CV review and career strategy for professionals targeting international roles.",
+  title: "CV Writing Services in Sri Lanka",
+  description: "CV writing, foreign job CVs, LinkedIn optimisation, cover letters and career strategy in Sri Lanka, priced in LKR and written personally by Chanuka Jeewantha.",
   path: "/services",
 });
 
