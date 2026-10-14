@@ -23,6 +23,7 @@ const columns = [
       { label: "CV format සිංහලෙන්", href: "/cv-format-sinhala" },
       { label: "Foreign job CV", href: "/foreign-job-cv-sri-lanka" },
       { label: "Choosing a CV writer", href: "/how-to-choose-a-cv-writer-sri-lanka" },
+      { label: "LinkedIn profile guide", href: "/linkedin-profile-guide-sri-lanka" },
       { label: "Job roles", href: "/job-roles" },
       { label: "Industries", href: "/industries" },
       { label: "Career advice", href: "/career-advice" },

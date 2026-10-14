@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ReviewsPill } from "./ReviewsPill";
@@ -23,7 +21,7 @@ export function Hero() {
             priority
             sizes="100vw"
             className="object-cover object-[75.3%_0%] scale-[1.15] origin-[75.3%_0%] sm:scale-[1.1] sm:object-[85%_0%] sm:origin-[85%_0%]"
-            quality={95}
+            quality={75}
           />
           {/* Smooth warm transition from below the collar into the section background */}
           <div
@@ -36,12 +34,12 @@ export function Hero() {
           <div className="max-w-[540px]">
             {/* Intro text */}
             <p className="max-w-[340px] sm:max-w-[380px] text-[15px] sm:text-[16px] leading-[1.65] text-ink font-medium tracking-normal">
-              Hey, I&apos;m Chanuka, a CPRW certified CV writer in Sri Lanka. I write ATS-optimised CVs that land interviews at home and abroad.
+              Hey, I&apos;m Chanuka, a CPRW certified CV writer in Sri Lanka. I write targeted CVs and LinkedIn profiles for jobs at home and abroad.
             </p>
 
             {/* Stylized Signature Headline */}
             <div className="mt-2.5 sm:mt-3">
-              <h1 className="font-extrabold uppercase tracking-[-0.035em] text-ink">
+              <div className="font-extrabold uppercase tracking-[-0.035em] text-ink" aria-hidden="true">
                 {/* Top line: LAND INTERVIEWS & */}
                 <span className="block whitespace-nowrap text-[clamp(1.65rem,8.2vw,3.5rem)] font-black tracking-[-0.035em] leading-[0.92] text-ink">
                   Land Interviews &amp;
@@ -84,7 +82,7 @@ export function Hero() {
                     </span>
                   </div>
                 </div>
-              </h1>
+              </div>
             </div>
 
             {/* Action Buttons: Stacked on phone, side-by-side on tablet */}
@@ -133,7 +131,7 @@ export function Hero() {
             priority
             sizes="100vw"
             className="object-cover object-[right_top]"
-            quality={95}
+            quality={75}
           />
         </div>
         <div
@@ -149,9 +147,9 @@ export function Hero() {
             <p className="rise mb-3 text-[12.5px] font-semibold uppercase tracking-[0.14em] text-accent-deep">
               CPRW &amp; CPCC certified CV writer · Sri Lanka
             </p>
-            <h1 className="display rise max-w-[14ch] xl:max-w-[15ch] 2xl:max-w-[16ch] text-[clamp(2.15rem,3.4vw,4.25rem)] font-bold leading-[1.08] tracking-tight text-ink">
+            <p className="display rise max-w-[14ch] xl:max-w-[15ch] 2xl:max-w-[16ch] text-[clamp(2.15rem,3.4vw,4.25rem)] font-bold leading-[1.08] tracking-tight text-ink">
               Land interviews in Sri Lanka and abroad.
-            </h1>
+            </p>
 
             <p className="rise d1 mt-5 max-w-[420px] xl:max-w-[520px] 2xl:max-w-[640px] text-[16px] leading-[1.75] text-muted sm:mt-6 sm:text-[17px]">
               CV writing in Sri Lanka for private sector, banking, IT, government and

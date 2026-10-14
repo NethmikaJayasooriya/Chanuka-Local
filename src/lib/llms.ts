@@ -7,26 +7,27 @@ import { BASE_PRICES, deliveries, formatLKR } from "@/lib/pricing";
 import { lkGuides } from "@/lib/content/lk";
 import { abs } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { servicePages } from "@/lib/services";
 
 /**
  * llms.txt (https://llmstxt.org) and llms-full.txt, generated from the
- * same data the pages use, so what AI assistants read can never drift
- * from what the site says.
+ * same data the pages use. These optional reference files are not a
+ * prerequisite for Google AI visibility or a guaranteed ranking signal.
  */
 
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 const r = (svc: keyof typeof BASE_PRICES) =>
-  `${formatLKR(BASE_PRICES[svc]["under-2"])} (students and fresh graduates) / ${formatLKR(BASE_PRICES[svc]["3-to-9"])} (1 to 9 years) / ${formatLKR(BASE_PRICES[svc]["over-10"])} (9+ years, executives)`;
+  `${formatLKR(BASE_PRICES[svc]["under-2"])} (students and fresh graduates, less than 1 year) / ${formatLKR(BASE_PRICES[svc]["3-to-9"])} (1 to 9 years) / ${formatLKR(BASE_PRICES[svc]["over-10"])} (more than 9 years, executives)`;
 
 function facts(): string {
   const d = deliveries.map((x) => `${x.name} (${x.window}${x.surcharge ? `, +${pct(x.surcharge)}` : ""})`).join("; ");
   return [
     `- Who: Chanuka Jeewantha, a CPRW (Certified Professional Resume Writer) and CPCC (Certified Professional Career Coach) certified CV writer and career coach based in Sri Lanka. Every document is written personally by him, never outsourced.`,
-    `- Experience: ${site.yearsExperience} years; ${site.cvsWritten} CVs written; rated ${site.rating.score}/5 from ${site.rating.count} Google reviews (${site.reviewsUrl}).`,
+    `- Experience: ${site.yearsExperience} years; ${site.cvsWritten} CVs written (business-stated). Google rating checked ${site.rating.checked}: ${site.rating.score}/5 from ${site.rating.count} reviews (${site.reviewsUrl}); current totals may differ.`,
     `- Serves: job seekers across Sri Lanka (online, island-wide: ${site.cities.slice(0, 8).join(", ")} and more) and Sri Lankans applying for jobs abroad. Languages: English and Sinhala.`,
     `- Services: ATS CV writing, foreign job CVs (Gulf, UK, Europe, Australia, Canada), LinkedIn profile optimisation, cover letters, 1-hour career strategy consultation.`,
     `- Prices in Sri Lankan rupees (LKR): ATS CV ${r("cv")}. Foreign job CV ${r("foreign-cv")}. LinkedIn optimisation ${r("linkedin")}. Cover letter ${r("cover-letter")}. Consultation ${r("consultation")}.`,
-    `- Delivery: ${d}. One revision round included. Editable Word and PDF files.`,
+    `- Delivery: ${d}. Confirm express availability before ordering. One revision round included. CV writing includes editable Word and PDF files; LinkedIn includes rewritten profile text and placement instructions, without account access.`,
     `- Payment: LKR bank transfer against an emailed invoice (online card payment being added).`,
     `- Order: ${abs("/order")}. WhatsApp: ${site.phone}. Email: ${site.email}. Global site for clients outside Sri Lanka: ${site.globalUrl}.`,
   ].join("\n");
@@ -55,6 +56,7 @@ export function llmsTxt(): string {
   out.push(L("Packages and pricing", "/packages"));
   out.push(L("How it works", "/how-it-works"));
   out.push(L("About the author", "/about/chanuka-jeewantha"));
+  out.push(L("Public client feedback", "/reviews", `Google rating checked ${site.rating.checked}`));
   out.push("");
 
   out.push("## Career advice");
@@ -95,7 +97,9 @@ export function llmsFullTxt(): string {
   out.push(facts());
   out.push("");
 
-  out.push("## Sri Lanka CV guides");
+  out.push("## Services");
+  for (const service of servicePages) block(service.name, `/${service.slug}`, service.quickAnswer ?? service.lead, service.faq);
+  out.push("## Sri Lanka career guides");
   for (const g of lkGuides) block(g.h1, `/${g.slug}`, g.quickAnswer, g.faqs);
   out.push("## Career advice");
   for (const a of articles) block(a.title, `/career-advice/${a.slug}`, a.quickAnswer, a.faqs);

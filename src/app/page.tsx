@@ -1,4 +1,7 @@
-import { homeCluster, pageMetadata } from "@/lib/seo";
+import { homeCluster, pageMetadata, webPageLd } from "@/lib/seo";
+import { JsonLd } from "@/components/Seo";
+import { LocalExpertise } from "@/components/LocalExpertise";
+import { site } from "@/lib/site";
 import { Configurator } from "@/components/Configurator";
 import { CtaBand } from "@/components/CtaBand";
 import { Faq } from "@/components/Faq";
@@ -11,10 +14,10 @@ import { TrustBar } from "@/components/TrustBar";
 
 
 export const metadata = pageMetadata({
-  title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha, CPRW",
+  title: "CV Writer & LinkedIn Optimization Sri Lanka | Chanuka Jeewantha",
   absoluteTitle: true,
   description:
-    "CPRW & CPCC certified CV writer in Sri Lanka. ATS CVs from LKR 3,950, foreign job CVs and LinkedIn, written personally by Chanuka. 4.9 from 107 Google reviews.",
+    `CPRW & CPCC certified CV writing and LinkedIn optimization in Sri Lanka. Personally written by Chanuka. From LKR 3,950; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
   path: "/",
   languages: homeCluster(),
 });
@@ -22,8 +25,10 @@ export const metadata = pageMetadata({
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={webPageLd({ name: "CV writing and LinkedIn optimization in Sri Lanka", description: site.tagline, path: "/" })} />
       <Hero />
       <TrustBar />
+      <LocalExpertise />
       <Configurator />
       <Services />
       <Process />

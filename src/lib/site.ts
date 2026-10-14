@@ -10,7 +10,7 @@
 export const site = {
   name: "Chanuka Jeewantha",
   domain: "chanukajeewantha.lk",
-  url: "https://chanukajeewantha.lk",
+  url: "https://www.chanukajeewantha.lk",
   globalUrl: "https://chanukajeewantha.com",
   phone: "+94 77 390 2230",
   phoneRaw: "94773902230",
@@ -25,10 +25,11 @@ export const site = {
   cvsWritten: "5,000+",
   rating: {
     score: "4.9",
-    count: "107",
+    count: "121",
     label: "Google reviews",
+    checked: "2026-10-14",
   },
-  reviewsUrl: "https://share.google/ur2XItxcmhKNt8QL3",
+  reviewsUrl: "https://share.google/JP60D8cDsvYFyST05",
   /** Verified public profiles (schema.org sameAs). Add only confirmed URLs. */
   sameAs: [
     "https://www.linkedin.com/in/chanuka-jeewantha/",
@@ -54,7 +55,7 @@ export const site = {
   ],
   stats: [
     { value: "5,000+", label: "CVs written" },
-    { value: "107", label: "Google reviews" },
+    { value: "121", label: "Google reviews" },
     { value: "24h", label: "Fastest delivery" },
     { value: "4.9/5", label: "Average rating" },
   ],

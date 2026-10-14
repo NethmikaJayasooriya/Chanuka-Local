@@ -1,9 +1,10 @@
 import { ConversionFooter } from "./ConversionFooter";
 import Link from "next/link";
 import { PageHeader } from "./PageHeader";
-import { JsonLd } from "./Seo";
-import { serviceLd } from "@/lib/seo";
-import { BASE_PRICES, usd } from "@/lib/pricing";
+import { AnswerBox, JsonLd } from "./Seo";
+import { AUTHOR_PATH, serviceLd, webPageLd } from "@/lib/seo";
+import { BASE_PRICES, levels, usd } from "@/lib/pricing";
+import { site } from "@/lib/site";
 import type { ServicePage } from "@/lib/services";
 
 function Tick() {
@@ -48,8 +49,11 @@ export function ServicePageView({ service }: { service: ServicePage }) {
           serviceType: service.name,
           lowPrice: service.packageService ? BASE_PRICES[service.packageService]["under-2"] : undefined,
           highPrice: service.packageService ? BASE_PRICES[service.packageService]["over-10"] : undefined,
+          packageService: service.packageService,
         })}
       />
+      <JsonLd data={webPageLd({ name: service.title, description: service.metaDescription, path: `/${service.slug}`, mainEntity: `/${service.slug}#service` })} />
+      <AnswerBox answer={service.quickAnswer} label={`${service.name} in Sri Lanka: at a glance`} />
 
       {fromPrice && (
         <section className="border-b border-line bg-surface py-6">
@@ -59,6 +63,24 @@ export function ServicePageView({ service }: { service: ServicePage }) {
             <span className="text-[13.5px] text-muted">
               Final price depends on your experience level and delivery speed.
             </span>
+          </div>
+        </section>
+      )}
+
+      {service.packageService && (
+        <section className="border-b border-line py-10">
+          <div className="container-page">
+            <h2 className="display text-[24px] text-ink">What does {service.name.toLowerCase()} cost in Sri Lanka?</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-3">
+              {levels.map((level) => (
+                <div key={level.id} className="rounded-[14px] border border-line bg-surface p-5">
+                  <h3 className="font-semibold text-ink">{level.name}</h3>
+                  <p className="mt-2 display text-[24px] text-brand">{usd(BASE_PRICES[service.packageService!][level.id])}</p>
+                  <p className="mt-2 text-[13px] text-muted">{level.hint}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-[14px] leading-relaxed text-muted">Written personally by <Link href={AUTHOR_PATH} className="font-semibold text-brand">{site.name}, CPRW, CPCC</Link>. One revision round included. <Link href="/how-it-works" className="text-brand underline underline-offset-2">See the process and delivery options</Link>.</p>
           </div>
         </section>
       )}
@@ -91,6 +113,40 @@ export function ServicePageView({ service }: { service: ServicePage }) {
           </div>
         </div>
       </section>
+
+      {service.examples && (
+        <section className="border-t border-line py-12 lg:py-16">
+          <div className="container-page">
+            <p className="eyebrow">See the difference</p>
+            <h2 className="display mt-3 text-[28px] text-ink">Specific evidence beats generic wording.</h2>
+            <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted">Illustrative writing examples, not client testimonials or measured outcomes. Use only details that are true for your own career.</p>
+            <div className="mt-7 grid gap-5 lg:grid-cols-2">
+              {service.examples.map((example) => (
+                <article key={example.label} className="rounded-[16px] border border-line bg-surface p-6">
+                  <h3 className="font-semibold text-ink">{example.label}</h3>
+                  <dl className="mt-5 space-y-4 text-[15px] leading-relaxed">
+                    <div><dt className="text-[12px] font-semibold uppercase text-muted">Before</dt><dd className="mt-1 text-muted">{example.before}</dd></div>
+                    <div><dt className="text-[12px] font-semibold uppercase text-brand">After</dt><dd className="mt-1 text-ink">{example.after}</dd></div>
+                  </dl>
+                  <p className="mt-5 border-t border-line pt-4 text-[14px] leading-relaxed text-muted">{example.why}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {service.localNotes && (
+        <section className="border-y border-line bg-surface py-12 lg:py-16">
+          <div className="container-page">
+            <h2 className="display text-[28px] text-ink">Built around your application, wherever you live in Sri Lanka.</h2>
+            <div className="mt-7 grid gap-6 md:grid-cols-3">
+              {service.localNotes.map((note) => <article key={note.heading}><h3 className="font-semibold text-ink">{note.heading}</h3><p className="mt-3 text-[15px] leading-relaxed text-muted">{note.body}</p></article>)}
+            </div>
+            {service.sinhalaSummary && <div lang="si-LK" className="mt-8 rounded-[14px] border border-line bg-paper p-6"><h3 className="font-semibold text-ink">සිංහලෙන් කෙටියෙන්</h3><p className="mt-3 text-[16px] leading-loose text-ink-soft">{service.sinhalaSummary}</p></div>}
+          </div>
+        </section>
+      )}
 
       {/* Who it is for */}
       <section className="border-y border-line bg-surface py-10 sm:py-14 lg:py-20">

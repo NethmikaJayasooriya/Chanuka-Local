@@ -28,6 +28,11 @@ const LEGACY_LK: Array<[string, string]> = [
   ["/ebooks", "/resources"],
   ["/ebooks/:slug*", "/resources"],
   ["/cv-writing-guides", "/cv-format-sri-lanka"],
+  ["/cv-writing-guides/hospitality-tourism-industry-cv-guide-sri-lanka", "/industries/hospitality"],
+  ["/blog/how-to-write-a-professional-cv-in-sri-lanka-step-by-step-guide", "/cv-format-sri-lanka"],
+  ["/blog/how-to-write-an-ats-friendly-cv-that-recruiters-can-actually-find", "/resources/ats-check"],
+  ["/blog/the-ats-cv-checklist-20-things-to-check-before-you-apply", "/resources/cv-checklist"],
+  ["/blog/your-first-professional-cv-the-complete-guide-for-sri-lankan-graduates", "/career-levels/graduate"],
   ["/free-ats-cv-template", "/cv-format-sri-lanka"],
   ["/free-ats-cv-checklist", "/cv-format-sri-lanka"],
   ["/resources/ats-friendly-cv-template-free", "/cv-format-sri-lanka"],
@@ -55,19 +60,23 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      { source: "/linkedin-optimization", destination: "/linkedin-optimisation", permanent: true },
+      { source: "/linkedin-optimisation-sri-lanka", destination: "/linkedin-optimisation", permanent: true },
+      { source: "/pricing", destination: "/packages", permanent: true },
       ...LEGACY_LK.map(([source, destination]) => ({ source, destination, permanent: true })),
       ...Object.entries(MIGRATED).map(([from, to]) => ({
         source: `/international-job-seekers/${from}`,
-        destination: `/${to}/international-job-seekers`,
+        destination: `https://chanukajeewantha.com/${to}/international-job-seekers`,
         permanent: true,
       })),
-      { source: "/countries/united-kingdom", destination: "/uk", permanent: true },
-      { source: "/countries/united-states", destination: "/usa", permanent: true },
-      { source: "/countries/:slug(australia|canada|new-zealand|uae|singapore)", destination: "/:slug", permanent: true },
+      { source: "/countries/united-kingdom", destination: "https://chanukajeewantha.com/uk", permanent: true },
+      { source: "/countries/united-states", destination: "https://chanukajeewantha.com/usa", permanent: true },
+      { source: "/countries/:slug(australia|canada|new-zealand|uae|singapore)", destination: "https://chanukajeewantha.com/:slug", permanent: true },
     ];
   },
   async headers() {
     return [
+      ...(process.env.VERCEL_ENV === "preview" ? [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }] : []),
       {
         source: "/:path*",
         headers: [
@@ -82,6 +91,7 @@ const nextConfig: NextConfig = {
         ],
       },
       { source: "/admin/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
+      { source: "/:path(login|signup|checkout|intake|dashboard|order)/:rest*", headers: [{ key: "X-Robots-Tag", value: "noindex" }] },
       { source: "/:file(llms.txt|llms-full.txt)", headers: [{ key: "X-Robots-Tag", value: "noindex" }] },
     ];
   },

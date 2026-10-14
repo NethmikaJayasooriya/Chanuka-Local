@@ -22,7 +22,7 @@ const DEFAULT_UI = {
  * HowTo steps, takeaways, sources, FAQ, plus Article, HowTo and
  * FAQPage schema in the page's own language.
  */
-export function LkGuideView({ guide }: { guide: LkGuide }) {
+export function LkGuideView({ guide, worksheet }: { guide: LkGuide; worksheet?: React.ReactNode }) {
   const ui = { ...DEFAULT_UI, ...(guide.ui ?? {}) };
   const path = `/${guide.slug}`;
   const inLanguage = guide.lang === "si" ? "si-LK" : "en-LK";
@@ -37,9 +37,10 @@ export function LkGuideView({ guide }: { guide: LkGuide }) {
             path,
             published: guide.published,
             updated: guide.updated,
-            section: "CV guides for Sri Lanka",
-            about: "CV writing in Sri Lanka",
+            section: "Career guides for Sri Lanka",
+            about: guide.h1,
             inLanguage,
+            editorial: guide.editorial,
           }),
           faqLd(guide.faqs, inLanguage),
           ...(guide.steps
@@ -60,7 +61,8 @@ export function LkGuideView({ guide }: { guide: LkGuide }) {
 
       <article className="py-12 lg:py-16">
         <div className="container-page max-w-3xl">
-          <Byline published={guide.published} updated={guide.updated} reviewed={false} />
+          <Byline published={guide.published} updated={guide.updated} reviewed={false} editorial={guide.editorial} />
+          {worksheet}
 
           {guide.keyFacts && guide.keyFacts.length > 0 && (
             <div className="mt-8">
@@ -200,7 +202,7 @@ export function LkGuideView({ guide }: { guide: LkGuide }) {
             </Link>
           </div>
 
-          <Sources items={guide.sources} />
+          <Sources items={guide.sources} note={guide.sourceNote} />
 
           {guide.related.length > 0 && (
             <div className="mt-12">

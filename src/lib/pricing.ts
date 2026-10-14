@@ -73,7 +73,7 @@ export const packages: Package[] = [
     id: "ats-cv",
     name: "ATS CV Writing",
     includes: ["cv"],
-    blurb: "100% recruiter-ready, ATS-compliant CV built to pass screening engines.",
+    blurb: "Achievement-led CV writing with readable formatting and relevant language for your target role.",
   },
   {
     id: "linkedin",

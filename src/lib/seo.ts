@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BASE_PRICES } from "@/lib/pricing";
+import { BASE_PRICES, levels, type ServiceId } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 /**
@@ -24,11 +24,10 @@ export const LINKEDIN_URL = site.sameAs[0];
 
 export const abs = (path: string) => (path.startsWith("http") ? path : `${BASE_URL}${path === "/" ? "" : path}`);
 
-/** Lowest and highest single-service prices (LKR), from the live price table. */
+/** Lowest and highest published single-service prices (LKR). */
 const allPrices = Object.values(BASE_PRICES).flatMap((p) => Object.values(p));
 export const PRICE_MIN = Math.min(...allPrices);
 export const PRICE_MAX = Math.max(...allPrices);
-const lkr = (n: number) => `LKR ${n.toLocaleString("en-US")}`;
 
 /**
  * hreflang between the two country-code sites. Sri Lankan searchers get
@@ -150,6 +149,7 @@ export function articleLd({
   section,
   about,
   inLanguage = "en",
+  editorial = false,
 }: {
   title: string;
   description: string;
@@ -159,6 +159,7 @@ export function articleLd({
   section?: string;
   about?: string;
   inLanguage?: string;
+  editorial?: boolean;
 }) {
   return {
     "@context": "https://schema.org",
@@ -173,9 +174,25 @@ export function articleLd({
     ...(section ? { articleSection: section } : {}),
     ...(about ? { about: { "@type": "Thing", name: about } } : {}),
     contentLocation: { "@type": "Country", name: site.country },
-    author: { "@id": PERSON_ID },
+    author: { "@id": editorial ? ORG_ID : PERSON_ID },
     publisher: { "@id": ORG_ID },
     isPartOf: { "@id": WEBSITE_ID },
+    image: abs("/og-image.png"),
+  };
+}
+
+export function webPageLd({ name, description, path, mainEntity }: { name: string; description: string; path: string; mainEntity?: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${abs(path)}#webpage`,
+    url: abs(path),
+    name,
+    description,
+    inLanguage: "en-LK",
+    isPartOf: { "@id": WEBSITE_ID },
+    about: { "@id": PERSON_ID },
+    ...(mainEntity ? { mainEntity: { "@id": abs(mainEntity) } } : {}),
   };
 }
 
@@ -190,8 +207,9 @@ export function serviceLd({
   path,
   serviceType,
   areaServed: area,
-  lowPrice = PRICE_MIN,
-  highPrice = PRICE_MAX,
+  lowPrice,
+  highPrice,
+  packageService,
 }: {
   name: string;
   description: string;
@@ -200,10 +218,12 @@ export function serviceLd({
   areaServed?: string;
   lowPrice?: number;
   highPrice?: number;
+  packageService?: ServiceId;
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
+    "@id": `${abs(path)}#service`,
     name,
     description,
     url: abs(path),
@@ -211,13 +231,20 @@ export function serviceLd({
     provider: { "@id": ORG_ID },
     areaServed: area ? { "@type": "Country", name: area } : { "@type": "Country", name: site.country },
     availableChannel: { "@type": "ServiceChannel", serviceUrl: abs("/order"), availableLanguage: ["English", "Sinhala"] },
-    offers: {
+    ...(packageService ? { offers: levels.map((level) => ({
+      "@type": "Offer",
+      name: `${name} — ${level.name}`,
+      description: level.hint,
+      priceCurrency: "LKR",
+      price: BASE_PRICES[packageService][level.id],
+      url: abs("/order"),
+    })) } : lowPrice !== undefined && highPrice !== undefined ? { offers: {
       "@type": "AggregateOffer",
       priceCurrency: "LKR",
       lowPrice,
       highPrice,
       url: abs("/order"),
-    },
+    } } : {}),
   };
 }
 
@@ -256,7 +283,7 @@ export function siteGraphLd() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "ProfessionalService",
+        "@type": "Organization",
         "@id": ORG_ID,
         name: site.name,
         alternateName: ["Chanuka Jeewantha CV Writing", "Chanuka Jeewantha Career Branding"],
@@ -268,12 +295,7 @@ export function siteGraphLd() {
         description: `CPRW and CPCC certified CV writing, LinkedIn optimisation, cover letters and foreign job CVs in Sri Lanka. ${site.cvsWritten} CVs written over ${site.yearsExperience} years, every one personally by Chanuka Jeewantha.`,
         slogan: site.tagline,
         founder: { "@id": PERSON_ID },
-        address: { "@type": "PostalAddress", addressCountry: "LK" },
-        priceRange: `${lkr(PRICE_MIN)} to ${lkr(PRICE_MAX)}`,
-        currenciesAccepted: "LKR",
-        paymentAccepted: "Bank transfer",
         areaServed: areaServed(),
-        availableLanguage: ["English", "Sinhala"],
         knowsLanguage: ["en", "si"],
         sameAs: [...site.sameAs, site.reviewsUrl, GLOBAL_URL],
         contactPoint: {
@@ -284,13 +306,8 @@ export function siteGraphLd() {
           areaServed: "LK",
           availableLanguage: ["English", "Sinhala"],
         },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: site.rating.score,
-          reviewCount: site.rating.count,
-          bestRating: "5",
-          worstRating: "1",
-        },
+        // Reviews are visible and linked to Google. A business's own
+        // reviews are not eligible for Google's self-serving review stars.
         hasOfferCatalog: {
           "@type": "OfferCatalog",
           name: "CV and career services in Sri Lanka",

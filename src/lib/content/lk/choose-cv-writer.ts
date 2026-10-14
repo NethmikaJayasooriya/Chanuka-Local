@@ -15,15 +15,15 @@ export const chooseCvWriter: LkGuide = {
     "How to choose a CV writer in Sri Lanka: credentials, real reviews, samples, ATS, revisions and fair LKR prices, plus red flags to avoid.",
   lead: "There are many CV writers in Sri Lanka, from Facebook pages to certified professionals. This checklist helps you compare them fairly, including the one whose site you are reading.",
   quickAnswer:
-    "The best CV writer in Sri Lanka for you is the one who writes your CV personally, holds a recognised credential such as CPRW, has a long record of real Google reviews, shows anonymised samples, writes in a plain ATS-friendly format, includes at least one revision, and states the full price in LKR before you pay. Avoid anyone who guarantees a job or a foreign visa, uses the same template for everyone, or asks no questions about your target role. Professionally written ATS CVs in Sri Lanka typically cost from about LKR 4,000 for freshers to about LKR 20,000 for executives.",
+    `Choose a CV writer in Sri Lanka by comparing the named writer, relevant examples, credentials, public reviews, target-role research, deliverables and revision terms. The best fit depends on your career and application. Chanuka Jeewantha's published ATS CV prices are ${formatLKR(cv["under-2"])} for fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals and ${formatLKR(cv["over-10"])} for executives. Those are his prices, not an independently measured market average.`,
   published: "2026-10-04",
-  updated: "2026-10-04",
+  updated: "2026-10-14",
   keyFacts: [
     { label: "Who writes it", value: "One named writer, ideally the person whose reputation is on the business" },
     { label: "Credentials", value: "A recognised certification such as CPRW, plus years of practice" },
     { label: "Proof", value: "Google reviews with names and detail, and anonymised samples" },
     { label: "Format", value: "Plain, single-column, ATS-readable, Word and PDF files" },
-    { label: "Typical price", value: "About LKR 4,000 (freshers) to LKR 20,000 (executives) for a written ATS CV" },
+    { label: "Chanuka's ATS CV prices", value: `${formatLKR(cv["under-2"])} / ${formatLKR(cv["3-to-9"])} / ${formatLKR(cv["over-10"])}` },
     { label: "Red flag", value: "Any promise of a guaranteed job or visa" },
   ],
   sections: [
@@ -44,17 +44,16 @@ export const chooseCvWriter: LkGuide = {
       id: "price",
       heading: "How much does a CV writer cost in Sri Lanka?",
       paragraphs: [
-        "Prices vary with what you get. Template edits and typing services are the cheapest, often from around LKR 1,500. A CV that is properly researched and written from scratch for a target role costs more, typically from about LKR 4,000 for freshers to around LKR 20,000 for senior professionals and executives. Packages that add LinkedIn optimisation, cover letters or foreign job CVs cost more again.",
-        "The useful question is not \"who is cheapest\" but \"what will this CV do for my next salary\". A CV that gets you one extra interview for a better job usually pays for itself many times over.",
+        "Compare current quotes for the same scope: rewriting is different from typing existing text into a template. Ask which services, file formats and revision terms are included. There is no independently verified market price survey behind this guide.",
+        "The table below shows Chanuka's published ATS CV prices. These are single-service prices, not a promise of a job, interview or salary increase. Foreign-job CVs, cover letters and LinkedIn services have their own prices.",
       ],
       table: {
-        caption: "What you typically get at each level",
-        head: ["Type of service", "Typical price (LKR)", "What you get"],
+        caption: "Chanuka Jeewantha's published ATS CV prices",
+        head: ["Career level", "ATS CV price", "Experience level"],
         rows: [
-          ["Free CV maker app or template", "Free", "A layout. You write all the content yourself."],
-          ["Typing or template editing", "About 1,500 to 3,000", "Your existing content placed into a template, light edits."],
-          ["Professionally written ATS CV", "About 4,000 to 20,000", "A brief, research into your target role, new achievement-led content, revisions."],
-          ["Career package", "About 10,000 and above", "CV plus LinkedIn, cover letter, foreign job CV or coaching."],
+          ["Students and fresh graduates", formatLKR(cv["under-2"]), "Less than 1 year"],
+          ["Professionals", formatLKR(cv["3-to-9"]), "1 to 9 years"],
+          ["Executives", formatLKR(cv["over-10"]), "More than 9 years"],
         ],
       },
     },
@@ -107,10 +106,10 @@ export const chooseCvWriter: LkGuide = {
   ],
   faqs: [
     { q: "Who is the best CV writer in Sri Lanka?", a: `It depends on your field and goals, so compare writers on who writes the CV, credentials, real reviews, samples, ATS format, revisions and price. Chanuka Jeewantha is a CPRW and CPCC certified CV writer with ${site.cvsWritten} CVs written over ${site.yearsExperience} years and a ${site.rating.score} rating from ${site.rating.count} Google reviews, and he writes every CV personally.` },
-    { q: "How much does CV writing cost in Sri Lanka?", a: "Template edits start from around LKR 1,500. A professionally written ATS CV typically costs from about LKR 4,000 for freshers to about LKR 20,000 for executives. Packages with LinkedIn, cover letters or foreign job CVs cost more." },
+    { q: "How much does CV writing cost in Sri Lanka?", a: `Providers and scopes differ, so compare current quotes. Chanuka's published ATS CV prices are ${formatLKR(cv["under-2"])} for students and fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals, and ${formatLKR(cv["over-10"])} for executives. Packages with other services have different totals.` },
     { q: "Is a professional CV writer worth it?", a: "It is worth it when the job matters: a competitive graduate role, a promotion, a career change or a foreign job. A free template is enough when you already know exactly what to write." },
     { q: "What is CPRW?", a: "CPRW stands for Certified Professional Resume Writer, a professional certification for resume and CV writers that tests their knowledge of writing standards and practical writing. CPCC (Certified Professional Career Coach) is a related certification for career coaching." },
-    { q: "Can a CV writer guarantee me a job?", a: "No. A good CV increases the number of interviews you get. Nobody can guarantee the interview result or a visa, and anyone who promises that is a red flag." },
+    { q: "Can a CV writer guarantee me a job?", a: "No. A clear, relevant CV helps present your experience, but interviews and offers depend on employer decisions, qualifications, competition and demand. A CV writing service cannot guarantee a job or visa." },
     { q: "Do I need to meet the CV writer in person in Colombo?", a: "No. Professional CV writing works well online: you share your current CV and the jobs you want, answer a short questionnaire and discuss details on WhatsApp or a call. That is how clients across Sri Lanka and overseas work with Chanuka." },
   ],
   sources: [

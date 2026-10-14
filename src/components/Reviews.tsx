@@ -74,8 +74,8 @@ export function Reviews() {
             Rated {site.rating.score} across {site.rating.count} Google reviews.
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-muted">
-            Every review below is a real, verified review left on Google by a client who paid
-            for the service and went on to apply with the documents.
+            Read the feedback below, then visit the public Google profile for the original
+            reviews and the latest rating.
           </p>
         </div>
 
@@ -163,7 +163,7 @@ export function Reviews() {
         </div>
 
         <p className="mt-6 text-[12.5px] text-muted">
-          Reviews shown as left on Google. Read all {site.rating.count} on the Google profile.
+          Rating checked 14 October 2026. Read the latest reviews on the linked Google profile.
         </p>
       </div>
     </section>

@@ -6,6 +6,7 @@ const BLURB: Record<string, string> = {
   "cv-format-sinhala": "CV සහ Resume අතර වෙනස සහ හොඳ CV එකක් ලියන පියවර, සරල සිංහලෙන්.",
   "foreign-job-cv-sri-lanka": "What changes for Dubai, Qatar, Saudi Arabia, the UK, Europe, Australia and Canada.",
   "how-to-choose-a-cv-writer-sri-lanka": "Credentials, reviews, ATS, revisions and fair LKR prices. Red flags to avoid.",
+  "linkedin-profile-guide-sri-lanka": "Headline examples, an About section worksheet and a free profile preparation checklist.",
 };
 
 /**
@@ -17,9 +18,9 @@ export function SriLankaGuides() {
   return (
     <section className="border-t border-line py-14 sm:py-20">
       <div className="container-page">
-        <p className="eyebrow reveal">Free CV guides for Sri Lanka</p>
+        <p className="eyebrow reveal">Free career guides for Sri Lanka</p>
         <h2 className="display reveal d1 mt-3 max-w-2xl text-[clamp(1.6rem,3.2vw,2.25rem)] text-ink">
-          Writing it yourself? Start with the format Sri Lankan employers expect.
+          Build a clearer CV and LinkedIn profile, one practical step at a time.
         </h2>
         <div className="reveal d2 mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {lkGuides.map((g) => (

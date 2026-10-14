@@ -24,12 +24,15 @@ export type LkGuide = {
   quickAnswerLabel?: string;
   published: string;
   updated: string;
+  /** Editorial drafts must not imply the named practitioner reviewed them. */
+  editorial?: boolean;
   keyFacts?: Array<{ label: string; value: string }>;
   sections: LkGuideSection[];
   steps?: { title: string; items: Array<{ name: string; text: string }> };
   takeaways?: string[];
   faqs: Array<{ q: string; a: string }>;
   sources?: Array<{ label: string; url: string }>;
+  sourceNote?: string;
   related: Array<{ href: string; label: string }>;
   cta: { heading: string; body: string; href: string; label: string };
   /** Same topic in the other language (hreflang en-LK / si-LK pair). */

@@ -8,7 +8,7 @@ export function JsonLd({ data }: { data: object | object[] }) {
   return (
     <>
       {list.map((d, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(d) }} />
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(d).replace(/</g, "\\u003c") }} />
       ))}
     </>
   );
@@ -84,10 +84,10 @@ function fmt(d?: string) {
 }
 
 /** Author + dates line (E-E-A-T and freshness signal). */
-export function Byline({ updated, published, reviewed = false }: { updated?: string; published?: string; reviewed?: boolean }) {
+export function Byline({ updated, published, reviewed = false, editorial = false }: { updated?: string; published?: string; reviewed?: boolean; editorial?: boolean }) {
   return (
     <p className="text-[13px] text-muted">
-      {reviewed ? "Reviewed by " : "By "}
+      {editorial ? "Editorial guide · " : reviewed ? "Reviewed by " : "By "}
       <Link href={AUTHOR_PATH} className="font-semibold text-ink hover:text-brand">
         Chanuka Jeewantha
       </Link>
@@ -108,7 +108,7 @@ export function Byline({ updated, published, reviewed = false }: { updated?: str
 }
 
 /** Official / authoritative references. */
-export function Sources({ items }: { items?: Array<{ label: string; url: string }> }) {
+export function Sources({ items, note = "Orientation only, not legal or immigration advice. Rules change: always check the official source." }: { items?: Array<{ label: string; url: string }>; note?: string }) {
   if (!items?.length) return null;
   return (
     <div className="mt-12 rounded-[14px] border border-line bg-surface p-6">
@@ -122,7 +122,7 @@ export function Sources({ items }: { items?: Array<{ label: string; url: string 
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-[12.5px] text-muted">Orientation only, not legal or immigration advice. Rules change: always check the official source.</p>
+      <p className="mt-3 text-[12.5px] text-muted">{note}</p>
     </div>
   );
 }

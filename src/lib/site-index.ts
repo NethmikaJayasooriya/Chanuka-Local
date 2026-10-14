@@ -16,10 +16,18 @@ import { lkGuides } from "@/lib/content/lk";
  */
 
 export const SITE_UPDATED = "2026-10-04";
+const CONTENT_UPDATES: Record<string, string> = {
+  "/": "2026-10-14",
+  "/cv-writing": "2026-10-14",
+  "/linkedin-optimisation": "2026-10-14",
+  "/reviews": "2026-10-14",
+  "/contact": "2026-10-14",
+  "/about/chanuka-jeewantha": "2026-10-14",
+};
 
 export type IndexEntry = { path: string; lastmod: string; priority: number };
 
-const e = (path: string, lastmod = SITE_UPDATED, priority = 0.6): IndexEntry => ({ path, lastmod, priority });
+const e = (path: string, lastmod = SITE_UPDATED, priority = 0.6): IndexEntry => ({ path, lastmod: CONTENT_UPDATES[path] ?? lastmod, priority });
 
 export function sitemapGroups(): Record<string, IndexEntry[]> {
   const groups: Record<string, IndexEntry[]> = {

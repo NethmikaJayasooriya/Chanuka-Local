@@ -828,11 +828,11 @@ export type AuthorProfile = {
 export const authorProfile: AuthorProfile = {
   metaTitle: "Chanuka Jeewantha: CPRW Certified CV Writer in Sri Lanka",
   metaDescription:
-    "Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. 8+ years, 5,000+ CVs written, rated 4.9 from 107 Google reviews.",
+    `Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. ${site.yearsExperience} years; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
   h1: "Chanuka Jeewantha",
   lead: "CPRW and CPCC certified CV writer and career coach in Sri Lanka. For more than eight years I have written CVs, cover letters and LinkedIn profiles for Sri Lankan professionals applying at home and abroad, and I write every one of them myself.",
   quickAnswer:
-    "Chanuka Jeewantha is a Sri Lankan CV writer and career coach, certified as a Certified Professional Resume Writer (CPRW) and Certified Professional Career Coach (CPCC). Over more than eight years he has written 5,000+ CVs for students, professionals and executives applying for jobs in Sri Lanka and overseas, is rated 4.9 from 107 Google reviews, and personally writes every client document and the guides on this site.",
+    `Chanuka Jeewantha is a Sri Lankan CV writer and career coach, certified as a Certified Professional Resume Writer (CPRW) and Certified Professional Career Coach (CPCC). He writes CVs and LinkedIn profiles for students, professionals and executives applying for jobs in Sri Lanka and overseas, has ${site.yearsExperience} years of experience, and is rated ${site.rating.score} from ${site.rating.count} Google reviews.`,
   bio: [
     "I write CVs, cover letters and LinkedIn profiles, and I have done it for more than eight years. In that time I have written more than 5,000 CVs: for school leavers and fresh graduates writing a first CV, for professionals moving up in Sri Lankan companies, and for senior leaders and people applying for jobs overseas.",
     "I hold two professional certifications, Certified Professional Resume Writer (CPRW) and Certified Professional Career Coach (CPCC). They set an international standard for how I write and coach, and I apply that standard to what Sri Lankan employers, government recruiters and overseas employers actually expect.",
@@ -982,8 +982,8 @@ export const cookiePolicy: LegalDoc = {
     {
       heading: "The short version",
       body: [
-        "The public site does not currently set advertising or analytics cookies. You can read every page without a tracking cookie being placed on your device.",
-        "The only cookies used are strictly necessary ones, described below.",
+        "You can read the public site without accepting analytics cookies. Google Analytics loads only after you choose Accept in the cookie banner.",
+        "Declining keeps analytics disabled. Your choice is remembered in local storage in your browser.",
       ],
     },
     {
@@ -1009,7 +1009,7 @@ export const cookiePolicy: LegalDoc = {
     {
       heading: "Changes to this policy",
       body: [
-        "If analytics or any other non-essential cookies are added in future, this policy will be updated before they are introduced, and you will be asked for consent where the law requires it.",
+        "The consent banner controls optional Google Analytics measurement. Non-essential tracking stays disabled until you accept. Changes to cookie use will be reflected in this policy.",
         "Questions about cookies can be sent to the contact address on this site.",
       ],
     },

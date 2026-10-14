@@ -13,12 +13,12 @@ export const metadata: Metadata = pageMetadata({
 
 const outcomes = [
   {
-    stat: "2 to 6 weeks",
-    label: "Typical time to first interview callback after the rewrite",
+    stat: "Public proof",
+    label: "Read dated reviews on the independent Google profile, not only quotations on this site",
   },
   {
-    stat: "40+",
-    label: "Countries clients have applied into",
+    stat: "Relevant detail",
+    label: "Look for comments about the brief, communication, document quality and delivery",
   },
   {
     stat: "1 round",
@@ -32,7 +32,7 @@ export default function ReviewsPage() {
       <PageHeader
         eyebrow="Reviews"
         title="What people say after the rewrite."
-        lead="Every review is a real, verified review left on Google by a client who paid for the service and went on to apply with the documents."
+        lead="Read client feedback and check the original Google profile before choosing your CV or LinkedIn writing service."
         crumbs={[{ label: "Reviews" }]}
         primary={{ href: "/#build", label: "Build your package" }}
       />
@@ -43,7 +43,7 @@ export default function ReviewsPage() {
         <div className="container-page">
           <p className="eyebrow">In practice</p>
           <h2 className="display mt-3 text-[clamp(1.6rem,3.2vw,2.2rem)] text-ink">
-            What tends to change.
+            How to assess the feedback.
           </h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {outcomes.map((o) => (
@@ -54,9 +54,9 @@ export default function ReviewsPage() {
             ))}
           </div>
           <p className="mt-6 max-w-2xl text-[13.5px] leading-relaxed text-muted">
-            These are observed ranges across past clients, not a promise. A better document
-            raises your response rate. It does not replace applying, and it cannot control
-            whether a role was already filled internally.
+            The displayed rating was checked on 14 October 2026. Reviews and counts change;
+            the linked Google profile has the latest information. Individual experiences do
+            not guarantee an interview, a job offer or a similar result for another client.
           </p>
         </div>
       </section>

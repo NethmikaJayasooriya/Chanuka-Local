@@ -83,12 +83,12 @@ export function PageHeader({
 
           {eyebrow && <p className="eyebrow rise d1">{eyebrow}</p>}
 
-          <h1 className="display rise d1 mt-3 max-w-[20ch] text-[clamp(1.85rem,4.4vw,3rem)] text-ink">
+          <h1 className="display mt-3 max-w-[20ch] text-[clamp(1.85rem,4.4vw,3rem)] text-ink">
             {title}
           </h1>
 
           {lead && (
-            <p className="rise d2 mt-5 max-w-2xl text-[16.5px] leading-relaxed text-muted">
+            <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-muted">
               {lead}
             </p>
           )}

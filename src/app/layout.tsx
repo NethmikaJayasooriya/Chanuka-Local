@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     locale: "en_LK",
     title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
     description:
-      "CPRW and CPCC certified CV writing, foreign job CVs and LinkedIn optimisation in Sri Lanka. 4.9 from 107 Google reviews.",
+      `CPRW and CPCC certified CV writing and LinkedIn optimization in Sri Lanka. ${site.rating.score} from ${site.rating.count} Google reviews.`,
     images: [
       {
         url: "/og-image.png",
@@ -58,11 +58,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
     description:
-      "CPRW and CPCC certified CV writing, foreign job CVs and LinkedIn optimisation in Sri Lanka. 4.9 from 107 Google reviews.",
+      `CPRW and CPCC certified CV writing and LinkedIn optimization in Sri Lanka. ${site.rating.score} from ${site.rating.count} Google reviews.`,
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" },
   verification: {
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : {}),
     // Bing Webmaster Tools site verification (renders <meta name="msvalidate.01" ...>)
     other: { "msvalidate.01": "7B0FD319711D2F6A1E4649C72DC92F65" },
   },

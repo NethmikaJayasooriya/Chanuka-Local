@@ -2,8 +2,8 @@ import { GoogleBadge } from "./GoogleBadge";
 
 const proofPoints = [
   {
-    title: "ATS-tested formatting",
-    subtitle: "Built to pass recruiter screens",
+    title: "ATS-friendly formatting",
+    subtitle: "Readable structure for online applications",
     icon: (
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" className="h-4 w-4">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M7 3h6l4 4v10a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" />
@@ -24,7 +24,7 @@ const proofPoints = [
   },
   {
     title: "One revision round included",
-    subtitle: "Refined until you are fully satisfied",
+    subtitle: "One full round to refine the draft",
     icon: (
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" className="h-4 w-4">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M4 4v5h5" />
