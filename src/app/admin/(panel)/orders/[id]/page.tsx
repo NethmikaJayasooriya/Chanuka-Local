@@ -12,7 +12,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: o } = await db.from("orders").select("*").eq("id", id).maybeSingle();
+  const { data: o } = await db.from("orders").select("*").eq("id", id).eq("site", "lk").maybeSingle();
   if (!o) notFound();
 
   const { data: brief } = await db

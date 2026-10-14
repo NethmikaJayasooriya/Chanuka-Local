@@ -11,6 +11,7 @@ export default async function BlogAdmin() {
   const { data: posts } = await db
     .from("blog_posts")
     .select("id,title,slug,category,status,updated_at")
+    .eq("site", "lk")
     .order("updated_at", { ascending: false });
 
   return (

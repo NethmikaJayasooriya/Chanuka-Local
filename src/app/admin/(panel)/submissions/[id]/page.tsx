@@ -11,7 +11,7 @@ export default async function BriefDetail({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: s } = await db.from("intake_submissions").select("*").eq("id", id).maybeSingle();
+  const { data: s } = await db.from("intake_submissions").select("*").eq("id", id).eq("site", "lk").maybeSingle();
   if (!s) notFound();
 
   let cvUrl: string | null = null;

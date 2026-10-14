@@ -11,6 +11,7 @@ export default async function SubmissionsPage() {
   const { data: rows } = await db
     .from("intake_submissions")
     .select("id,name,email,target_role,cv_path,handled,created_at")
+    .eq("site", "lk")
     .order("created_at", { ascending: false });
 
   return (

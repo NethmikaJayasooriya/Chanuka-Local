@@ -12,7 +12,7 @@ export default async function EditLanding({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: page } = await db.from("landing_pages").select("*").eq("id", id).maybeSingle();
+  const { data: page } = await db.from("landing_pages").select("*").eq("id", id).eq("site", "lk").maybeSingle();
   if (!page) notFound();
 
   let coverUrl: string | null = null;

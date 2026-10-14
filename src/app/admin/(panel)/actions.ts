@@ -73,6 +73,7 @@ export async function savePost(form: FormData) {
   const status = String(form.get("status") ?? "draft");
 
   const record: Record<string, unknown> = {
+    site: "lk",
     title,
     slug,
     excerpt: String(form.get("excerpt") ?? ""),
@@ -101,7 +102,7 @@ export async function savePost(form: FormData) {
   }
 
   if (id) {
-    await db.from("blog_posts").update(record).eq("id", id);
+    await db.from("blog_posts").update(record).eq("id", id).eq("site", "lk");
   } else {
     await db.from("blog_posts").insert(record);
   }
@@ -116,7 +117,7 @@ export async function savePost(form: FormData) {
 export async function deletePost(id: string) {
   await requireAdmin();
   const db = createAdminClient();
-  await db.from("blog_posts").delete().eq("id", id);
+  await db.from("blog_posts").delete().eq("id", id).eq("site", "lk");
   revalidatePath("/admin/blog");
   revalidatePath("/career-advice");
 }
@@ -124,7 +125,7 @@ export async function deletePost(id: string) {
 export async function updateOrderStatus(id: string, status: string) {
   await requireAdmin();
   const db = createAdminClient();
-  await db.from("orders").update({ status }).eq("id", id);
+  await db.from("orders").update({ status }).eq("id", id).eq("site", "lk");
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/admin");
@@ -133,21 +134,21 @@ export async function updateOrderStatus(id: string, status: string) {
 export async function saveOrderNotes(id: string, admin_notes: string) {
   await requireAdmin();
   const db = createAdminClient();
-  await db.from("orders").update({ admin_notes }).eq("id", id);
+  await db.from("orders").update({ admin_notes }).eq("id", id).eq("site", "lk");
   revalidatePath(`/admin/orders/${id}`);
 }
 
 export async function markBriefHandled(id: string, handled: boolean) {
   await requireAdmin();
   const db = createAdminClient();
-  await db.from("intake_submissions").update({ handled }).eq("id", id);
+  await db.from("intake_submissions").update({ handled }).eq("id", id).eq("site", "lk");
   revalidatePath("/admin/submissions");
   revalidatePath(`/admin/submissions/${id}`);
   revalidatePath("/admin");
 }
 
 export async function savePrices(form: FormData) {
-  await requireAdmin();
+  await requireAdmin(true);
   const db = createAdminClient();
 
   const priceRows: { service_id: string; level_id: string; price_usd: number }[] = [];
@@ -199,6 +200,7 @@ export async function saveLanding(form: FormData) {
   const status = String(form.get("status") ?? "draft");
 
   const record: Record<string, unknown> = {
+    site: "lk",
     section,
     slug,
     title,
@@ -223,7 +225,7 @@ export async function saveLanding(form: FormData) {
   }
 
   if (id) {
-    await db.from("landing_pages").update(record).eq("id", id);
+    await db.from("landing_pages").update(record).eq("id", id).eq("site", "lk");
   } else {
     await db.from("landing_pages").upsert(record, { onConflict: "section,slug" });
   }
@@ -237,8 +239,8 @@ export async function saveLanding(form: FormData) {
 export async function deleteLanding(id: string) {
   await requireAdmin();
   const db = createAdminClient();
-  const { data } = await db.from("landing_pages").select("section,slug").eq("id", id).maybeSingle();
-  await db.from("landing_pages").delete().eq("id", id);
+  const { data } = await db.from("landing_pages").select("section,slug").eq("id", id).eq("site", "lk").maybeSingle();
+  await db.from("landing_pages").delete().eq("id", id).eq("site", "lk");
   if (data) revalidatePath(landingPath(data.section, data.slug));
   revalidatePath("/admin/pages");
   redirect("/admin/pages");
@@ -249,7 +251,7 @@ export async function deleteLanding(id: string) {
 export async function setPaymentStatus(id: string, status: string) {
   await requireAdmin();
   const db = createAdminClient();
-  await db.from("orders").update({ payment_status: status }).eq("id", id);
+  await db.from("orders").update({ payment_status: status }).eq("id", id).eq("site", "lk");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
@@ -268,7 +270,8 @@ export async function uploadDeliverable(form: FormData) {
     return;
   }
 
-  const { data: order } = await db.from("orders").select("user_id").eq("id", orderId).maybeSingle();
+  const { data: order } = await db.from("orders").select("user_id").eq("id", orderId).eq("site", "lk").maybeSingle();
+  if (!order) return;
   const userId = order?.user_id ?? null;
 
   const ext = file.name.split(".").pop() || "pdf";
@@ -282,6 +285,7 @@ export async function uploadDeliverable(form: FormData) {
   if (!error) {
     await db.from("deliverables").insert({
       order_id: orderId,
+      site: "lk",
       user_id: userId,
       label,
       kind,
@@ -289,8 +293,8 @@ export async function uploadDeliverable(form: FormData) {
       file_name: file.name,
     });
     // Reflect the stage on the order so the customer's timeline moves.
-    if (kind === "final") await db.from("orders").update({ status: "completed" }).eq("id", orderId);
-    else if (kind === "draft") await db.from("orders").update({ status: "draft_delivered" }).eq("id", orderId).neq("status", "completed");
+    if (kind === "final") await db.from("orders").update({ status: "completed" }).eq("id", orderId).eq("site", "lk");
+    else if (kind === "draft") await db.from("orders").update({ status: "draft_delivered" }).eq("id", orderId).eq("site", "lk").neq("status", "completed");
   }
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
@@ -299,8 +303,8 @@ export async function uploadDeliverable(form: FormData) {
 export async function deleteDeliverable(id: string, orderId: string) {
   await requireAdmin();
   const db = createAdminClient();
-  const { data: row } = await db.from("deliverables").select("file_path").eq("id", id).maybeSingle();
+  const { data: row } = await db.from("deliverables").select("file_path").eq("id", id).eq("site", "lk").maybeSingle();
   if (row?.file_path) await db.storage.from("deliverables").remove([row.file_path]);
-  await db.from("deliverables").delete().eq("id", id);
+  await db.from("deliverables").delete().eq("id", id).eq("site", "lk");
   revalidatePath(`/admin/orders/${orderId}`);
 }

@@ -11,6 +11,7 @@ export default async function OrdersPage() {
   const { data: orders } = await db
     .from("orders")
     .select("id,ref,package_name,level_name,delivery_window,total_usd,status,payment_status,customer_name,customer_email,created_at")
+    .eq("site", "lk")
     .order("created_at", { ascending: false });
 
   return (

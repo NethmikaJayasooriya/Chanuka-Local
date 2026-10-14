@@ -14,6 +14,7 @@ export default async function PagesAdmin() {
   const { data: rows } = await db
     .from("landing_pages")
     .select("id,section,slug,title,status,updated_at")
+    .eq("site", "lk")
     .order("section")
     .order("updated_at", { ascending: false });
 

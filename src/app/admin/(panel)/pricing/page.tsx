@@ -1,7 +1,7 @@
 import { savePrices } from "../actions";
 import { Card, PageTitle } from "@/components/admin/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseConfigured } from "@/lib/supabase/guard";
+import { requireAdmin, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,7 @@ const LEVELS = [
 
 export default async function PricingPage() {
   if (!supabaseConfigured()) return null;
+  await requireAdmin(true);
   const db = createAdminClient();
   const [{ data: prices }, { data: deliveries }, { data: bundles }] = await Promise.all([
     db.from("service_prices").select("*"),

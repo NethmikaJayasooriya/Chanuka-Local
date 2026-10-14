@@ -11,7 +11,7 @@ export default async function EditPost({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: post } = await db.from("blog_posts").select("*").eq("id", id).maybeSingle();
+  const { data: post } = await db.from("blog_posts").select("*").eq("id", id).eq("site", "lk").maybeSingle();
   if (!post) notFound();
 
   let coverUrl: string | null = null;

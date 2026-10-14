@@ -11,17 +11,17 @@ export default async function AdminDashboard() {
 
   const [ordersNew, ordersActive, briefsNew, postsPub, recentOrders, recentBriefs] =
     await Promise.all([
-      db.from("orders").select("id", { count: "exact", head: true }).eq("status", "new"),
-      db.from("orders").select("id", { count: "exact", head: true }).in("status", ["new", "in_progress", "revision"]),
-      db.from("intake_submissions").select("id", { count: "exact", head: true }).eq("handled", false),
-      db.from("blog_posts").select("id", { count: "exact", head: true }).eq("status", "published"),
-      db.from("orders").select("id,ref,package_name,customer_name,status,total_usd,created_at").order("created_at", { ascending: false }).limit(6),
-      db.from("intake_submissions").select("id,name,target_role,created_at,handled").order("created_at", { ascending: false }).limit(6),
+      db.from("orders").select("id", { count: "exact", head: true }).eq("site", "lk").eq("status", "new"),
+      db.from("orders").select("id", { count: "exact", head: true }).eq("site", "lk").in("status", ["new", "in_progress", "revision"]),
+      db.from("intake_submissions").select("id", { count: "exact", head: true }).eq("site", "lk").eq("handled", false),
+      db.from("blog_posts").select("id", { count: "exact", head: true }).eq("site", "lk").eq("status", "published"),
+      db.from("orders").select("id,ref,package_name,customer_name,status,total_usd,created_at").eq("site", "lk").order("created_at", { ascending: false }).limit(6),
+      db.from("intake_submissions").select("id,name,target_role,created_at,handled").eq("site", "lk").order("created_at", { ascending: false }).limit(6),
     ]);
 
   return (
     <>
-      <PageTitle title="Dashboard" sub="Orders, briefs and content at a glance." />
+      <PageTitle title="Sri Lanka dashboard" sub="Local orders, briefs and content at a glance." />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="New orders" value={ordersNew.count ?? 0} href="/admin/orders" />

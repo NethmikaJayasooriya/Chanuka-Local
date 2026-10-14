@@ -9,7 +9,6 @@ const nav = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/submissions", label: "CV briefs" },
-  { href: "/admin/pricing", label: "Pricing" },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/pages", label: "SEO Pages" },
 ];
@@ -47,7 +46,7 @@ export function AdminShell({
     <div className="min-h-screen bg-[#f4f6fa] text-ink">
       {/* Top bar (mobile) */}
       <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
-        <span className="font-bold">Chanuka · Admin</span>
+        <span className="font-bold">Chanuka · Sri Lanka Admin</span>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -77,8 +76,13 @@ export function AdminShell({
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
             <Link href="/admin" className="hidden px-2 py-2 text-[16px] font-bold lg:block">
-              Chanuka · Admin
+              Chanuka · Sri Lanka Admin
             </Link>
+            <div className="mt-3 rounded-xl border border-line bg-[#f7f9fc] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Workspace</p>
+              <p className="mt-1 text-[13px] font-semibold text-ink">🇱🇰 chanukajeewantha.lk</p>
+              <a href="https://chanukajeewantha.com/admin" className="mt-2 block text-[12px] font-semibold text-brand hover:underline">Open Global control centre ↗</a>
+            </div>
             <nav className="mt-2 space-y-1">
               {nav.map((n) => (
                 <Link
