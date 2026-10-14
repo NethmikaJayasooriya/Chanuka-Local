@@ -30,14 +30,13 @@ export const PRICE_MIN = Math.min(...allPrices);
 export const PRICE_MAX = Math.max(...allPrices);
 
 /**
- * hreflang between the two country-code sites. Sri Lankan searchers get
- * the .lk page (en-LK, LKR prices); everyone else gets the .com page
- * (x-default). The .com site carries the reciprocal en-LK link.
+ * Self-reference for local pages. Cross-domain variants are intentionally
+ * omitted until the .com deployment emits matching reciprocal links to
+ * final canonical URLs. Sinhala/English guide pairs are declared in their
+ * own metadata builder and remain reciprocal within this site.
  */
-export const lkCluster = (path: string, globalPath: string = path): Record<string, string> => ({
+export const lkCluster = (path: string): Record<string, string> => ({
   "en-LK": abs(path),
-  en: `${GLOBAL_URL}${globalPath === "/" ? "/" : globalPath}`,
-  "x-default": `${GLOBAL_URL}${globalPath === "/" ? "/" : globalPath}`,
 });
 export const homeCluster = () => lkCluster("/");
 export const serviceCluster = (service: string) => lkCluster(`/${service}`);
