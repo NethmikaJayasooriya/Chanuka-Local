@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_KEY } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/guard";
+import { resolveOrder } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
         .select("id")
         .eq("id", existingOrderId)
         .eq("user_id", userId)
+        .eq("site", SITE_KEY)
         .maybeSingle();
       if (owned) orderId = owned.id;
     }
@@ -48,18 +50,15 @@ export async function POST(request: Request) {
       if (orderRaw) {
         try {
           const o = JSON.parse(String(orderRaw));
+          const [prefix, suffix] = String(o.package_id ?? "").split(":");
+          const selection = resolveOrder(suffix ?? prefix, o.level_id, o.delivery_id, suffix ? prefix : "essential");
+          if (!selection) throw new Error("Invalid pricing selection");
           const { data } = await db
             .from("orders")
             .insert({
               site: SITE_KEY,
               user_id: userId,
-              package_id: o.package_id ?? null,
-              package_name: o.package_name ?? null,
-              level_id: o.level_id ?? null,
-              level_name: o.level_name ?? null,
-              delivery_id: o.delivery_id ?? null,
-              delivery_window: o.delivery_window ?? null,
-              total_usd: o.total_usd ?? null,
+              ...selection,
               customer_name: String(form.get("name") ?? "") || null,
               customer_email: String(form.get("email") ?? "") || null,
               customer_phone: String(form.get("phone") ?? "") || null,

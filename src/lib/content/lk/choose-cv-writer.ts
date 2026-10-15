@@ -93,7 +93,7 @@ export const chooseCvWriter: LkGuide = {
       id: "disclosure",
       heading: "Where Chanuka Jeewantha fits",
       paragraphs: [
-        `For transparency, since this guide is on his site: Chanuka Jeewantha holds the CPRW and CPCC certifications, has ${site.yearsExperience} years of experience and has written ${site.cvsWritten} CVs. He is rated ${site.rating.score} from ${site.rating.count} Google reviews, and he writes every CV personally. An ATS CV is ${formatLKR(cv["under-2"])} for freshers, ${formatLKR(cv["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(cv["over-10"])} for executives, with one revision round and Word and PDF files.`,
+        `For transparency, since this guide is on his site: Chanuka Jeewantha holds the CPRW and CPCC certifications, has ${site.yearsExperience} years of experience and has written ${site.cvsWritten} CVs. He is rated ${site.rating.score} from ${site.rating.count} Google reviews, and offers supervised Essential and personally crafted Signature services. An Essential ATS CV is ${formatLKR(cv["under-2"])} for freshers, ${formatLKR(cv["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(cv["over-10"])} for executives, with one revision round and Word and PDF files.`,
         "Use the checklist above to compare him fairly with any other writer you are considering.",
       ],
     },
@@ -105,7 +105,7 @@ export const chooseCvWriter: LkGuide = {
     "Walk away from guaranteed jobs or visas.",
   ],
   faqs: [
-    { q: "Who is the best CV writer in Sri Lanka?", a: `It depends on your field and goals, so compare writers on who writes the CV, credentials, real reviews, samples, ATS format, revisions and price. Chanuka Jeewantha is a CPRW and CPCC certified CV writer with ${site.cvsWritten} CVs written over ${site.yearsExperience} years and a ${site.rating.score} rating from ${site.rating.count} Google reviews, and he writes every CV personally.` },
+    { q: "Who is the best CV writer in Sri Lanka?", a: `It depends on your field and goals, so compare writers on who writes the CV, credentials, real reviews, samples, ATS format, revisions and price. Chanuka Jeewantha is a CPRW and CPCC certified CV writer with ${site.cvsWritten} CVs written over ${site.yearsExperience} years and a ${site.rating.score} rating from ${site.rating.count} Google reviews, and offers supervised Essential and personally crafted Signature services.` },
     { q: "How much does CV writing cost in Sri Lanka?", a: `Providers and scopes differ, so compare current quotes. Chanuka's published ATS CV prices are ${formatLKR(cv["under-2"])} for students and fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals, and ${formatLKR(cv["over-10"])} for executives. Packages with other services have different totals.` },
     { q: "Is a professional CV writer worth it?", a: "It is worth it when the job matters: a competitive graduate role, a promotion, a career change or a foreign job. A free template is enough when you already know exactly what to write." },
     { q: "What is CPRW?", a: "CPRW stands for Certified Professional Resume Writer, a professional certification for resume and CV writers that tests their knowledge of writing standards and practical writing. CPCC (Certified Professional Career Coach) is a related certification for career coaching." },

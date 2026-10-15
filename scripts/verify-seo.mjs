@@ -26,7 +26,7 @@ for (const path of ["/", "/cv-writing", "/linkedin-optimisation", "/linkedin-pro
     assert.ok(!schemas.some((schema) => JSON.stringify(schema).includes('"aggregateRating"')), "no self-serving business review markup");
     if (path === "/cv-writing" || path === "/linkedin-optimisation") {
       const service = schemas.find((schema) => schema["@type"] === "Service");
-      assert.deepEqual(service.offers.map((offer) => Number(offer.price)), [3950, 13500, 19500]);
+      assert.deepEqual(service.offers.map((offer) => Number(offer.price)), [3950, 5950, 9950, 7500, 13500, 19500]);
       assert.ok(service.offers.every((offer) => offer.priceCurrency === "LKR"));
       assert.ok(html.includes('lang="si-LK"'), "Sinhala summary required");
     }

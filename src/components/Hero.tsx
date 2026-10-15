@@ -153,7 +153,7 @@ export function Hero() {
 
             <p className="rise d1 mt-5 max-w-[420px] xl:max-w-[520px] 2xl:max-w-[640px] text-[16px] leading-[1.75] text-muted sm:mt-6 sm:text-[17px]">
               CV writing in Sri Lanka for private sector, banking, IT, government and
-              foreign jobs, written personally by Chanuka. {site.cvsWritten} CVs over {site.yearsExperience} years.
+              foreign jobs. Choose supervised Essential or personally crafted Signature. {site.cvsWritten} CVs over {site.yearsExperience} years.
               Choose your package, your experience level and how fast you need it.
             </p>
 

@@ -109,7 +109,7 @@ export const foreignJobCv: LkGuide = {
     { q: "Should I put my passport number on my CV?", a: "No. Share your passport number only when a verified employer or a licensed agency needs it for a visa or offer. It does not help you get shortlisted." },
     { q: "Do I need to register with SLBFE?", a: "Sri Lankans leaving for employment abroad are required to register with the Sri Lanka Bureau of Foreign Employment. Check the SLBFE website for the current process and fees, and confirm that any agency you use is licensed." },
     { q: "How long should a CV for a foreign job be?", a: "Two pages for most roles in the Gulf, UK, Canada and Europe. Australia accepts two to three pages. A US resume is one to two pages. Japan uses a standard form." },
-    { q: "How much does a foreign job CV cost?", a: `With Chanuka Jeewantha a Foreign Job CV is ${formatLKR(f["under-2"])} for students and fresh graduates, ${formatLKR(f["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(f["over-10"])} for executives. It is written for the specific country you name, with one revision round and Word and PDF files.` },
+    { q: "How much does a foreign job CV cost?", a: `With Chanuka Jeewantha an Essential Foreign Job CV is ${formatLKR(f["under-2"])} for students and fresh graduates, ${formatLKR(f["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(f["over-10"])} for executives. It is written for the specific country you name, with one revision round and Word and PDF files.` },
   ],
   sources: [
     { label: "Sri Lanka Bureau of Foreign Employment (SLBFE)", url: "https://www.slbfe.lk/" },
@@ -127,7 +127,7 @@ export const foreignJobCv: LkGuide = {
   ],
   cta: {
     heading: "Get a CV written for your destination",
-    body: `Chanuka writes Foreign Job CVs for the Gulf, UK, Europe, Australia and Canada, personally. From ${formatLKR(f["under-2"])}, delivery from 24 hours.`,
+    body: `Essential and Signature Foreign Job CVs cover the Gulf, UK, Europe, Australia and Canada. Essential from ${formatLKR(f["under-2"])}, delivery from 24 hours.`,
     href: "/order?package=foreign-cv",
     label: "Order a Foreign Job CV",
   },

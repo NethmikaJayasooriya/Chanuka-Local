@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BASE_PRICES, levels, type ServiceId } from "@/lib/pricing";
+import { BASE_PRICES, TIER_PRICES, tiers, levels, type ServiceId } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 /**
@@ -25,7 +25,7 @@ export const LINKEDIN_URL = site.sameAs[0];
 export const abs = (path: string) => (path.startsWith("http") ? path : `${BASE_URL}${path === "/" ? "" : path}`);
 
 /** Lowest and highest published single-service prices (LKR). */
-const allPrices = Object.values(BASE_PRICES).flatMap((p) => Object.values(p));
+const allPrices = Object.values(TIER_PRICES).flatMap((prices) => Object.values(prices).flatMap((p) => Object.values(p)));
 export const PRICE_MIN = Math.min(...allPrices);
 export const PRICE_MAX = Math.max(...allPrices);
 
@@ -230,14 +230,14 @@ export function serviceLd({
     provider: { "@id": ORG_ID },
     areaServed: area ? { "@type": "Country", name: area } : { "@type": "Country", name: site.country },
     availableChannel: { "@type": "ServiceChannel", serviceUrl: abs("/order"), availableLanguage: ["English", "Sinhala"] },
-    ...(packageService ? { offers: levels.map((level) => ({
+    ...(packageService ? { offers: tiers.flatMap((tier) => levels.map((level) => ({
       "@type": "Offer",
-      name: `${name} — ${level.name}`,
-      description: level.hint,
+      name: `${tier.name} ${name} — ${level.name}`,
+      description: `${level.hint}. ${tier.description}`,
       priceCurrency: "LKR",
-      price: BASE_PRICES[packageService][level.id],
+      price: TIER_PRICES[tier.id][packageService][level.id],
       url: abs("/order"),
-    })) } : lowPrice !== undefined && highPrice !== undefined ? { offers: {
+    }))) } : lowPrice !== undefined && highPrice !== undefined ? { offers: {
       "@type": "AggregateOffer",
       priceCurrency: "LKR",
       lowPrice,
@@ -291,7 +291,7 @@ export function siteGraphLd() {
         image: abs("/images/chanuka.jpg"),
         email: site.email,
         telephone: site.phone,
-        description: `CPRW and CPCC certified CV writing, LinkedIn optimisation, cover letters and foreign job CVs in Sri Lanka. ${site.cvsWritten} CVs written over ${site.yearsExperience} years, every one personally by Chanuka Jeewantha.`,
+        description: `CPRW and CPCC certified CV writing, LinkedIn optimisation, cover letters and foreign job CVs in Sri Lanka. ${site.cvsWritten} CVs over ${site.yearsExperience} years. Essential is team-crafted and quality-checked by Chanuka; Signature is personally crafted by him.`,
         slogan: site.tagline,
         founder: { "@id": PERSON_ID },
         areaServed: areaServed(),
@@ -311,10 +311,11 @@ export function siteGraphLd() {
           "@type": "OfferCatalog",
           name: "CV and career services in Sri Lanka",
           itemListElement: [
-            offer("ATS CV writing", "/cv-writing", BASE_PRICES.cv["under-2"]),
+            offer("Essential ATS CV writing", "/cv-writing", BASE_PRICES.cv["under-2"]),
             offer("Foreign job CV writing", "/foreign-job-cv-sri-lanka", BASE_PRICES["foreign-cv"]["under-2"]),
             offer("LinkedIn profile optimisation", "/linkedin-optimisation", BASE_PRICES.linkedin["under-2"]),
             offer("Cover letter writing", "/cover-letter-writing", BASE_PRICES["cover-letter"]["under-2"]),
+            offer("Essential CV Review", "/cv-review", BASE_PRICES["cv-review"]["under-2"]),
             offer("Career strategy consultation", "/career-strategy", BASE_PRICES.consultation["under-2"]),
           ],
         },

@@ -1,31 +1,13 @@
-/**
- * SRI LANKA PRICING SOURCE OF TRUTH (LKR)
- * ------------------------------------------------------------------
- * Official Sri Lanka market pricing for Chanuka Jeewantha Portfolio:
- * 
- * 1. Starter Pack (Essentials, Students / Fresh Graduates · Less than 1 year):
- *    - ATS CV Writing: LKR 3,950
- *    - Cover Letter Writing: LKR 2,950
- *    - LinkedIn Optimization: LKR 3,950
- *    -> Total: LKR 10,850
- *
- * 2. Career Pack (Signature, Professionals · 1-9 years):
- *    - ATS CV Writing: LKR 13,500
- *    - Cover Letter Writing: LKR 8,500
- *    - LinkedIn Optimization: LKR 13,500
- *    - Foreign Job CV: LKR 17,500
- *    -> Total: LKR 53,000
- *
- * 3. Executive Pack (Signature, Executives · More than 9 years):
- *    - ATS CV Writing: LKR 19,500
- *    - Foreign Job CV: LKR 28,500
- *    - LinkedIn Optimization: LKR 19,500
- *    - Cover Letter Writing: LKR 13,500
- *    - 1-Hour Strategy Consultation: LKR 27,500
- *    -> Total: LKR 108,500
+/** LKR prices from the supplied Essential and Signature lists.
+ * Legacy level IDs are retained for existing orders; labels define the current bands.
  */
 
-export type ServiceId = "cv" | "cover-letter" | "linkedin" | "foreign-cv" | "consultation";
+export type ServiceId = "cv" | "cover-letter" | "linkedin" | "foreign-cv" | "cv-review" | "consultation";
+export type TierId = "essential" | "signature";
+export const tiers = [
+  { id: "essential" as const, name: "Essential", description: "Team-crafted under Chanuka’s supervision. Quality-checked by Chanuka." },
+  { id: "signature" as const, name: "Signature", description: "Personally crafted by Chanuka Jeewantha. Industry + country positioning and 30-day support." },
+];
 export type LevelId = "under-2" | "3-to-9" | "over-10";
 export type DeliveryId = "normal" | "fast" | "ultra";
 
@@ -35,15 +17,32 @@ export const services: Record<ServiceId, { name: string; short: string }> = {
   linkedin: { name: "LinkedIn Optimization", short: "LinkedIn" },
   "foreign-cv": { name: "Foreign Job CV", short: "Foreign Job CV" },
   consultation: { name: "1-Hour Strategy Consultation", short: "Consultation" },
+  "cv-review": { name: "CV Review", short: "CV Review" },
 };
 
 export const BASE_PRICES: Record<ServiceId, Record<LevelId, number>> = {
-  cv: { "under-2": 3950, "3-to-9": 13500, "over-10": 19500 },
-  "cover-letter": { "under-2": 2950, "3-to-9": 8500, "over-10": 13500 },
-  linkedin: { "under-2": 3950, "3-to-9": 13500, "over-10": 19500 },
-  "foreign-cv": { "under-2": 5950, "3-to-9": 17500, "over-10": 28500 },
+  cv: { "under-2": 3950, "3-to-9": 5950, "over-10": 9950 },
+  "cover-letter": { "under-2": 2950, "3-to-9": 3950, "over-10": 5950 },
+  linkedin: { "under-2": 3950, "3-to-9": 5950, "over-10": 9950 },
+  "foreign-cv": { "under-2": 4950, "3-to-9": 7450, "over-10": 10950 },
+  "cv-review": { "under-2": 1490, "3-to-9": 1990, "over-10": 2490 },
   consultation: { "under-2": 7500, "3-to-9": 15000, "over-10": 27500 },
 };
+
+export const SIGNATURE_PRICES: typeof BASE_PRICES = {
+  cv: { "under-2": 7500, "3-to-9": 13500, "over-10": 19500 },
+  linkedin: { "under-2": 7500, "3-to-9": 13500, "over-10": 19500 },
+  "cover-letter": { "under-2": 5500, "3-to-9": 8500, "over-10": 13500 },
+  "foreign-cv": { "under-2": 12500, "3-to-9": 17500, "over-10": 28500 },
+  "cv-review": { "under-2": 2500, "3-to-9": 3500, "over-10": 4500 },
+  // Consultation was not revised in the supplied lists; retain its existing rates.
+  consultation: BASE_PRICES.consultation,
+};
+export const TIER_PRICES = { essential: BASE_PRICES, signature: SIGNATURE_PRICES };
+export const listedServices: ServiceId[] = ["cv", "linkedin", "cover-letter", "foreign-cv", "cv-review"];
+export function pricingSummary(service: ServiceId = "cv"): string {
+  return tiers.map((tier) => `${tier.name}: ${levels.map((level) => `${level.hint} ${formatLKR(TIER_PRICES[tier.id][service][level.id])}`).join("; ")}`).join(". ");
+}
 
 export const BUNDLE_DISCOUNT: Record<number, number> = {
   1: 0,
@@ -112,6 +111,7 @@ export const packages: Package[] = [
     includes: ["cv", "cover-letter"],
     blurb: "The complete application pair tailored for high-priority vacancies.",
   },
+  { id: "cv-review", name: "CV Review", includes: ["cv-review"], blurb: "A focused assessment of your existing CV, with practical improvement recommendations." },
 ];
 
 export const levels: Array<{
@@ -123,23 +123,23 @@ export const levels: Array<{
 }> = [
   {
     id: "under-2",
-    name: "Starter Pack",
+    name: "Student / Fresh Graduate",
     hint: "Students / Fresh Graduates · Less than 1 year",
-    eyebrow: "ESSENTIALS",
+    eyebrow: "LESS THAN 1 YEAR",
     packName: "Starter Pack",
   },
   {
     id: "3-to-9",
-    name: "Career Pack",
+    name: "Professional",
     hint: "Professionals · 1-9 years",
-    eyebrow: "SIGNATURE",
+    eyebrow: "1–9 YEARS",
     packName: "Career Pack",
   },
   {
     id: "over-10",
-    name: "Executive Pack",
+    name: "Executive",
     hint: "Executives · More than 9 years",
-    eyebrow: "SIGNATURE",
+    eyebrow: "MORE THAN 9 YEARS",
     packName: "Executive Pack",
   },
 ];
@@ -185,12 +185,12 @@ export type Quote = {
   serviceBreakdown: Array<{ serviceId: ServiceId; name: string; price: number }>;
 };
 
-export function quote(pkg: Package, level: LevelId, delivery: DeliveryId): Quote {
+export function quote(pkg: Package, level: LevelId, delivery: DeliveryId, tier: TierId = "essential"): Quote {
   const incs = getPackageIncludes(pkg, level);
   const serviceBreakdown = incs.map((s) => ({
     serviceId: s,
     name: services[s]?.name ?? s,
-    price: BASE_PRICES[s]?.[level] ?? 0,
+    price: TIER_PRICES[tier][s][level],
   }));
   const listPrice = serviceBreakdown.reduce((sum, item) => sum + item.price, 0);
   const discount = BUNDLE_DISCOUNT[incs.length] ?? 0;
@@ -212,6 +212,24 @@ export function quote(pkg: Package, level: LevelId, delivery: DeliveryId): Quote
 
 export function formatLKR(value: number): string {
   return `LKR ${value.toLocaleString("en-US")}`;
+}
+
+/** Server-side selection validation. Never accept a customer-supplied price. */
+export function resolveOrder(packageId: unknown, levelId: unknown, deliveryId: unknown, tierId: unknown) {
+  const pkg = packages.find((item) => item.id === packageId);
+  const level = levels.find((item) => item.id === levelId);
+  const delivery = deliveries.find((item) => item.id === deliveryId);
+  const tier = tiers.find((item) => item.id === tierId);
+  if (!pkg || !level || !delivery || !tier) return null;
+  return {
+    package_id: `${tier.id}:${pkg.id}`,
+    package_name: `${tier.name} · ${getPackageDisplayName(pkg, level.id)}`,
+    level_id: level.id,
+    level_name: level.name,
+    delivery_id: delivery.id,
+    delivery_window: delivery.window,
+    total_usd: quote(pkg, level.id, delivery.id, tier.id).total,
+  };
 }
 
 export function usd(value: number): string {

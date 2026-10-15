@@ -98,7 +98,7 @@ export function JobRolePageView({ role }: { role: JobRole }) {
         <InlineOfferBanner
           badge={`${role.name} Positioning`}
           title={`Need your ${role.name} CV rewritten for international roles?`}
-          body="Chanuka personally structures your stack, achievements, and leadership metrics to pass enterprise ATS filters and impress hiring managers."
+          body="Choose Essential or Signature to structure your skills, achievements and leadership evidence for your target role."
           ctaText={`Order ${role.name} CV`}
           ctaHref={`/order?package=cv-linkedin&role=${role.slug}`}
         />

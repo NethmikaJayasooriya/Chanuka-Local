@@ -13,8 +13,8 @@ const proofPoints = [
     ),
   },
   {
-    title: "Written personally by Chanuka",
-    subtitle: "1-on-1 expert craft, no outsourcing",
+    title: "Essential or Signature",
+    subtitle: "Team-crafted or personally written by Chanuka",
     icon: (
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" className="h-4 w-4">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M14.5 2.5a2.121 2.121 0 013 3L6 17l-4 1 1-4 11.5-11.5z" />

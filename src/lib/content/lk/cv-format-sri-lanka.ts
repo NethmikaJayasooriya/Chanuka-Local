@@ -145,7 +145,7 @@ export const cvFormatSriLanka: LkGuide = {
     { q: "What format should I use for government job applications?", a: "The application format published with the Gazette notice or advertisement. Copy it exactly, fill every field, attach the documents it asks for and submit before the closing date. A separate CV is only needed if the notice requests one." },
     { q: "Should I send my CV as PDF or Word?", a: "PDF, unless the employer or recruitment agency asks for Word. A PDF keeps your layout intact on any device. Name the file with your name, for example Nimal-Perera-CV.pdf." },
     { q: "What is the difference between a CV and a bio data?", a: "A CV shows your education, experience, skills and achievements for a job. A bio data is a personal details sheet (date of birth, family, religion, address) used for some forms and often for marriage proposals in Sri Lanka. Employers expect a CV." },
-    { q: "How much does a professional CV cost in Sri Lanka?", a: `With Chanuka Jeewantha an ATS CV is ${formatLKR(cv["under-2"])} for students and fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(cv["over-10"])} for executives. Every CV is written personally, with one revision round and Word and PDF files.` },
+    { q: "How much does a professional CV cost in Sri Lanka?", a: `With Chanuka Jeewantha an Essential ATS CV is ${formatLKR(cv["under-2"])} for students and fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals with 1 to 9 years of experience and ${formatLKR(cv["over-10"])} for executives. Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support. CV writing includes one revision round and Word and PDF files.` },
   ],
   sources: [
     { label: "Department of Government Printing: Government Gazette", url: "https://documents.gov.lk/" },
@@ -160,7 +160,7 @@ export const cvFormatSriLanka: LkGuide = {
   ],
   cta: {
     heading: "Want this format done for you?",
-    body: `Chanuka writes your CV personally in this format, tailored to your target role. From ${formatLKR(cv["under-2"])}, delivery from 24 hours.`,
+    body: `Choose Essential or Signature CVs in this format, tailored to your target role. Essential from ${formatLKR(cv["under-2"])}, delivery from 24 hours.`,
     href: "/order?package=ats-cv",
     label: "Order your CV",
   },

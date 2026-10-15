@@ -1,9 +1,10 @@
+import { PriceList } from "./PriceList";
 import { ConversionFooter } from "./ConversionFooter";
 import Link from "next/link";
 import { PageHeader } from "./PageHeader";
 import { AnswerBox, JsonLd } from "./Seo";
 import { AUTHOR_PATH, serviceLd, webPageLd } from "@/lib/seo";
-import { BASE_PRICES, levels, usd } from "@/lib/pricing";
+import { BASE_PRICES, SIGNATURE_PRICES, usd } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import type { ServicePage } from "@/lib/services";
 
@@ -48,7 +49,7 @@ export function ServicePageView({ service }: { service: ServicePage }) {
           path: `/${service.slug}`,
           serviceType: service.name,
           lowPrice: service.packageService ? BASE_PRICES[service.packageService]["under-2"] : undefined,
-          highPrice: service.packageService ? BASE_PRICES[service.packageService]["over-10"] : undefined,
+          highPrice: service.packageService ? SIGNATURE_PRICES[service.packageService]["over-10"] : undefined,
           packageService: service.packageService,
         })}
       />
@@ -61,7 +62,7 @@ export function ServicePageView({ service }: { service: ServicePage }) {
             <span className="text-[13px] uppercase tracking-[0.1em] text-muted">From</span>
             <span className="display text-[26px] text-ink">{usd(fromPrice)}</span>
             <span className="text-[13.5px] text-muted">
-              Final price depends on your experience level and delivery speed.
+              Essential starting price. Choose your service tier and experience level below.
             </span>
           </div>
         </section>
@@ -71,16 +72,8 @@ export function ServicePageView({ service }: { service: ServicePage }) {
         <section className="border-b border-line py-10">
           <div className="container-page">
             <h2 className="display text-[24px] text-ink">What does {service.name.toLowerCase()} cost in Sri Lanka?</h2>
-            <div className="mt-5 grid gap-4 sm:grid-cols-3">
-              {levels.map((level) => (
-                <div key={level.id} className="rounded-[14px] border border-line bg-surface p-5">
-                  <h3 className="font-semibold text-ink">{level.name}</h3>
-                  <p className="mt-2 display text-[24px] text-brand">{usd(BASE_PRICES[service.packageService!][level.id])}</p>
-                  <p className="mt-2 text-[13px] text-muted">{level.hint}</p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-5 text-[14px] leading-relaxed text-muted">Written personally by <Link href={AUTHOR_PATH} className="font-semibold text-brand">{site.name}, CPRW, CPCC</Link>. One revision round included. <Link href="/how-it-works" className="text-brand underline underline-offset-2">See the process and delivery options</Link>.</p>
+            <div className="mt-5"><PriceList service={service.packageService} /></div>
+            <p className="mt-5 text-sm leading-relaxed text-muted">Essential is team-crafted under Chanuka’s supervision and quality-checked by him. Signature is personally crafted by <Link href={AUTHOR_PATH} className="font-semibold text-brand">{site.name}, CPRW, CPCC</Link>, with 30-day support. <Link href="/how-it-works" className="underline">See the process</Link>.</p>
           </div>
         </section>
       )}

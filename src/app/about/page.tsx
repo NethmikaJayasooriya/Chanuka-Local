@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 const facts: Array<[string, string]> = [
-  ["Founded", "Founder-led practice, every document written personally"],
+  ["Founded", "Founder-led Essential and Signature services"],
   ["Experience", "8+ years in career branding and CV writing"],
   ["Certifications", "CPRW and CPCC"],
   ["CVs written", "5,000+"],
@@ -70,8 +70,8 @@ const method = [
 
 const principles = [
   {
-    title: "One writer, every document",
-    body: "Nothing is passed to a team or outsourced. That caps how many orders run at once, and it is the reason the faster delivery options carry a fee.",
+    title: "Two tiers, one quality commitment",
+    body: "Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.",
   },
   {
     title: "Evidence over adjectives",
@@ -93,7 +93,7 @@ export default function AboutPage() {
       <PageHeader
         eyebrow="About"
         title="Chanuka Jeewantha, CPRW certified CV writer in Sri Lanka."
-        lead="I help Sri Lankan professionals present themselves clearly, confidently and competitively, for jobs at home and abroad. More than 5,000 CVs so far, and every document has been written personally."
+        lead="I help Sri Lankan professionals present themselves clearly, confidently and competitively, for jobs at home and abroad. More than 5,000 CVs so far. Choose supervised Essential or personally crafted Signature services."
         crumbs={[{ label: "About" }]}
         primary={{ href: "/#build", label: "Build your package" }}
         secondary={{ href: "/reviews", label: "Read reviews" }}
@@ -141,10 +141,9 @@ export default function AboutPage() {
             </p>
             <p>
               <strong className="font-semibold text-ink">
-                Everything is written by me. No team, no outsourcing and no template library
+                Essential work is team-crafted under my supervision and quality-checked by me. Signature work is personally written by me.
               </strong>{" "}
-              with your name dropped into it. That is a hard limit on volume, and it is the
-              reason the work holds up.
+              Both options start with your career evidence and target role, rather than a generic template with your name dropped into it.
             </p>
           </div>
 

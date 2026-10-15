@@ -1,3 +1,4 @@
+import { pricingSummary } from "@/lib/pricing";
 import type { ServiceId } from "./pricing";
 
 export type ServicePage = {
@@ -28,12 +29,12 @@ export const servicePages: ServicePage[] = [
     name: "ATS Friendly CV",
     packageService: "cv",
     title: "Professional CV writing in Sri Lanka, for your next role.",
-    lead: "A targeted CV for Sri Lankan employers or overseas applications, written personally by Chanuka Jeewantha. Clear achievements, readable formatting and a story that matches the role you actually want.",
+    lead: "A targeted CV for Sri Lankan employers or overseas applications, available as supervised Essential or personally crafted Signature work. Clear achievements, readable formatting and a story that matches the role you actually want.",
     metaTitle: "CV Writing Service in Sri Lanka | ATS CV from LKR 3,950",
     metaDescription:
-      "CPRW certified ATS CV writing in Sri Lanka for private sector, banking, IT and foreign jobs. Written personally by Chanuka Jeewantha, delivery from 24 hours.",
+      "CPRW certified ATS CV writing in Sri Lanka for private sector, banking, IT and foreign jobs. Essential or Signature Jeewantha, delivery from 24 hours.",
     quickAnswer: "Chanuka Jeewantha provides professional CV writing in Sri Lanka for graduates, experienced professionals and executives. The service includes target-role research, achievement-led writing, an ATS-friendly layout, editable Word and PDF files, and one revision round. Prices start at LKR 3,950 for students and fresh graduates; standard delivery is 48 to 72 hours. Sinhala and English communication is available online, island-wide.",
-    sinhalaSummary: "ශ්‍රී ලංකාවේ රැකියාවකට හෝ විදේශ රැකියාවකට ගැළපෙන CV එකක් Chanuka Jeewantha විසින් ලියා දෙනවා. ඔබේ අත්දැකීම් සහ ඉලක්ක රැකියාව අනුව අන්තර්ගතය සකස් කරන අතර Word සහ PDF files සමඟ එක් revision round එකක් ඇතුළත්. සිසුන් සහ නව උපාධිධාරීන් සඳහා මිල රු. 3,950 සිට.",
+    sinhalaSummary: "ශ්‍රී ලංකාවේ හෝ විදේශ රැකියාවකට ගැළපෙන CV එකක් Essential team-crafted හෝ Chanuka විසින්ම ලියන Signature tier එකෙන් තෝරන්න. ඔබේ අත්දැකීම් සහ ඉලක්ක රැකියාව අනුව අන්තර්ගතය සකස් කරන අතර Word සහ PDF files සමඟ එක් revision round එකක් ඇතුළත්. සිසුන් සහ නව උපාධිධාරීන් සඳහා මිල රු. 3,950 සිට.",
     localNotes: [
       { heading: "Private-sector applications", body: "Start with the employer's vacancy notice, whether it is on TopJobs, LinkedIn or a company careers page. A Colombo banking role and a software engineering role need different evidence; your actual qualifications, tools and achievements determine the content." },
       { heading: "Government and prescribed forms", body: "A government vacancy may require its own application form and supporting documents. A professional CV does not replace those instructions. Supply the notice so the document supports the stated requirements." },
@@ -86,9 +87,9 @@ export const servicePages: ServicePage[] = [
         q: "What do you need from me?",
         a: "Your current CV, the target role and market, and a link to one or two job adverts you would actually apply to. If you do not have a CV, a detailed work history is enough to start.",
       },
-      { q: "How much does CV writing cost in Sri Lanka with Chanuka?", a: "An ATS CV costs LKR 3,950 for students and fresh graduates with less than one year of experience, LKR 13,500 for professionals with 1 to 9 years, and LKR 19,500 for executives with more than 9 years. Foreign-job CVs and bundled services have their own prices. See the package calculator for your total." },
+      { q: "How much does CV writing cost in Sri Lanka with Chanuka?", a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.` },
       { q: "Can I order online from Kandy, Galle or outside Colombo?", a: "Yes. The service is online across Sri Lanka. Share your existing CV or work history and target vacancies, discuss the brief in Sinhala or English, and receive the files digitally. No visit to a Colombo office is needed." },
-      { q: "Who is the best CV writer in Sri Lanka for my application?", a: "Compare named writers using relevant samples, credentials, independent reviews, target-role research, clear prices and revision terms. Chanuka offers a personally written service; use the buyer's guide and public Google reviews to decide whether that approach fits your needs." },
+      { q: "Who is the best CV writer in Sri Lanka for my application?", a: "Compare named writers using relevant samples, credentials, independent reviews, target-role research, clear prices and revision terms. Chanuka offers supervised Essential and personally written Signature services; use the buyer's guide and public Google reviews to decide whether that approach fits your needs." },
     ],
     related: [
       { href: "/linkedin-optimisation", label: "LinkedIn Optimization" },
@@ -159,7 +160,7 @@ export const servicePages: ServicePage[] = [
         q: "How soon will I see results?",
         a: "There is no fixed time or guaranteed increase. Visibility depends on your target market, experience, profile settings, network and hiring demand. Compare available Search Appearances, relevant profile views and recruiter conversations over time, rather than expecting an immediate ranking change.",
       },
-      { q: "How much does LinkedIn optimization cost in Sri Lanka?", a: "Chanuka's LinkedIn service costs LKR 3,950 for students and fresh graduates, LKR 13,500 for professionals with 1 to 9 years of experience, and LKR 19,500 for executives with more than 9 years. CV and LinkedIn bundles are also available." },
+      { q: "How much does LinkedIn optimization cost in Sri Lanka?", a: `${pricingSummary("linkedin")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.` },
       { q: "Can you guarantee the top result in LinkedIn recruiter searches?", a: "No. LinkedIn controls its search and personalizes results. The service improves the clarity, relevance and completeness of your profile; it cannot guarantee a position, number of views or job offer." },
       { q: "Is LinkedIn optimization the same as managing my account?", a: "No. This service provides profile content and placement guidance. It does not include account operation, posting on your behalf, paid promotion or messaging recruiters from your account." },
     ],
@@ -223,6 +224,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "cv-review",
+    packageService: "cv-review",
     name: "CV Review",
     title: "An honest read of the CV you already have.",
     lead: "Sometimes the document is closer than you think and needs direction rather than a rewrite. A review tells you what is working, what is costing you interviews, and whether a rewrite is worth paying for.",

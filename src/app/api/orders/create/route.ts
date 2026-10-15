@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_KEY } from "@/lib/site";
 import { supabaseConfigured } from "@/lib/supabase/guard";
-import { deliveries, levels, packages, quote, type DeliveryId, type LevelId } from "@/lib/pricing";
+import { resolveOrder } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -31,17 +31,14 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
-
-  const pkg = packages.find((p) => p.id === b.package_id);
-  const level = levels.find((l) => l.id === b.level_id)?.id as LevelId | undefined;
-  const delivery = deliveries.find((d) => d.id === b.delivery_id)?.id as DeliveryId | undefined;
-  if (!pkg || !level || !delivery) {
-    return NextResponse.json({ ok: false, reason: "invalid_order" }, { status: 400 });
+  if (!b || typeof b !== "object" || Array.isArray(b)) {
+    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
 
-  const q = quote(pkg, level, delivery);
-  const levelName = levels.find((l) => l.id === level)?.name ?? "";
-  const deliveryWindow = deliveries.find((d) => d.id === delivery)?.window ?? "";
+  const selection = resolveOrder(b.package_id, b.level_id, b.delivery_id, b.tier_id);
+  if (!selection) {
+    return NextResponse.json({ ok: false, reason: "invalid_order" }, { status: 400 });
+  }
 
   const db = createAdminClient();
   const { data, error } = await db
@@ -49,13 +46,7 @@ export async function POST(request: Request) {
     .insert({
       site: SITE_KEY,
       user_id: user.id,
-      package_id: pkg.id,
-      package_name: pkg.name,
-      level_id: level,
-      level_name: levelName,
-      delivery_id: delivery,
-      delivery_window: deliveryWindow,
-      total_usd: q.total,
+      ...selection,
       status: "new",
       payment_status: "pending",
       customer_name: (b.name ?? "").slice(0, 200) || null,

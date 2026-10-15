@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { IntakeForm, type OrderInfo } from "@/components/IntakeForm";
 import { PageHeader } from "@/components/PageHeader";
 import {
+  tiers,
+  type TierId,
   deliveries,
   levels,
   packages,
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
 export default async function IntakePage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; package?: string; level?: string; delivery?: string }>;
+  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string }>;
 }) {
   const params = await searchParams;
 
@@ -55,20 +57,22 @@ export default async function IntakePage({
     );
   }
 
+  const tier: TierId = params.tier === "signature" ? "signature" : "essential";
+  const tierName = tiers.find((item) => item.id === tier)!.name;
   const pkg = packages.find((p) => p.id === params.package);
   const level = levels.find((l) => l.id === (params.level as LevelId));
   const delivery = deliveries.find((d) => d.id === (params.delivery as DeliveryId));
 
   const summary = pkg
-    ? [pkg.name, level?.name, delivery?.window].filter(Boolean).join(" · ")
+    ? [`${tierName} · ${pkg.name}`, level?.name, delivery?.window].filter(Boolean).join(" · ")
     : undefined;
 
-  const q = pkg && level && delivery ? quote(pkg, level.id, delivery.id) : null;
+  const q = pkg && level && delivery ? quote(pkg, level.id, delivery.id, tier) : null;
 
   const order: OrderInfo | undefined = pkg
     ? {
-        package_id: pkg.id,
-        package_name: pkg.name,
+        package_id: `${tier}:${pkg.id}`,
+        package_name: `${tierName} · ${pkg.name}`,
         level_id: level?.id,
         level_name: level?.name,
         delivery_id: delivery?.id,

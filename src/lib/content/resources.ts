@@ -839,7 +839,7 @@ export const authorProfile: AuthorProfile = {
     "The work sits where a strong career meets a weak document. Most of the people I work with are good at what they do. What they struggle with is translation: turning years of responsibility into evidence a stranger can judge in seconds, in the conventions of the market they are applying into.",
     "That cross-border part matters in Sri Lanka, where many careers lead to the Gulf, Europe, Australia or the UK. A CV that is right for a Colombo employer can read as too long or oddly personal to a recruiter in London or Dubai. Working with both has made me careful about separating conventions that are genuinely local from ones that are simply habit.",
     "I also write on LinkedIn, where more than 30,000 people follow what I publish about CVs and job search. It is the same platform I optimise profiles for, so I see first-hand how headlines, About sections and activity are read there.",
-    "Everything on this site carries my name because I am responsible for it. Client documents are written by me personally, with no team and no outsourced writers, and every guide and resource is written or reviewed and edited by me before it is published.",
+    "Everything on this site carries my name because I am responsible for it. Essential documents are team-crafted under my supervision and quality-checked by me; Signature documents are written personally by me, and every guide and resource is written or reviewed and edited by me before it is published.",
   ],
   expertise: [
     "CV and resume writing, from graduate to C-suite level",
@@ -887,11 +887,11 @@ export const authorProfile: AuthorProfile = {
   faqs: [
     {
       q: "Who is Chanuka Jeewantha?",
-      a: "Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. He has more than eight years of experience, has written 5,000+ CVs for jobs in Sri Lanka and overseas, and runs a founder-led practice in which he writes every client document personally.",
+      a: "Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. He has more than eight years of experience, has written 5,000+ CVs for jobs in Sri Lanka and overseas, and runs a founder-led practice offering supervised Essential and personally crafted Signature services.",
     },
     {
       q: "Does Chanuka Jeewantha write the CVs himself?",
-      a: "Yes. Every CV, cover letter and LinkedIn profile is written personally by Chanuka. Nothing is outsourced or passed to a team of writers, and no template library is used with your name dropped in. That limits how many orders can run at once, which is why 24-hour slots are limited each week.",
+      a: "Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support. Express slots depend on availability.",
     },
     {
       q: "Who writes the career advice on this site?",
@@ -953,7 +953,7 @@ export const editorialPolicy: LegalDoc = {
       heading: "Use of AI and writing tools",
       body: [
         "Drafts and research notes for articles and resources may be assisted by writing tools, including AI tools. That is stated here plainly rather than hidden.",
-        "No page is published as a tool produced it. Every page is reviewed, edited and checked by Chanuka, who is responsible for what it says. Client documents are covered separately: each one is written personally by Chanuka.",
+        "No page is published as a tool produced it. Every page is reviewed, edited and checked by Chanuka, who is responsible for what it says. Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.",
       ],
     },
     {

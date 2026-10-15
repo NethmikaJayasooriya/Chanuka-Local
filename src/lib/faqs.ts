@@ -1,9 +1,8 @@
-import { BASE_PRICES, deliveries, formatLKR } from "@/lib/pricing";
+import { pricingSummary, deliveries } from "@/lib/pricing";
 import { site } from "@/lib/site";
 
 export type Faq = { q: string; a: string };
 
-const cv = BASE_PRICES.cv;
 const win = (id: string) => deliveries.find((d) => d.id === id)?.window ?? "";
 
 /**
@@ -17,7 +16,7 @@ export const faqGroups: Array<{ title: string; items: Faq[] }> = [
     items: [
       {
         q: "How much does CV writing cost in Sri Lanka?",
-        a: `With Chanuka Jeewantha an ATS CV is ${formatLKR(cv["under-2"])} for students and fresh graduates, ${formatLKR(cv["3-to-9"])} for professionals with 1 to 9 years of experience, and ${formatLKR(cv["over-10"])} for executives with more than 9 years. LinkedIn optimisation and cover letters are priced the same way, and the career packs combine them. The total shows before you order and nothing is added later.`,
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
       {
         q: "Why does experience level change the price?",
@@ -75,7 +74,7 @@ export const faqGroups: Array<{ title: string; items: Faq[] }> = [
       },
       {
         q: "Who writes the documents?",
-        a: "Chanuka writes every document personally. Nothing is passed to a team of writers or filled into a template.",
+        a: "Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.",
       },
       {
         q: "Is my information kept private?",

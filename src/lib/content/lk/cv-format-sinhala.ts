@@ -1,4 +1,4 @@
-import { BASE_PRICES, formatLKR } from "@/lib/pricing";
+import { BASE_PRICES, SIGNATURE_PRICES, formatLKR } from "@/lib/pricing";
 import { site } from "@/lib/site";
 import type { LkGuide } from "./types";
 
@@ -140,7 +140,7 @@ export const cvFormatSinhala: LkGuide = {
     { q: "CV එකට photo එකක් දාන්න ඕනද?", a: "ලංකාවේ පෞද්ගලික අංශයේ රැකියා සඳහා අනිවාර්ය නැහැ. දැන්වීමේ ඉල්ලා ඇත්නම් පමණක් professional photo එකක් දාන්න. එංගලන්තය, ඇමරිකාව, කැනඩාව සහ ඕස්ට්‍රේලියාව සඳහා කිසිසේත් photo එකක් දාන්න එපා." },
     { q: "CV එකට NIC අංකය දාන්න ඕනද?", a: "ඉල්ලුවොත් පමණයි. රජයේ රැකියා සහ සමහර බැංකු අයදුම්පත් NIC අංකය ඉල්ලනවා. බොහෝ පෞද්ගලික රැකියා සඳහා NIC අංකය, උපන් දිනය, ආගම සහ විවාහක බව අවශ්‍ය නැහැ." },
     { q: "Freshers ලාගේ CV එකට මොනවද දාන්නේ?", a: "අධ්‍යාපනය (උපාධිය, A/L ප්‍රතිඵල), projects, internships, part-time රැකියා, සමිති හෝ ක්‍රීඩා නායකත්ව තනතුරු සහ කුසලතා. පිටු එකකට සීමා කරන්න." },
-    { q: "Professional CV එකක් ලියා ගන්න කීයක් යනවද?", a: `චනුක ජීවන්ත සමඟ ATS CV එකක් students සහ freshers සඳහා ${formatLKR(cv["under-2"])}, අවුරුදු 1 සිට 9 පළපුරුද්ද ඇති අය සඳහා ${formatLKR(cv["3-to-9"])}, සහ executives සඳහා ${formatLKR(cv["over-10"])}. හැම CV එකක්ම චනුක විසින්ම ලියනවා, revision එකක් සහ Word, PDF files සමඟ.` },
+    { q: "Professional CV එකක් ලියා ගන්න කීයක් යනවද?", a: `Essential ATS CV එකක් වසරකට අඩු පළපුරුද්ද ඇති students සහ freshers සඳහා ${formatLKR(cv["under-2"])}, අවුරුදු 1–9 සඳහා ${formatLKR(cv["3-to-9"])}, අවුරුදු 9ට වැඩි සඳහා ${formatLKR(cv["over-10"])}. Essential එක චනුකගේ අධීක්ෂණයෙන් team එක සකස් කර චනුක quality-check කරනවා. චනුක විසින්ම ලියන Signature මිල පිළිවෙළින් ${formatLKR(SIGNATURE_PRICES.cv["under-2"])} / ${formatLKR(SIGNATURE_PRICES.cv["3-to-9"])} / ${formatLKR(SIGNATURE_PRICES.cv["over-10"])}. CV writing සඳහා revision round එකක් සහ Word, PDF files ඇතුළත්.` },
   ],
   related: [
     { href: "/cv-format-sri-lanka", label: "CV format guide (English)" },
@@ -150,7 +150,7 @@ export const cvFormatSinhala: LkGuide = {
   ],
   cta: {
     heading: "මේ format එකට CV එක ලියා ගන්න",
-    body: `ඔබේ ඉලක්ක රැකියාවට ගැලපෙන විදිහට චනුක විසින්ම ඔබේ CV එක ලියා දෙනවා. ${formatLKR(cv["under-2"])} සිට, පැය 24න් delivery.`,
+    body: `ඔබේ ඉලක්ක රැකියාවට ගැළපෙන Essential CV එකක් ${formatLKR(cv["under-2"])} සිට හෝ චනුක විසින්ම ලියන Signature CV එකක් තෝරන්න. Express delivery availability කලින් තහවුරු කරන්න.`,
     href: "/order?package=ats-cv",
     label: "CV එක order කරන්න",
   },

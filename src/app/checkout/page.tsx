@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import {
+  tiers,
+  type TierId,
   deliveries,
   levels,
   packages,
@@ -78,7 +80,7 @@ function Summary({
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; package?: string; level?: string; delivery?: string }>;
+  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string }>;
 }) {
   const params = await searchParams;
 
@@ -150,10 +152,12 @@ export default async function CheckoutPage({
   }
 
   // -------- Legacy / guest checkout (no account) --------
+  const tier: TierId = params.tier === "signature" ? "signature" : "essential";
+  const tierName = tiers.find((item) => item.id === tier)!.name;
   const pkg = packages.find((p) => p.id === params.package) ?? packages[4];
   const level = (levels.find((l) => l.id === params.level)?.id ?? "3-to-9") as LevelId;
   const delivery = (deliveries.find((d) => d.id === params.delivery)?.id ?? "normal") as DeliveryId;
-  const q = quote(pkg, level, delivery);
+  const q = quote(pkg, level, delivery, tier);
   const levelName = levels.find((l) => l.id === level)?.name ?? "";
   const deliveryOption = deliveries.find((d) => d.id === delivery);
 
@@ -163,12 +167,12 @@ export default async function CheckoutPage({
       <section className="py-8 sm:py-12 lg:py-16">
         <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
           <Summary
-            title={pkg.name}
+            title={`${tierName} · ${pkg.name}`}
             levelName={levelName}
             window={deliveryOption?.window ?? ""}
-            includes={pkg.includes.map((s) => services[s].name)}
+            includes={q.includedServices.map((s) => services[s].name)}
             total={q.total}
-            changeHref={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}`}
+            changeHref={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`}
           />
           <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
             <h2 className="display text-[19px] sm:text-[21px] text-ink">Payment</h2>
@@ -180,10 +184,10 @@ export default async function CheckoutPage({
                 Secure online card payment (PayHere) connects here once the merchant account is live. Until then, you are invoiced directly, then you complete your brief so the writing can start.
               </p>
               <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <Link href={`/intake?package=${pkg.id}&level=${level}&delivery=${delivery}`} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper transition-all hover:bg-brand-deep">
+                <Link href={`/intake?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper transition-all hover:bg-brand-deep">
                   Confirm &amp; continue
                 </Link>
-                <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice Request: ${pkg.name} (${levelName})`)}`} className="w-full sm:w-auto rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[14px] sm:text-[15px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand shadow-2xs">
+                <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice Request: ${tierName} · ${pkg.name} (${levelName})`)}`} className="w-full sm:w-auto rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[14px] sm:text-[15px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand shadow-2xs">
                   Request invoice by email
                 </a>
               </div>

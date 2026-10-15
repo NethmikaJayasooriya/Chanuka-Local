@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { TierSelector } from "./TierSelector";
 import {
+  tiers,
+  type TierId,
   deliveries,
   levels,
   packages,
   quote,
   formatLKR,
   getPackageDisplayName,
-  getPackageIncludes,
   type DeliveryId,
   type LevelId,
 } from "@/lib/pricing";
@@ -23,6 +25,7 @@ export function Configurator() {
   const [done, setDone] = useState<{ 1: boolean; 2: boolean; 3: boolean }>({ 1: false, 2: false, 3: false });
 
   // Configuration state
+  const [tier, setTier] = useState<TierId>("essential");
   const [level, setLevel] = useState<LevelId>("3-to-9");
   const [packageId, setPackageId] = useState("complete");
   const [delivery, setDelivery] = useState<DeliveryId>("normal");
@@ -39,7 +42,6 @@ export function Configurator() {
   const availableSingles = useMemo(() => {
     return singles.filter((p) => {
       const s = p.includes[0];
-      if (s === "foreign-cv" && level === "under-2") return false;
       if (s === "consultation" && level !== "over-10") return false;
       return true;
     });
@@ -49,7 +51,7 @@ export function Configurator() {
     () => packages.find((p) => p.id === packageId) ?? packages[0],
     [packageId]
   );
-  const q = useMemo(() => quote(pkg, level, delivery), [pkg, level, delivery]);
+  const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
 
   const levelObj = levels.find((l) => l.id === level);
   const deliveryOption = deliveries.find((d) => d.id === delivery);
@@ -65,10 +67,10 @@ export function Configurator() {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" });
   }, [delivery, mounted]);
 
-  const orderHref = `/order?package=${pkg.id}&level=${level}&delivery=${delivery}`;
+  const orderHref = `/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`;
   
   const whatsappDiscussUrl = whatsappUrl(
-    `Hi Chanuka, I would like to discuss the ${pkgDisplayName} (${formatLKR(q.total)}) for ${levelObj?.name} (${levelObj?.hint}).`
+    `Hi Chanuka, I would like to discuss the ${tier} ${pkgDisplayName} (${formatLKR(q.total)}) for ${levelObj?.name} (${levelObj?.hint}).`
   );
 
   const toggleStep = (step: 1 | 2 | 3) => {
@@ -145,6 +147,7 @@ export function Configurator() {
                 </div>
               </div>
 
+              <TierSelector value={tier} onChange={setTier} />
               {/* Inset Steps Container */}
               <div className="rounded-2xl border border-line/80 bg-sand/20 p-2.5 sm:p-3.5 space-y-2.5">
                 {/* ------------------------------------------------------- */}
@@ -338,7 +341,7 @@ export function Configurator() {
                         {(tab === "bundles" ? bundles : availableSingles).map((p) => {
                           const isSelected = p.id === packageId;
                           const name = getPackageDisplayName(p, level);
-                          const rowQuote = quote(p, level, delivery);
+                          const rowQuote = quote(p, level, delivery, tier);
 
                           return (
                             <button
@@ -501,7 +504,7 @@ export function Configurator() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#b9862f] block">
-                    {levelObj?.eyebrow ?? "SIGNATURE"}
+                    {tiers.find((item) => item.id === tier)?.name}
                   </span>
                   <h4 className="display mt-1 text-2xl sm:text-3xl font-bold text-ink">
                     {pkgDisplayName}
@@ -538,8 +541,8 @@ export function Configurator() {
                     </div>
                   ))}
                   <div className="flex items-center justify-between py-1 text-[11.5px] text-muted">
-                    <span>Revisions included</span>
-                    <span className="font-semibold text-emerald-600">Free 14-30 Days</span>
+                    <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
+                    <span className="font-semibold text-emerald-600">{tier === "signature" ? "30 days" : "Included"}</span>
                   </div>
                 </div>
               </div>

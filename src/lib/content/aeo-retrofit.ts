@@ -11,6 +11,7 @@
  * licensing notes are orientation only and point to official sources.
  */
 
+import { pricingSummary } from "@/lib/pricing";
 import type { AeoFields } from "@/lib/content/types";
 
 /* ------------------------------------------------------------------ */
@@ -36,7 +37,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "How much does a software engineer CV rewrite cost?",
-        a: "With Chanuka Jeewantha an ATS CV costs LKR 3,950 for students and fresh graduates, LKR 13,500 for professionals with 1 to 9 years of experience, and LKR 19,500 for executives with more than 9 years. Standard delivery is 48 to 72 hours, with 24-hour options available, and one revision round is included. Chanuka writes every CV personally, and you receive editable Word and PDF files.",
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
     ],
   },
@@ -80,7 +81,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "Which CV package fits a senior project manager with 10 or more years?",
-        a: "The Executive tier (LKR 19,500) covers CV writing for more than 9 years of experience, including programme and executive-level candidates. It includes one revision round and editable Word and PDF files, with standard delivery in 48 to 72 hours. LinkedIn optimisation and a cover letter can be added, or taken together in the Executive Pack.",
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
     ],
   },
@@ -102,7 +103,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "Can I get my accountant CV and LinkedIn profile done together?",
-        a: "Yes. CV writing and LinkedIn optimisation can be booked together, and the career packs add a cover letter as well. Chanuka writes each one personally from the same brief, so your qualification, systems and scope read consistently everywhere, which matters when a recruiter checks your LinkedIn straight after reading your CV.",
+        a: "Yes. CV writing and LinkedIn optimisation can be booked together, and the career packs add a cover letter as well. Your selected Essential team or Signature writer works from the same brief, so your qualification, systems and scope read consistently everywhere, which matters when a recruiter checks your LinkedIn straight after reading your CV.",
       },
     ],
   },
@@ -288,7 +289,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "Which CV package is right for a recent graduate?",
-        a: "The Starter tier (LKR 3,950) covers students, fresh graduates and first-time applicants with under a year of experience. It includes a personal brief, one revision round, and editable Word and PDF files, with standard delivery in 48 to 72 hours. If a closing date is close, the 24-hour express option is available.",
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
       {
         q: "Should a graduate CV include a personal statement?",
@@ -314,7 +315,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "What does a CV rewrite cost with 3 to 9 years of experience?",
-        a: "CV writing for professionals with 1 to 9 years of experience is LKR 13,500. That covers the brief, a first draft written personally by Chanuka, one revision round, and final editable Word and PDF files, with standard delivery in 48 to 72 hours. It can be combined with LinkedIn optimisation and a cover letter in the Career Pack.",
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
     ],
   },
@@ -358,7 +359,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "How much does executive CV writing cost?",
-        a: "Executive CV writing is LKR 19,500 for more than 9 years of experience, written personally by Chanuka Jeewantha. LinkedIn optimisation at the same level is also LKR 19,500, and an executive cover letter is LKR 13,500. The Executive Pack adds a foreign job CV and a 1-hour strategy consultation. Standard delivery is 48 to 72 hours, with one revision round and editable Word and PDF files.",
+        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
       },
     ],
   },

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Chanuka Jeewantha",
   },
   description:
-    "Sri Lanka's CPRW and CPCC certified CV writer. ATS CVs, foreign job CVs, LinkedIn and cover letters in LKR, written personally by Chanuka Jeewantha. Delivery from 24 hours.",
+    "Sri Lanka's CPRW and CPCC certified CV writer. ATS CVs, foreign job CVs, LinkedIn and cover letters in LKR, with Essential and personally crafted Signature options. Delivery from 24 hours.",
   applicationName: site.name,
   authors: [{ name: site.name, url: `${site.url}/about/chanuka-jeewantha` }],
   creator: site.name,

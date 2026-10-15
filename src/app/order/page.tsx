@@ -13,6 +13,7 @@ export default async function OrderPage({
   searchParams,
 }: {
   searchParams: Promise<{
+    tier?: string;
     package?: string;
     level?: string;
     delivery?: string;
@@ -48,6 +49,7 @@ export default async function OrderPage({
       <section className="py-12 lg:py-16">
         <div className="container-page">
           <OrderWizard
+            initialTier={params.tier === "signature" ? "signature" : "essential"}
             initialPackage={initialPackage}
             initialLevel={initialLevel}
             initialDelivery={initialDelivery}

@@ -17,7 +17,7 @@ export const metadata = pageMetadata({
   title: "CV Writer & LinkedIn Optimization Sri Lanka | Chanuka Jeewantha",
   absoluteTitle: true,
   description:
-    `CPRW & CPCC certified CV writing and LinkedIn optimization in Sri Lanka. Personally written by Chanuka. From LKR 3,950; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
+    `CPRW & CPCC certified CV writing and LinkedIn optimization in Sri Lanka. Essential from LKR 3,950; personally crafted Signature from LKR 7,500; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
   path: "/",
   languages: homeCluster(),
 });
