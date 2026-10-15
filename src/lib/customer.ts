@@ -53,7 +53,7 @@ export async function getMyOrder(id: string): Promise<CustomerOrder | null> {
 /** Whether this order already has a completed brief (CV + details). */
 export async function orderHasBrief(orderId: string): Promise<boolean> {
   const db = await createClient();
-  const { data } = await db.from("intake_submissions").select("id, cv_path").eq("site", SITE_KEY).eq("order_id", orderId).maybeSingle();
+  const { data } = await db.from("intake_submissions").select("id, cv_path").eq("site", SITE_KEY).eq("order_id", orderId).limit(1).maybeSingle();
   return !!data;
 }
 

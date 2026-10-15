@@ -36,24 +36,28 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAdminArea = path.startsWith("/admin") && path !== "/admin/login";
   const isDashboard = path === "/dashboard" || path.startsWith("/dashboard/");
+  const withSessionCookies = (redirect: NextResponse) => {
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  };
 
   if (isAdminArea && !user) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = "/admin/login";
     redirect.searchParams.set("next", path);
-    return NextResponse.redirect(redirect);
+    return withSessionCookies(NextResponse.redirect(redirect));
   }
 
   if (isDashboard && !user) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = "/login";
     redirect.searchParams.set("next", path);
-    return NextResponse.redirect(redirect);
+    return withSessionCookies(NextResponse.redirect(redirect));
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/dashboard"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/dashboard", "/order/:path*", "/checkout", "/intake", "/login", "/signup", "/auth/callback"],
 };

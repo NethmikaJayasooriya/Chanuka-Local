@@ -18,7 +18,7 @@ In the **chanuka-local** Vercel project's environment variables, configure:
 Never prefix credentials with `NEXT_PUBLIC_`, commit `.env.local`, or use the .com domain's secret. Use matching sandbox credentials when testing sandbox mode. Redeploy after changing environment variables.
 
 PayHere notification URL: `https://www.chanukajeewantha.lk/api/payhere/notify`.
-Return/cancel URLs are generated server-side for the account-owned order. Supabase Google Auth must allow `https://www.chanukajeewantha.lk/auth/callback` in its redirect URL settings. Email and Google providers were confirmed enabled with a read-only settings check; the redirect allow-list still requires dashboard verification.
+Return/cancel URLs are generated server-side for the account-owned order. Email and Google providers are enabled, but Google login has a confirmed configuration blocker: the Supabase URL Configuration page currently has Site URL `http://localhost:3000` and only `http://localhost:3000/**` in Redirect URLs. A provider-initiation/cancellation check returned to localhost instead of .lk. The owner must add `https://www.chanukajeewantha.lk/auth/callback` and `https://www.chanukajeewantha.lk/auth/callback?**` to Redirect URLs, then re-run `node scripts/verify-google-redirect.mjs`. Do not change shared .com settings or the default Site URL as part of the .lk correction.
 
 ## Database
 
@@ -28,7 +28,9 @@ The shared backend already exposes the billing columns, `payment_events` and `re
 
 ## Verification
 
-Run `node scripts/verify-payhere.mjs`, `node scripts/verify-pricing.mjs`, `npm run typecheck`, and `npm run build`. Against a running preview, also run `node scripts/verify-accounts.mjs http://127.0.0.1:3014` and `node scripts/verify-pricing.mjs http://127.0.0.1:3014`.
+Run `node scripts/verify-payhere.mjs`, `node scripts/verify-customer-flow.mjs`, `node scripts/verify-pricing.mjs`, `npm run typecheck`, and `npm run build`. Against a running preview, also run `node scripts/verify-accounts.mjs http://127.0.0.1:3014` and `node scripts/verify-pricing.mjs http://127.0.0.1:3014`. The Google redirect check talks to Supabase with the public key from the local environment, starts and cancels only its own OAuth flow, and never visits Google or authenticates an account.
+
+CV uploads accept PDF, DOC or DOCX up to 3 MB (below Vercel's request-size ceiling), with extension, MIME and file-header checks. This is basic document validation, not a malware scan. Upload/persistence failures keep the customer's form visible with retry guidance; they never silently claim success through an email fallback. Existing order IDs must belong to the signed-in .lk customer. An unpaid brief cannot advance its order to writing status; confirmation copy remains conditional on verified payment. A customer awaiting a gateway return confirmation is not shown another payment button.
 
 The isolated tests cover signed checkout, approved/cancelled/error callback states, duplicate callbacks and account/order authorization without external writes. A full hosted-gateway end-to-end transaction with a dedicated test account has not been performed. The merchant should complete that acceptance check, including dashboard status and CV upload; use matching sandbox credentials on a dedicated sandbox deployment if testing without a real charge. Do not mix sandbox credentials with the live configuration. Real payments must be completed by the merchant/customer, not automated during implementation. A return URL or `payment=return` is never proof of payment; only a verified server callback can set Paid.
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
+import { InputError, readJsonBody, inputText } from "@/lib/request-validation";
 
 export const runtime = "nodejs";
 
@@ -18,20 +19,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "not_configured" }, { status: 503 });
   }
 
-  let body: { email?: string; password?: string; full_name?: string; phone?: string };
+  let body: Record<string, unknown>;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
-  }
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
+    body = await readJsonBody(request, 8192);
+  } catch (error) {
+    return NextResponse.json({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, { status: error instanceof InputError ? error.status : 400 });
   }
 
-  const email = String(body.email ?? "").trim().toLowerCase();
-  const password = String(body.password ?? "");
-  const full_name = String(body.full_name ?? "").trim();
-  const phone = String(body.phone ?? "").trim();
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  const password = typeof body.password === "string" ? body.password : "";
+  const full_name = inputText(body.full_name, 200);
+  const phone = inputText(body.phone, 60);
 
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ ok: false, reason: "invalid_email" }, { status: 400 });

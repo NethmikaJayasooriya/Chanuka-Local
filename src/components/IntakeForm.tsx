@@ -149,6 +149,7 @@ export function IntakeForm({
   const [cvName, setCvName] = useState<string>("");
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   const set = (k: keyof Fields, v: string) => setF((prev) => ({ ...prev, [k]: v }));
 
@@ -189,6 +190,7 @@ export function IntakeForm({
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
+    setError("");
 
     // No backend configured: keep the original email-based flow.
     if (!DB_ON) {
@@ -197,6 +199,11 @@ export function IntakeForm({
     }
 
     setBusy(true);
+    if (cvFile && (cvFile.size > 3 * 1024 * 1024 || !/\.(pdf|doc|docx)$/i.test(cvFile.name))) {
+      setError("Please choose a PDF, DOC or DOCX file no larger than 3 MB.");
+      setBusy(false);
+      return;
+    }
     try {
       const fd = new FormData();
       fd.set("order_summary", orderSummary ?? "");
@@ -210,12 +217,22 @@ export function IntakeForm({
         router.push(orderId ? `/order/confirmation?order=${orderId}` : "/order/confirmation");
         return;
       }
+      const data = await res.json().catch(() => ({}));
+      const errors: Record<string, string> = {
+        invalid_cv: "Please choose a valid PDF, DOC or DOCX document.",
+        cv_too_large: "Your CV must be no larger than 3 MB.",
+        payload_too_large: "The upload is too large. Please use a CV smaller than 3 MB.",
+        cv_upload_failed: "Your CV could not be uploaded. Your entries are still here; please try again.",
+        not_signed_in: "Your session has expired. Please sign in again before submitting this order's brief.",
+        order_not_found: "This order is not available in your account. Please open the correct order from your dashboard.",
+        invalid_details: "Please check your name, email, phone and target job position.",
+      };
+      setError(errors[data.reason] ?? "Your brief was not saved. Your entries are still here; please try again.");
     } catch {
-      /* fall through to email */
+      setError("Could not connect. Your entries are still here; please check your connection and retry.");
     }
-    // Something went wrong (or backend unavailable): don't lose the brief.
+    // Never claim success or silently switch to email after a failed upload.
     setBusy(false);
-    emailFallback();
   };
 
   return (
@@ -276,7 +293,7 @@ export function IntakeForm({
             </label>
             <p className="mt-0.5 text-[12px] leading-relaxed text-muted">
               {DB_ON
-                ? "Optional but helpful. Your file is sent securely with your brief."
+                ? "Optional but helpful. PDF, DOC or DOCX, up to 3 MB. Your file is sent securely with your brief."
                 : "Optional but helpful. Pick your file here, then attach it to the email that opens when you submit."}
             </p>
             <input
@@ -299,6 +316,7 @@ export function IntakeForm({
         </div>
       </fieldset>
 
+      {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{error}</p>}
       <div className="flex flex-col gap-3.5 rounded-[14px] border border-line bg-sand/40 p-4 sm:p-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-md text-[13px] leading-relaxed text-muted">
           {DB_ON

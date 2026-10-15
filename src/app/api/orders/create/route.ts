@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_KEY } from "@/lib/site";
 import { supabaseConfigured } from "@/lib/supabase/guard";
 import { resolveOrder } from "@/lib/pricing";
+import { InputError, readJsonBody, inputText } from "@/lib/request-validation";
 
 export const runtime = "nodejs";
 
@@ -25,19 +26,23 @@ export async function POST(request: Request) {
   } = await auth.auth.getUser();
   if (!user) return NextResponse.json({ ok: false, reason: "not_signed_in" }, { status: 401 });
 
-  let b: Record<string, string>;
+  let b: Record<string, unknown>;
   try {
-    b = await request.json();
-  } catch {
-    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
-  }
-  if (!b || typeof b !== "object" || Array.isArray(b)) {
-    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
+    b = await readJsonBody(request);
+  } catch (error) {
+    return NextResponse.json({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, { status: error instanceof InputError ? error.status : 400 });
   }
 
   const selection = resolveOrder(b.package_id, b.level_id, b.delivery_id, b.tier_id);
   if (!selection) {
     return NextResponse.json({ ok: false, reason: "invalid_order" }, { status: 400 });
+  }
+  const name = inputText(b.name, 200);
+  const phone = inputText(b.phone, 60);
+  const targetRole = inputText(b.target_role, 200);
+  const targetCountry = inputText(b.target_country, 120);
+  if (name.length < 2 || targetRole.length < 2 || targetCountry.length < 2) {
+    return NextResponse.json({ ok: false, reason: "invalid_details" }, { status: 400 });
   }
 
   const db = createAdminClient();
@@ -49,24 +54,24 @@ export async function POST(request: Request) {
       ...selection,
       status: "new",
       payment_status: "pending",
-      customer_name: (b.name ?? "").slice(0, 200) || null,
-      customer_email: user.email ?? ((b.email ?? "").slice(0, 200) || null),
-      customer_phone: (b.phone ?? "").slice(0, 60) || null,
-      target_role: (b.target_role ?? "").slice(0, 200) || null,
-      target_country: (b.target_country ?? "").slice(0, 120) || null,
-      deadline: (b.deadline ?? "").slice(0, 200) || null,
-      brief_notes: (b.notes ?? "").slice(0, 4000) || null,
+      customer_name: name,
+      customer_email: user.email ?? null,
+      customer_phone: phone || null,
+      target_role: targetRole,
+      target_country: targetCountry,
+      deadline: inputText(b.deadline, 200) || null,
+      brief_notes: inputText(b.notes, 4000) || null,
     })
     .select("id, ref")
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ ok: false, reason: error?.message ?? "insert_failed" }, { status: 500 });
+    return NextResponse.json({ ok: false, reason: "insert_failed" }, { status: 500 });
   }
 
   // Keep the customer's profile name/phone current.
   await db.from("profiles").upsert(
-    { user_id: user.id, full_name: (b.name ?? "").slice(0, 200) || null, phone: (b.phone ?? "").slice(0, 60) || null },
+    { user_id: user.id, full_name: name, phone: phone || null },
     { onConflict: "user_id" },
   );
 

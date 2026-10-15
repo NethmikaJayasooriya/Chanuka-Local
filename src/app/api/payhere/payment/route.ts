@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
 import { resolveOrder } from "@/lib/pricing";
 import { SITE_KEY } from "@/lib/site";
+import { InputError, readJsonBody } from "@/lib/request-validation";
 import {
   createCheckoutHash,
   formatPayHereAmount,
@@ -53,11 +54,9 @@ export async function POST(request: Request) {
 
   let body: Record<string, unknown>;
   try {
-    const raw = await request.text();
-    if (raw.length > 8_192) return noStore({ ok: false, reason: "payload_too_large" }, 413);
-    body = JSON.parse(raw);
-  } catch {
-    return noStore({ ok: false, reason: "bad_request" }, 400);
+    body = await readJsonBody(request, 8_192);
+  } catch (error) {
+    return noStore({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, error instanceof InputError ? error.status : 400);
   }
 
   if (!body || typeof body !== "object" || Array.isArray(body)) return noStore({ ok: false, reason: "bad_request" }, 400);

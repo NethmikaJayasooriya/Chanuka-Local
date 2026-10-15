@@ -19,7 +19,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(search.get("error") === "oauth" ? "Google sign-in was cancelled or could not finish. Please try again or sign in with email." : "");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +78,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
         />
       </div>
 
-      {error && <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-700">{error}</p>}
 
       <button
         type="submit"

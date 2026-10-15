@@ -28,3 +28,16 @@ assert.ok(destination.origin === origin.origin || (loopback.has(origin.hostname)
 assert.equal(destination.pathname, "/login");
 assert.equal(destination.searchParams.get("error"), "oauth");
 console.log("PASS invalid OAuth callback stays on the site");
+const cancelled = await get(`/auth/callback?error=access_denied&next=${encodeURIComponent(selection)}`);
+const retry = new URL(cancelled.headers.get("location"), origin);
+assert.equal(retry.pathname, "/login");
+assert.equal(retry.searchParams.get("next"), selection);
+const retryPage = await get(`${retry.pathname}${retry.search}`);
+assert.ok((await retryPage.text()).includes("Google sign-in was cancelled or could not finish"));
+console.log("PASS cancelled OAuth retains the order selection and renders recovery guidance");
+for (const path of ["/intake", "/order/confirmation"]) {
+  const gated = await get(`${path}?order=12345678-1234-1234-1234-123456789abc`);
+  assert.equal(gated.status, 307);
+  assert.equal(new URL(gated.headers.get("location"), origin).pathname, "/login");
+}
+console.log("PASS account-owned brief and confirmation pages require sign-in");

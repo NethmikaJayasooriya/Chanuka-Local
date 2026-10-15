@@ -91,6 +91,7 @@ export default async function CheckoutPage({
     if (!order) redirect("/order");
 
     const paid = order.payment_status === "paid";
+    const awaitingConfirmation = order.payment_status === "pending" && params.payment === "return";
     const paymentBlocked = order.payment_status === "refunded" || order.payment_status === "charged_back";
     const paymentLabel: Record<string, string> = {
       pending: "Payment pending",
@@ -120,7 +121,7 @@ export default async function CheckoutPage({
           crumbs={[{ label: "Order", href: "/order" }, { label: "Checkout" }]}
         />
         <section className="py-8 sm:py-12 lg:py-16">
-          <PaymentStatusPoller active={!paid && params.payment === "return"} />
+          <PaymentStatusPoller active={awaitingConfirmation} />
           <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
             <Summary
               title={order.package_name ?? "Your package"}
@@ -147,9 +148,9 @@ export default async function CheckoutPage({
                   Payment was cancelled. Your order is still saved, and you can try again safely below.
                 </p>
               )}
-              {params.payment === "return" && !paid && (
+              {awaitingConfirmation && (
                 <p className="mt-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-[13.5px] text-blue-800">
-                  PayHere is confirming the payment. This page updates automatically when the signed confirmation arrives.
+                  PayHere is confirming the payment. This page checks automatically for the signed confirmation. Please do not pay again while confirmation is pending; check your dashboard or contact us if it does not arrive.
                 </p>
               )}
 
@@ -167,6 +168,11 @@ export default async function CheckoutPage({
                   <p className="text-[13.5px] leading-relaxed text-red-800">
                     Online repayment is paused for this order. Please contact {site.email} and include order reference {order.ref}.
                   </p>
+                </div>
+              ) : awaitingConfirmation ? (
+                <div className="mt-6 flex flex-wrap gap-4 text-[13.5px] font-semibold text-brand">
+                  <Link href="/dashboard" className="underline underline-offset-4">Check my dashboard</Link>
+                  <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Payment confirmation: ${order.ref}`)}`} className="underline underline-offset-4">Get payment help</a>
                 </div>
               ) : payHereReady ? (
                 <>

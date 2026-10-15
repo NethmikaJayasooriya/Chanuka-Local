@@ -11,6 +11,7 @@ import {
   signaturesMatch,
 } from "@/lib/payhere";
 import { SITE_KEY } from "@/lib/site";
+import { InputError, readLimitedBody } from "@/lib/request-validation";
 
 export const runtime = "nodejs";
 
@@ -32,9 +33,10 @@ export async function POST(request: Request) {
 
   let form: FormData;
   try {
-    form = await request.formData();
-  } catch {
-    return response("Bad request", 400);
+    const bytes = await readLimitedBody(request, 16_384);
+    form = await new Response(bytes.buffer as ArrayBuffer, { headers: { "Content-Type": contentType } }).formData();
+  } catch (error) {
+    return response(error instanceof InputError ? error.reason : "Bad request", error instanceof InputError ? error.status : 400);
   }
 
   const value = (key: string, max = 200) => {

@@ -17,15 +17,18 @@ export async function GET(request: Request) {
   const rawNext = url.searchParams.get("next") || "/dashboard";
   // Only allow same-site relative redirects.
   const next = safeReturnPath(rawNext);
+  const failure = new URL("/login", url.origin);
+  failure.searchParams.set("error", "oauth");
+  failure.searchParams.set("next", next);
 
   if (!code || !supabaseConfigured()) {
-    return NextResponse.redirect(new URL("/login?error=oauth", url.origin));
+    return NextResponse.redirect(failure);
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(new URL("/login?error=oauth", url.origin));
+    return NextResponse.redirect(failure);
   }
 
   // Ensure a profile exists (Google users skip the account-create route).

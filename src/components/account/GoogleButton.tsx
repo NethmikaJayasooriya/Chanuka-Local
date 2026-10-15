@@ -12,21 +12,29 @@ import { safeReturnPath } from "@/lib/auth-redirect";
  */
 export function GoogleButton({ next = "/dashboard", label = "Continue with Google" }: { next?: string; label?: string }) {
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   if (!AUTH_ON) return null;
 
   const go = async () => {
     if (busy) return;
     setBusy(true);
-    const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeReturnPath(next))}`;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) setBusy(false);
+    setError("");
+    try {
+      const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeReturnPath(next))}`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo },
+      });
+      if (error) throw error;
+    } catch {
+      setError("Google sign-in could not start. Please try again or use email and password.");
+      setBusy(false);
+    }
   };
 
   return (
+    <>
     <button
       type="button"
       onClick={go}
@@ -41,5 +49,7 @@ export function GoogleButton({ next = "/dashboard", label = "Continue with Googl
       </svg>
       {busy ? "Redirecting..." : label}
     </button>
+    {error && <p role="alert" className="mt-3 text-[13px] text-red-700">{error}</p>}
+    </>
   );
 }

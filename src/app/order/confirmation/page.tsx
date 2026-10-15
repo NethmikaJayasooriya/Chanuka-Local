@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { site } from "@/lib/site";
+import { redirect } from "next/navigation";
+import { getMyOrder, orderHasBrief } from "@/lib/customer";
+import { requireUser, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const metadata: Metadata = {
   title: "Order confirmed",
@@ -12,7 +15,7 @@ const next = [
   {
     n: 1,
     title: "Brief received",
-    body: "Your details are in and the delivery clock has started. Nothing else is needed from you right now.",
+    body: "Your details are saved. Writing and the delivery window begin after payment is confirmed and your brief is complete.",
   },
   {
     n: 2,
@@ -37,12 +40,20 @@ export default async function ConfirmationPage({
   searchParams: Promise<{ order?: string }>;
 }) {
   const { order } = await searchParams;
+  let paymentPending = false;
+  if (order && supabaseConfigured()) {
+    await requireUser(`/order/confirmation?order=${encodeURIComponent(order)}`);
+    const savedOrder = await getMyOrder(order);
+    if (!savedOrder) redirect("/dashboard");
+    if (!(await orderHasBrief(order))) redirect(`/intake?order=${encodeURIComponent(order)}`);
+    paymentPending = savedOrder.payment_status !== "paid";
+  }
   return (
     <>
       <PageHeader
         eyebrow="Brief received"
-        title="That is everything. The writing starts now."
-        lead="Your order and your brief are both in. Track everything, review your draft and download your final documents from your dashboard. Chanuka only reaches out if a point needs clarifying."
+        title={paymentPending ? "Your brief is saved. Complete your payment next." : "Your brief is received. Here is what happens next."}
+        lead="Track your order, review your draft and download final documents from your dashboard. Writing starts once payment is confirmed and your brief is complete. Chanuka will contact you if anything needs clarifying."
         crumbs={[{ label: "Order", href: "/order" }, { label: "Confirmation" }]}
         showProof={false}
         primary={{ href: "/dashboard", label: "Go to my dashboard" }}
@@ -50,6 +61,12 @@ export default async function ConfirmationPage({
 
       <section className="py-14 lg:py-20">
         <div className="container-page">
+          {order && paymentPending && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-6">
+              <p className="text-sm text-amber-900">Your brief is saved, but payment has not yet been confirmed.</p>
+              <Link href={`/checkout?order=${encodeURIComponent(order)}`} className="mt-4 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-paper">Continue to payment</Link>
+            </div>
+          )}
           {order && (
             <div className="mb-8 flex flex-col gap-3 rounded-[14px] border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[14.5px] text-ink-soft">

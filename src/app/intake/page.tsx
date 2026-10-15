@@ -86,7 +86,7 @@ export default async function IntakePage({
       <PageHeader
         eyebrow="Step 2 of 2 · Your brief"
         title="Tell me about you. Then I get to work."
-        lead="Payment is done. This is the only form you fill in. The delivery clock starts once this brief is complete, and the more you give me here, the sharper the first draft comes back."
+        lead="Complete your career brief and upload your CV here. Writing begins after payment is confirmed and your brief is complete. The more you share, the sharper your first draft can be."
         crumbs={[{ label: "Order", href: "/order" }, { label: "Your brief" }]}
         showProof={false}
       />

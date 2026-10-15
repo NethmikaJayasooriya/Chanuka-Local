@@ -14,7 +14,7 @@ function load(path, imports = {}, customEnv = env, globals = {}) {
   const source = fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
   const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
   const exports = {};
-  vm.runInNewContext(output, { exports, Buffer, URL, Request, Response, FormData, process: { env: customEnv }, ...globals, require: (id) => {
+  vm.runInNewContext(output, { exports, Buffer, URL, Request, Response, FormData, TextDecoder, Uint8Array, process: { env: customEnv }, ...globals, require: (id) => {
     if (id === "server-only") return {};
     if (id === "@/lib/site") return { site, SITE_KEY: "lk" };
     if (id === "next/server") return { NextResponse: Response };
@@ -26,6 +26,7 @@ function load(path, imports = {}, customEnv = env, globals = {}) {
 }
 const pricing = load("src/lib/pricing.ts");
 const payhere = load("src/lib/payhere.ts");
+const requestValidation = load("src/lib/request-validation.ts");
 const redirect = load("src/lib/auth-redirect.ts").safeReturnPath;
 let checks = 0;
 async function test(name, run) { await run(); checks++; console.log(`PASS ${name}`); }
@@ -83,6 +84,7 @@ const db = { from: query, rpc: async (_name, data) => {
   return { data: !duplicate, error: null };
 } };
 const imports = {
+  "@/lib/request-validation": requestValidation,
   "@/lib/payhere": payhere,
   "@/lib/pricing": pricing,
   "@/lib/supabase/guard": { supabaseConfigured: () => true },
@@ -165,6 +167,7 @@ const fakeAccountDb = {
   from: () => ({ upsert: async () => ({ error: null }) }),
 };
 const account = load("src/app/api/account/create/route.ts", {
+  "@/lib/request-validation": requestValidation,
   "@/lib/supabase/admin": { createAdminClient: () => fakeAccountDb },
   "@/lib/supabase/guard": { supabaseConfigured: () => true },
 }).POST;
