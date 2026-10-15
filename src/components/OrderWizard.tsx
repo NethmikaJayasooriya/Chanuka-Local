@@ -329,8 +329,8 @@ Notes: ${details.notes || "-"}`;
               <h2 className="text-[15px] font-semibold text-ink">Your details</h2>
               <p className="text-[13.5px] text-muted">
                 {AUTH_ON
-                  ? "This creates your account, so you can track your order, upload your CV and download your final documents. Your receipt and draft links are emailed to you too."
-                  : "Your order receipt, intake confirmation, and draft delivery links will be sent to your email."}
+                  ? "This creates your account, so you can track your order, upload your CV and download your final documents from your dashboard."
+                  : "Use the email associated with your account to track this order and access your documents from your dashboard."}
               </p>
               <div>
                 <label className={label} htmlFor="name">
