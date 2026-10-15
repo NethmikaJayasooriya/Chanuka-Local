@@ -65,9 +65,13 @@ if (process.argv[2]) {
         const order = await get(url);
         assert.ok(order.includes(`${tier === "essential" ? "Essential" : "Signature"} · ${pkg.name}`), `order tier ${url}`);
         assert.ok(order.includes(price), `order price ${url}`);
-        const checkout = await get(`/checkout?package=${pkg.id}&tier=${tier}&level=${level.id}&delivery=normal`);
-        assert.ok(checkout.includes(price), `checkout price ${url}`);
-        assert.ok(checkout.includes(`tier=${tier}`), `checkout retains tier ${url}`);
+        const checkout = await fetch(new URL(`/checkout?package=${pkg.id}&tier=${tier}&level=${level.id}&delivery=normal`, origin), { redirect: "manual", signal: AbortSignal.timeout(30000) });
+        assert.equal(checkout.status, 307, `checkout requires an account-owned order ${url}`);
+        const target = new URL(checkout.headers.get("location"), origin);
+        assert.equal(target.pathname, "/order");
+        assert.equal(target.searchParams.get("package"), pkg.id);
+        assert.equal(target.searchParams.get("tier"), tier);
+        assert.equal(target.searchParams.get("level"), level.id);
         links++;
       }
     }
@@ -78,5 +82,5 @@ if (process.argv[2]) {
     const data = schemas.find((schema) => schema["@type"] === "Service");
     assert.deepEqual(data.offers.map((offer) => Number(offer.price)), [...expected.essential[service], ...expected.signature[service]]);
   }
-  console.log(`PASS rendered price list, ${links} tier-aware order and checkout selections, four service offer schemas at ${origin.origin}`);
+  console.log(`PASS rendered price list, ${links} tier-aware orders and account-required checkout redirects, four service offer schemas at ${origin.origin}`);
 }

@@ -23,6 +23,11 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "Cancelled",
 };
 
+const PAYMENT_LABEL: Record<string, string> = {
+  pending: "Payment pending", paid: "Paid", failed: "Payment failed",
+  cancelled: "Payment cancelled", refunded: "Refunded", charged_back: "Charged back",
+};
+
 function StatusBadge({ status }: { status: string }) {
   const tone =
     status === "completed"
@@ -101,7 +106,7 @@ export default async function DashboardPage() {
               const done = o.status === "completed";
               const stages: Array<{ label: string; note: string; state: "done" | "current" | "todo" }> = [
                 { label: "Order placed", note: `${o.package_name}, ${o.level_name}.`, state: "done" },
-                { label: "Payment", note: paid ? "Payment received." : "Pending. Pay by invoice or once online payment is live.", state: paid ? "done" : "current" },
+                { label: "Payment", note: paid ? "Payment verified." : "Pending. Open checkout to pay securely or request an invoice.", state: paid ? "done" : "current" },
                 { label: "Brief and CV", note: hasBrief ? "Received." : "Upload your CV and complete your brief.", state: hasBrief ? "done" : paid ? "current" : "todo" },
                 { label: "Writing", note: "Your document is being written.", state: done || hasDraft ? "done" : hasBrief ? "current" : "todo" },
                 { label: "Draft and revision", note: "Draft delivered here, one revision round.", state: done ? "done" : hasDraft ? "current" : "todo" },
@@ -121,7 +126,7 @@ export default async function DashboardPage() {
                     <div className="flex flex-col items-end gap-2">
                       <StatusBadge status={o.status} />
                       <span className={`rounded-full px-3 py-1 text-[12px] font-semibold ${paid ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                        {paid ? "Paid" : "Payment pending"}
+                        {PAYMENT_LABEL[o.payment_status] ?? "Payment pending"}
                       </span>
                     </div>
                   </div>
@@ -140,6 +145,9 @@ export default async function DashboardPage() {
                     </ol>
 
                     <div className="space-y-4">
+                      <Link href={`/checkout?order=${o.id}`} className="block rounded-[12px] border border-brand px-4 py-3 text-center text-[13.5px] font-semibold text-brand hover:bg-brand-soft">
+                        {paid ? "View payment details" : "Open payment checkout"}
+                      </Link>
                       {!hasBrief && (
                         <Link href={`/intake?order=${o.id}`} className="block rounded-[12px] bg-brand px-4 py-3 text-center text-[13.5px] font-semibold text-paper hover:bg-brand-deep">
                           Upload CV and complete brief

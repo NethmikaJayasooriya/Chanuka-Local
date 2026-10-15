@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
+import { safeReturnPath } from "@/lib/auth-redirect";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const rawNext = url.searchParams.get("next") || "/dashboard";
   // Only allow same-site relative redirects.
-  const next = rawNext.startsWith("/") ? rawNext : "/dashboard";
+  const next = safeReturnPath(rawNext);
 
   if (!code || !supabaseConfigured()) {
     return NextResponse.redirect(new URL("/login?error=oauth", url.origin));

@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SITE_KEY } from "@/lib/site";
 
 /**
  * Customer-facing reads. These use the signed-in user's own session, so
@@ -18,6 +19,7 @@ export type CustomerOrder = {
   total_usd: number | null;
   status: string;
   payment_status: string;
+  customer_phone: string | null;
   target_role: string | null;
   target_country: string | null;
   created_at: string;
@@ -34,30 +36,30 @@ export type Deliverable = {
 };
 
 const ORDER_COLS =
-  "id, ref, package_name, level_name, delivery_window, total_usd, status, payment_status, target_role, target_country, created_at";
+  "id, ref, package_name, level_name, delivery_window, total_usd, status, payment_status, customer_phone, target_role, target_country, created_at";
 
 export async function getMyOrders(): Promise<CustomerOrder[]> {
   const db = await createClient();
-  const { data } = await db.from("orders").select(ORDER_COLS).order("created_at", { ascending: false });
+  const { data } = await db.from("orders").select(ORDER_COLS).eq("site", SITE_KEY).order("created_at", { ascending: false });
   return (data as CustomerOrder[] | null) ?? [];
 }
 
 export async function getMyOrder(id: string): Promise<CustomerOrder | null> {
   const db = await createClient();
-  const { data } = await db.from("orders").select(ORDER_COLS).eq("id", id).maybeSingle();
+  const { data } = await db.from("orders").select(ORDER_COLS).eq("site", SITE_KEY).eq("id", id).maybeSingle();
   return (data as CustomerOrder | null) ?? null;
 }
 
 /** Whether this order already has a completed brief (CV + details). */
 export async function orderHasBrief(orderId: string): Promise<boolean> {
   const db = await createClient();
-  const { data } = await db.from("intake_submissions").select("id, cv_path").eq("order_id", orderId).maybeSingle();
+  const { data } = await db.from("intake_submissions").select("id, cv_path").eq("site", SITE_KEY).eq("order_id", orderId).maybeSingle();
   return !!data;
 }
 
 export async function getMyDeliverables(orderId?: string): Promise<Deliverable[]> {
   const db = await createClient();
-  let q = db.from("deliverables").select("id, order_id, label, file_name, kind, file_path, created_at").order("created_at", { ascending: false });
+  let q = db.from("deliverables").select("id, order_id, label, file_name, kind, file_path, created_at").eq("site", SITE_KEY).order("created_at", { ascending: false });
   if (orderId) q = q.eq("order_id", orderId);
   const { data } = await q;
   const rows = (data as Array<Omit<Deliverable, "url"> & { file_path: string }> | null) ?? [];
@@ -85,7 +87,7 @@ export async function getMyDeliverables(orderId?: string): Promise<Deliverable[]
 /** Order ids that already have a completed brief. */
 export async function getMyBriefOrderIds(): Promise<Set<string>> {
   const db = await createClient();
-  const { data } = await db.from("intake_submissions").select("order_id");
+  const { data } = await db.from("intake_submissions").select("order_id").eq("site", SITE_KEY);
   const set = new Set<string>();
   for (const r of (data as Array<{ order_id: string | null }> | null) ?? []) {
     if (r.order_id) set.add(r.order_id);

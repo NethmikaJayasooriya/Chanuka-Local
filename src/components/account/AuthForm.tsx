@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signIn, signUp, AUTH_ON } from "@/lib/auth";
 import { GoogleButton } from "@/components/account/GoogleButton";
+import { safeReturnPath } from "@/lib/auth-redirect";
 
 const field =
   "mt-1.5 w-full rounded-[10px] border border-line-strong bg-paper px-4 py-3 text-[14.5px] text-ink outline-none transition-colors focus:border-brand";
@@ -12,7 +13,7 @@ const field =
 export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const router = useRouter();
   const search = useSearchParams();
-  const next = search.get("next") || "/dashboard";
+  const next = safeReturnPath(search.get("next"));
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,17 +30,18 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
       return;
     }
     setBusy(true);
-    const res =
-      mode === "signup"
+    try {
+      const res = mode === "signup"
         ? await signUp(email, password, name)
         : await signIn(email, password);
-    if (!res.ok) {
-      setError(res.message);
+      if (!res.ok) { setError(res.message); return; }
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError("Could not connect. Please check your connection and try again.");
+    } finally {
       setBusy(false);
-      return;
     }
-    router.push(next);
-    router.refresh();
   };
 
   return (
@@ -68,6 +70,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
           type="password"
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
           required
+          minLength={mode === "signup" ? 8 : undefined}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={field}
@@ -87,9 +90,9 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 
       <p className="pt-1 text-center text-[13px] text-muted">
         {mode === "signup" ? (
-          <>Already have an account? <Link href="/login" className="font-semibold text-brand hover:underline">Sign in</Link></>
+          <>Already have an account? <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-brand hover:underline">Sign in</Link></>
         ) : (
-          <>No account yet? <Link href="/signup" className="font-semibold text-brand hover:underline">Create one</Link>, or just <Link href="/order" className="font-semibold text-brand hover:underline">start an order</Link>.</>
+          <>No account yet? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-semibold text-brand hover:underline">Create one</Link>, or just <Link href="/order" className="font-semibold text-brand hover:underline">start an order</Link>.</>
         )}
       </p>
       </form>

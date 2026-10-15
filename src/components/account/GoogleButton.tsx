@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AUTH_ON } from "@/lib/auth";
+import { safeReturnPath } from "@/lib/auth-redirect";
 
 /**
  * "Continue with Google" button. Redirects to Google, then back to
@@ -17,7 +18,7 @@ export function GoogleButton({ next = "/dashboard", label = "Continue with Googl
     if (busy) return;
     setBusy(true);
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeReturnPath(next))}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },

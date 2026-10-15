@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { isPayHereConfigured, getPayHereConfig } from "@/lib/payhere";
+import { PayHerePaymentForm } from "@/components/PayHerePaymentForm";
+import { PaymentStatusPoller } from "@/components/PaymentStatusPoller";
 import { PageHeader } from "@/components/PageHeader";
 import {
-  tiers,
   type TierId,
   deliveries,
   levels,
   packages,
-  quote,
-  services,
   usd,
   type DeliveryId,
   type LevelId,
@@ -80,7 +80,7 @@ function Summary({
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string }>;
+  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string; payment?: string }>;
 }) {
   const params = await searchParams;
 
@@ -91,6 +91,25 @@ export default async function CheckoutPage({
     if (!order) redirect("/order");
 
     const paid = order.payment_status === "paid";
+    const paymentBlocked = order.payment_status === "refunded" || order.payment_status === "charged_back";
+    const paymentLabel: Record<string, string> = {
+      pending: "Payment pending",
+      paid: "Paid",
+      failed: "Payment failed",
+      cancelled: "Payment cancelled",
+      refunded: "Refunded",
+      charged_back: "Charged back",
+    };
+    const paymentTone: Record<string, string> = {
+      pending: "bg-amber-100 text-amber-700",
+      paid: "bg-green-100 text-green-700",
+      failed: "bg-red-100 text-red-700",
+      cancelled: "bg-slate-100 text-slate-700",
+      refunded: "bg-blue-100 text-blue-700",
+      charged_back: "bg-red-100 text-red-800",
+    };
+    const payHereReady = isPayHereConfigured();
+    const sandbox = payHereReady && getPayHereConfig().sandbox;
     const intakeHref = `/intake?order=${order.id}`;
 
     return (
@@ -101,6 +120,7 @@ export default async function CheckoutPage({
           crumbs={[{ label: "Order", href: "/order" }, { label: "Checkout" }]}
         />
         <section className="py-8 sm:py-12 lg:py-16">
+          <PaymentStatusPoller active={!paid && params.payment === "return"} />
           <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
             <Summary
               title={order.package_name ?? "Your package"}
@@ -114,30 +134,64 @@ export default async function CheckoutPage({
             <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
               <div className="flex items-center justify-between">
                 <h2 className="display text-[19px] sm:text-[21px] text-ink">Payment</h2>
-                <span className={`rounded-full px-3 py-1 text-[12px] font-semibold ${paid ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                  {paid ? "Paid" : "Payment pending"}
+                <span className={`rounded-full px-3 py-1 text-[12px] font-semibold ${paymentTone[order.payment_status] ?? paymentTone.pending}`}>
+                  {paymentLabel[order.payment_status] ?? "Payment pending"}
                 </span>
               </div>
               <p className="mt-1.5 text-[13.5px] text-muted">
                 Your order <span className="font-semibold text-ink">{order.ref}</span> is saved to your account. You can complete your brief and CV upload now; writing starts once payment is confirmed.
               </p>
 
-              <div className="mt-6 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
-                <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-                  Secure online card payment (PayHere) is being connected. Until it goes live, you are invoiced directly for card, PayPal or bank transfer. Either way, upload your CV now so your brief is ready the moment payment clears.
+              {params.payment === "cancelled" && !paid && (
+                <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13.5px] text-amber-800">
+                  Payment was cancelled. Your order is still saved, and you can try again safely below.
                 </p>
-                <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                  <Link href={intakeHref} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper shadow-[0_10px_26px_-14px_rgb(23_53_92/0.9)] transition-all hover:bg-brand-deep">
+              )}
+              {params.payment === "return" && !paid && (
+                <p className="mt-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-[13.5px] text-blue-800">
+                  PayHere is confirming the payment. This page updates automatically when the signed confirmation arrives.
+                </p>
+              )}
+
+              {paid ? (
+                <div className="mt-6 rounded-[14px] border border-green-200 bg-green-50 p-4.5 sm:p-6">
+                  <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-green-800">
+                    Payment has been verified. Complete your brief and upload your current CV so work can begin.
+                  </p>
+                  <Link href={intakeHref} className="mt-5 block w-full rounded-full bg-brand px-7 py-3.5 text-center text-[15px] font-semibold text-paper shadow-md transition-all hover:bg-brand-deep sm:w-auto sm:inline-block">
                     Upload my CV and complete brief
                   </Link>
-                  <a
-                    href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice request: ${order.ref}`)}&body=${encodeURIComponent(`Hi Chanuka, please send the invoice and payment details for order ${order.ref} (${order.package_name}, ${order.level_name}, total ${usd(order.total_usd ?? 0)}).`)}`}
-                    className="w-full sm:w-auto rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[14px] sm:text-[15px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand shadow-2xs"
-                  >
-                    Request invoice by email
-                  </a>
                 </div>
-              </div>
+              ) : paymentBlocked ? (
+                <div className="mt-6 rounded-[14px] border border-red-200 bg-red-50 p-4.5 sm:p-6">
+                  <p className="text-[13.5px] leading-relaxed text-red-800">
+                    Online repayment is paused for this order. Please contact {site.email} and include order reference {order.ref}.
+                  </p>
+                </div>
+              ) : payHereReady ? (
+                <>
+                  <PayHerePaymentForm orderId={order.id} defaultPhone={order.customer_phone ?? ""} sandbox={sandbox} />
+                  <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                    <Link href={intakeHref} className="text-center text-[13.5px] font-semibold text-brand underline underline-offset-4">
+                      Complete my brief before paying
+                    </Link>
+                    <span className="hidden text-line-strong sm:inline">·</span>
+                    <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Payment help: ${order.ref}`)}`} className="text-center text-[13.5px] font-medium text-muted hover:text-brand">
+                      Get payment help
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <div className="mt-6 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
+                  <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
+                    Online payment is not currently available. Your order is saved; request an invoice or complete your brief now.
+                  </p>
+                  <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                    <Link href={intakeHref} className="w-full rounded-full bg-brand px-7 py-3.5 text-center text-[15px] font-semibold text-paper hover:bg-brand-deep sm:w-auto">Complete my brief</Link>
+                    <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice request: ${order.ref}`)}`} className="w-full rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[15px] font-semibold text-ink hover:border-brand hover:text-brand sm:w-auto">Request invoice</a>
+                  </div>
+                </div>
+              )}
 
               <ul className="mt-6 sm:mt-7 space-y-2 border-t border-line pt-5 sm:pt-6 text-[13px] sm:text-[13.5px] text-muted">
                 <li>Track this order any time from your <Link href="/dashboard" className="font-medium text-ink underline underline-offset-2">dashboard</Link>.</li>
@@ -153,48 +207,9 @@ export default async function CheckoutPage({
 
   // -------- Legacy / guest checkout (no account) --------
   const tier: TierId = params.tier === "signature" ? "signature" : "essential";
-  const tierName = tiers.find((item) => item.id === tier)!.name;
   const pkg = packages.find((p) => p.id === params.package) ?? packages[4];
   const level = (levels.find((l) => l.id === params.level)?.id ?? "3-to-9") as LevelId;
   const delivery = (deliveries.find((d) => d.id === params.delivery)?.id ?? "normal") as DeliveryId;
-  const q = quote(pkg, level, delivery, tier);
-  const levelName = levels.find((l) => l.id === level)?.name ?? "";
-  const deliveryOption = deliveries.find((d) => d.id === delivery);
 
-  return (
-    <>
-      <PageHeader eyebrow="Checkout" title="One payment, then we start." crumbs={[{ label: "Order", href: "/order" }, { label: "Checkout" }]} />
-      <section className="py-8 sm:py-12 lg:py-16">
-        <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-          <Summary
-            title={`${tierName} · ${pkg.name}`}
-            levelName={levelName}
-            window={deliveryOption?.window ?? ""}
-            includes={q.includedServices.map((s) => services[s].name)}
-            total={q.total}
-            changeHref={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`}
-          />
-          <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
-            <h2 className="display text-[19px] sm:text-[21px] text-ink">Payment</h2>
-            <p className="mt-1.5 sm:mt-2 text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-              Payment in LKR by bank transfer for now. Your order number arrives by email, and the CV upload step opens straight after.
-            </p>
-            <div className="mt-5 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
-              <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-                Secure online card payment (PayHere) connects here once the merchant account is live. Until then, you are invoiced directly, then you complete your brief so the writing can start.
-              </p>
-              <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <Link href={`/intake?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper transition-all hover:bg-brand-deep">
-                  Confirm &amp; continue
-                </Link>
-                <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice Request: ${tierName} · ${pkg.name} (${levelName})`)}`} className="w-full sm:w-auto rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[14px] sm:text-[15px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand shadow-2xs">
-                  Request invoice by email
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+  redirect(`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`);
 }

@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/account/AuthForm";
 import { getSessionUser, supabaseConfigured } from "@/lib/supabase/guard";
+import { safeReturnPath } from "@/lib/auth-redirect";
 
 export const metadata: Metadata = {
   title: "Create your account",
@@ -12,8 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/signup" },
 };
 
-export default async function SignupPage() {
-  if (supabaseConfigured() && (await getSessionUser())) redirect("/dashboard");
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  const params = await searchParams;
+  if (supabaseConfigured() && (await getSessionUser())) redirect(safeReturnPath(params.next));
 
   return (
     <section className="relative overflow-hidden">

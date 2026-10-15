@@ -24,16 +24,19 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
+  }
 
   const email = String(body.email ?? "").trim().toLowerCase();
   const password = String(body.password ?? "");
   const full_name = String(body.full_name ?? "").trim();
   const phone = String(body.phone ?? "").trim();
 
-  if (!email || !email.includes("@")) {
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ ok: false, reason: "invalid_email" }, { status: 400 });
   }
-  if (password.length < 8) {
+  if (password.length < 8 || password.length > 128) {
     return NextResponse.json({ ok: false, reason: "weak_password" }, { status: 400 });
   }
 
@@ -42,7 +45,7 @@ export async function POST(request: Request) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name },
+    user_metadata: { full_name: full_name.slice(0, 200) },
   });
 
   if (error) {
@@ -50,13 +53,13 @@ export async function POST(request: Request) {
     if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
       return NextResponse.json({ ok: false, reason: "exists" }, { status: 409 });
     }
-    return NextResponse.json({ ok: false, reason: error.message }, { status: 400 });
+    return NextResponse.json({ ok: false, reason: "create_failed" }, { status: 400 });
   }
 
   const userId = data.user?.id;
   if (userId) {
     await db.from("profiles").upsert(
-      { user_id: userId, full_name: full_name || null, phone: phone || null },
+      { user_id: userId, full_name: full_name.slice(0, 200) || null, phone: phone.slice(0, 60) || null },
       { onConflict: "user_id" },
     );
   }

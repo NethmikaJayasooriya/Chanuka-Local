@@ -389,7 +389,7 @@ Notes: ${details.notes || "-"}`;
                   )}
                   <p className="mt-3 text-[12px] text-muted">
                     Already ordered before? Just use the same email and password.{" "}
-                    <Link href="/login" className="font-semibold text-brand">Sign in instead</Link>
+                    <Link href={`/login?next=${encodeURIComponent(`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`)}`} className="font-semibold text-brand">Sign in instead</Link>
                   </p>
                 </div>
               )}
