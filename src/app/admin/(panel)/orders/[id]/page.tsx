@@ -1,10 +1,10 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderControls } from "./OrderControls";
 import { uploadDeliverable, deleteDeliverable } from "../../actions";
 import { Badge, Card } from "@/components/admin/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseConfigured } from "@/lib/supabase/guard";
+import { canManageSite, requireAdmin, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -12,19 +12,24 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: o } = await db.from("orders").select("*").eq("id", id).eq("site", "lk").maybeSingle();
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const { data: o } = await (isUuid
+    ? db.from("orders").select("*").eq("id", id).maybeSingle()
+    : db.from("orders").select("*").eq("ref", id).maybeSingle());
   if (!o) notFound();
+  const access = await requireAdmin();
+  if (!canManageSite(access, o.site)) notFound();
 
   const { data: brief } = await db
     .from("intake_submissions")
     .select("id,name,target_role,handled")
-    .eq("order_id", id)
+    .eq("order_id", o.id)
     .maybeSingle();
 
   const { data: files } = await db
     .from("deliverables")
     .select("id,label,kind,file_name,created_at")
-    .eq("order_id", id)
+    .eq("order_id", o.id)
     .order("created_at", { ascending: false });
 
   const rows: Array<[string, string]> = [
@@ -38,7 +43,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
     ["Package", o.package_name ?? "-"],
     ["Experience", o.level_name ?? "-"],
     ["Delivery", o.delivery_window ?? "-"],
-    ["Total", o.total_usd != null ? `$${o.total_usd}` : "-"],
+    ["Total", o.total_usd != null ? (o.site === "lk" ? `Rs ${o.total_usd}` : `$${o.total_usd}`) : "-"],
     ["Placed", new Date(o.created_at).toLocaleString()],
   ];
 
@@ -60,8 +65,40 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
             </svg>
             Order Workflow View
           </Link>
+          <Link
+            href={`/admin/invoices/new?order_id=${o.id}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink shadow-xs hover:border-brand hover:text-brand transition-all"
+          >
+            <svg className="h-4 w-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Generate Invoice
+          </Link>
         </div>
       </div>
+
+      {o.status === "revision" && (
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-4 text-[13.5px] text-[#7c2d12] shadow-xs">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#fef3c7] text-[#d97706] font-bold">
+              ✎
+            </span>
+            <div>
+              <p className="font-bold text-[#b45309]">Client Requested a Revision</p>
+              <p className="text-[12.5px] text-[#9a3412]">
+                The buyer has requested adjustments on this order. View feedback notes and deliver the updated documents in the order workflow.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/order-workflow?id=${o.id}&role=seller`}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-[#1dbf73] px-4 py-2 text-[12.5px] font-bold text-white shadow-xs hover:bg-[#19a463] transition"
+          >
+            <span>View Feedback &amp; Deliver</span>
+            <span>→</span>
+          </Link>
+        </div>
+      )}
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px]">
         <Card>

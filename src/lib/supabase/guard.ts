@@ -1,11 +1,29 @@
 import { redirect } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "./server";
+
+export type AdminSite = "com" | "lk";
+export type AdminAccess = {
+  user: User;
+  email: string;
+  role: "owner" | "manager";
+  sites: AdminSite[];
+};
+
+export function canManageSite(access: Pick<AdminAccess, "role" | "sites">, site: string | null | undefined) {
+  return access.role === "owner" || site === "com" && access.sites.includes("com") || site === "lk" && access.sites.includes("lk");
+}
+
+export function resolveAdminSite(requested: string | null | undefined, access: Pick<AdminAccess, "sites">): AdminSite | undefined {
+  if ((requested === "com" || requested === "lk") && access.sites.includes(requested)) return requested;
+  return access.sites.length === 1 ? access.sites[0] : undefined;
+}
 
 /**
  * Returns the signed-in admin, or redirects to the login page. An admin
  * is a signed-in user whose id is present in the `admins` table.
  */
-export async function requireAdmin(ownerOnly = false) {
+export async function requireAdmin(requiredSite?: AdminSite, ownerOnly = false): Promise<AdminAccess> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,13 +44,13 @@ export async function requireAdmin(ownerOnly = false) {
   }
 
   const role = adminRow.role === "owner" ? "owner" : "manager";
-  const sites = role === "owner" ? ["com", "lk"] : (Array.isArray(adminRow.site_access) ? adminRow.site_access : []);
-  if (!sites.includes("lk")) {
-    await supabase.auth.signOut();
-    redirect("/admin/login?denied=1");
-  }
+  const rawSites = Array.isArray(adminRow.site_access) ? adminRow.site_access : ["com"];
+  const sites = rawSites.filter((site): site is AdminSite => site === "com" || site === "lk");
+  const access: AdminAccess = { user, email: user.email ?? "", role, sites: role === "owner" ? ["com", "lk"] : sites };
+
   if (ownerOnly && role !== "owner") redirect("/admin?denied=owner");
-  return { user, email: user.email ?? "", role };
+  if (requiredSite && !canManageSite(access, requiredSite)) redirect("/admin?denied=site");
+  return access;
 }
 
 /** The signed-in user, or null. For pages that adapt to auth state. */

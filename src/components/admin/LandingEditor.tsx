@@ -14,6 +14,7 @@ type Landing = {
   meta_title: string | null;
   meta_description: string | null;
   status: string;
+  site?: string | null;
   quick_answer?: string | null;
   faqs?: Array<{ q: string; a: string }> | null;
   primary_keyword?: string | null;
@@ -30,10 +31,12 @@ export function LandingEditor({
   sections,
   page,
   coverUrl,
+  allowedSites = ["com", "lk"],
 }: {
   sections: SectionOpt[];
   page?: Landing;
   coverUrl?: string | null;
+  allowedSites?: Array<"com" | "lk">;
 }) {
   const [section, setSection] = useState(page?.section ?? sections[0]?.value ?? "");
   const [slug, setSlug] = useState(page?.slug ?? "");
@@ -103,7 +106,13 @@ export function LandingEditor({
 
       <div className="space-y-5">
         <Card className="h-fit">
-          <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Status</label>
+          <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Site</label>
+          <select name="site" defaultValue={page?.site ?? allowedSites[0] ?? "com"} className={inputCls}>
+            {allowedSites.includes("com") && <option value="com">chanukajeewantha.com</option>}
+            {allowedSites.includes("lk") && <option value="lk">chanukajeewantha.lk</option>}
+          </select>
+
+          <label className="mt-4 block text-[12px] font-semibold uppercase tracking-wide text-muted">Status</label>
           <select name="status" defaultValue={page?.status ?? "draft"} className={inputCls}>
             <option value="draft">Draft</option>
             <option value="published">Published (goes live)</option>

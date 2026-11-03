@@ -4,21 +4,30 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { AdminSite } from "@/lib/supabase/guard";
+import { SITE_KEY } from "@/lib/site";
 
 const nav = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/orders", label: "Orders" },
   { href: "/order-workflow?role=seller", label: "Order Workflow" },
+  { href: "/admin/invoices", label: "Invoices" },
   { href: "/admin/submissions", label: "CV briefs" },
+  { href: "/admin/pricing", label: "Global pricing", comOnly: true },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/pages", label: "SEO Pages" },
+  { href: "/admin/team", label: "Team access", ownerOnly: true },
 ];
 
 export function AdminShell({
   email,
+  role,
+  sites,
   children,
 }: {
   email: string;
+  role: "owner" | "manager";
+  sites: AdminSite[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "/admin";
@@ -47,7 +56,7 @@ export function AdminShell({
     <div className="min-h-screen bg-[#f4f6fa] text-ink">
       {/* Top bar (mobile) */}
       <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
-        <span className="font-bold">Chanuka · Sri Lanka Admin</span>
+        <span className="font-bold">Chanuka · Control centre</span>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -77,15 +86,16 @@ export function AdminShell({
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
             <Link href="/admin" className="hidden px-2 py-2 text-[16px] font-bold lg:block">
-              Chanuka · Sri Lanka Admin
+              Chanuka · Control centre
             </Link>
-            <div className="mt-3 rounded-xl border border-line bg-[#f7f9fc] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Workspace</p>
-              <p className="mt-1 text-[13px] font-semibold text-ink">🇱🇰 chanukajeewantha.lk</p>
-              <a href="https://chanukajeewantha.com/admin" className="mt-2 block text-[12px] font-semibold text-brand hover:underline">Open Global control centre ↗</a>
+            <div className="mt-3 rounded-xl border border-line bg-[#f7f9fc] p-2">
+              <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">Workspaces</p>
+              {sites.includes("com") && <Link href="/admin?site=com" onClick={() => setOpen(false)} className="block rounded-lg px-2 py-2 text-[12.5px] font-semibold text-ink-soft hover:bg-white">🌐 Global · .com</Link>}
+              {sites.includes("lk") && <Link href="/admin?site=lk" onClick={() => setOpen(false)} className="block rounded-lg px-2 py-2 text-[12.5px] font-semibold text-ink-soft hover:bg-white">🇱🇰 Sri Lanka · .lk</Link>}
+              {sites.includes("lk") && <a href="https://chanukajeewantha.lk/admin" className="block rounded-lg px-2 py-2 text-[12px] text-muted hover:bg-white">Open Local admin ↗</a>}
             </div>
             <nav className="mt-2 space-y-1">
-              {nav.map((n) => (
+              {nav.filter((n) => (!("ownerOnly" in n && n.ownerOnly) || role === "owner") && (!("comOnly" in n && n.comOnly) || sites.includes("com"))).map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
@@ -102,6 +112,7 @@ export function AdminShell({
             </nav>
             <div className="mt-auto border-t border-line pt-4">
               <p className="truncate px-3 text-[12px] text-muted">{email}</p>
+              <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-wide text-brand">{role === "owner" ? "Owner · all sites" : `Manager · ${sites.map((site) => `.${site}`).join(" + ")}`}</p>
               <button
                 onClick={signOut}
                 className="mt-2 w-full rounded-lg px-3 py-2 text-left text-[13.5px] font-medium text-red-600 hover:bg-red-50"

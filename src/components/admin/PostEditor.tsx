@@ -18,6 +18,7 @@ type Post = {
   meta_title: string | null;
   meta_description: string | null;
   status: string;
+  site?: string | null;
   quick_answer?: string | null;
   faqs?: Array<{ q: string; a: string }> | null;
   primary_keyword?: string | null;
@@ -28,7 +29,7 @@ type Post = {
 const inputCls =
   "mt-1.5 w-full rounded-[10px] border border-line-strong bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none focus:border-brand";
 
-export function PostEditor({ post, coverUrl }: { post?: Post; coverUrl?: string | null }) {
+export function PostEditor({ post, coverUrl, allowedSites = ["com", "lk"] }: { post?: Post; coverUrl?: string | null; allowedSites?: Array<"com" | "lk"> }) {
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [html, setHtml] = useState(post?.body_html ?? "");
@@ -117,7 +118,13 @@ export function PostEditor({ post, coverUrl }: { post?: Post; coverUrl?: string 
 
       <div className="space-y-5">
         <Card className="h-fit">
-          <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Status</label>
+          <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Site</label>
+          <select name="site" defaultValue={post?.site ?? allowedSites[0] ?? "com"} className={inputCls}>
+            {allowedSites.includes("com") && <option value="com">chanukajeewantha.com</option>}
+            {allowedSites.includes("lk") && <option value="lk">chanukajeewantha.lk</option>}
+          </select>
+
+          <label className="mt-4 block text-[12px] font-semibold uppercase tracking-wide text-muted">Status</label>
           <select name="status" defaultValue={post?.status ?? "draft"} className={inputCls}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>

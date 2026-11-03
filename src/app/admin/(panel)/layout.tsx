@@ -26,6 +26,6 @@ export default async function PanelLayout({
     );
   }
 
-  const { email } = await requireAdmin();
-  return <AdminShell email={email}>{children}</AdminShell>;
+  const { email, role, sites } = await requireAdmin();
+  return <AdminShell email={email} role={role} sites={sites}>{children}</AdminShell>;
 }

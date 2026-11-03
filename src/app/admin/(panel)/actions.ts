@@ -1,8 +1,8 @@
-﻿"use server";
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/lib/supabase/guard";
+import { canManageSite, requireAdmin, type AdminSite } from "@/lib/supabase/guard";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { landingPath } from "@/lib/landing";
 import { submitToIndexNow } from "@/lib/indexnow";
@@ -15,6 +15,15 @@ function slugify(s: string) {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 80);
+}
+
+const siteFrom = (value: FormDataEntryValue | null): AdminSite => value === "lk" ? "lk" : "com";
+
+async function authorizeRecord(table: "orders" | "intake_submissions" | "blog_posts" | "landing_pages" | "deliverables", id: string) {
+  const access = await requireAdmin();
+  const { data } = await createAdminClient().from(table).select("site").eq("id", id).maybeSingle();
+  if (!data || !canManageSite(access, data.site)) throw new Error("You do not have access to this site's records.");
+  return { access, site: data.site as AdminSite };
 }
 
 /**
@@ -64,16 +73,18 @@ function aeoFields(form: FormData) {
 }
 
 export async function savePost(form: FormData) {
-  await requireAdmin();
+  const targetSite = siteFrom(form.get("site"));
+  await requireAdmin(targetSite);
   const db = createAdminClient();
 
   const id = (form.get("id") as string) || null;
+  if (id) await authorizeRecord("blog_posts", id);
   const title = String(form.get("title") ?? "").trim();
   const slug = slugify(String(form.get("slug") || title));
   const status = String(form.get("status") ?? "draft");
 
   const record: Record<string, unknown> = {
-    site: "lk",
+    site: targetSite,
     title,
     slug,
     excerpt: String(form.get("excerpt") ?? ""),
@@ -102,7 +113,7 @@ export async function savePost(form: FormData) {
   }
 
   if (id) {
-    await db.from("blog_posts").update(record).eq("id", id).eq("site", "lk");
+    await db.from("blog_posts").update(record).eq("id", id);
   } else {
     await db.from("blog_posts").insert(record);
   }
@@ -115,40 +126,40 @@ export async function savePost(form: FormData) {
 }
 
 export async function deletePost(id: string) {
-  await requireAdmin();
+  await authorizeRecord("blog_posts", id);
   const db = createAdminClient();
-  await db.from("blog_posts").delete().eq("id", id).eq("site", "lk");
+  await db.from("blog_posts").delete().eq("id", id);
   revalidatePath("/admin/blog");
   revalidatePath("/career-advice");
 }
 
 export async function updateOrderStatus(id: string, status: string) {
-  await requireAdmin();
+  await authorizeRecord("orders", id);
   const db = createAdminClient();
-  await db.from("orders").update({ status }).eq("id", id).eq("site", "lk");
+  await db.from("orders").update({ status }).eq("id", id);
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/admin");
 }
 
 export async function saveOrderNotes(id: string, admin_notes: string) {
-  await requireAdmin();
+  await authorizeRecord("orders", id);
   const db = createAdminClient();
-  await db.from("orders").update({ admin_notes }).eq("id", id).eq("site", "lk");
+  await db.from("orders").update({ admin_notes }).eq("id", id);
   revalidatePath(`/admin/orders/${id}`);
 }
 
 export async function markBriefHandled(id: string, handled: boolean) {
-  await requireAdmin();
+  await authorizeRecord("intake_submissions", id);
   const db = createAdminClient();
-  await db.from("intake_submissions").update({ handled }).eq("id", id).eq("site", "lk");
+  await db.from("intake_submissions").update({ handled }).eq("id", id);
   revalidatePath("/admin/submissions");
   revalidatePath(`/admin/submissions/${id}`);
   revalidatePath("/admin");
 }
 
 export async function savePrices(form: FormData) {
-  await requireAdmin(true);
+  await requireAdmin("com");
   const db = createAdminClient();
 
   const priceRows: { service_id: string; level_id: string; price_usd: number }[] = [];
@@ -190,17 +201,19 @@ export async function savePrices(form: FormData) {
 // ================= SEO landing pages =================
 
 export async function saveLanding(form: FormData) {
-  await requireAdmin();
+  const targetSite = siteFrom(form.get("site"));
+  await requireAdmin(targetSite);
   const db = createAdminClient();
 
   const id = (form.get("id") as string) || null;
+  if (id) await authorizeRecord("landing_pages", id);
   const section = String(form.get("section") ?? "").trim();
   const slug = slugify(String(form.get("slug") || form.get("title")));
   const title = String(form.get("title") ?? "").trim();
   const status = String(form.get("status") ?? "draft");
 
   const record: Record<string, unknown> = {
-    site: "lk",
+    site: targetSite,
     section,
     slug,
     title,
@@ -225,7 +238,7 @@ export async function saveLanding(form: FormData) {
   }
 
   if (id) {
-    await db.from("landing_pages").update(record).eq("id", id).eq("site", "lk");
+    await db.from("landing_pages").update(record).eq("id", id);
   } else {
     await db.from("landing_pages").upsert(record, { onConflict: "section,slug" });
   }
@@ -237,10 +250,10 @@ export async function saveLanding(form: FormData) {
 }
 
 export async function deleteLanding(id: string) {
-  await requireAdmin();
+  await authorizeRecord("landing_pages", id);
   const db = createAdminClient();
-  const { data } = await db.from("landing_pages").select("section,slug").eq("id", id).eq("site", "lk").maybeSingle();
-  await db.from("landing_pages").delete().eq("id", id).eq("site", "lk");
+  const { data } = await db.from("landing_pages").select("section,slug").eq("id", id).maybeSingle();
+  await db.from("landing_pages").delete().eq("id", id);
   if (data) revalidatePath(landingPath(data.section, data.slug));
   revalidatePath("/admin/pages");
   redirect("/admin/pages");
@@ -249,16 +262,16 @@ export async function deleteLanding(id: string) {
 // ================= Payments & deliverables =================
 
 export async function setPaymentStatus(id: string, status: string) {
-  await requireAdmin();
+  await authorizeRecord("orders", id);
+  if (!["pending", "paid", "refunded", "cancelled", "failed", "charged_back"].includes(status)) return;
   const db = createAdminClient();
-  await db.from("orders").update({ payment_status: status }).eq("id", id).eq("site", "lk");
+  await db.from("orders").update({ payment_status: status }).eq("id", id);
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/admin/orders");
   revalidatePath("/admin");
 }
 
 export async function uploadDeliverable(form: FormData) {
-  await requireAdmin();
   const db = createAdminClient();
 
   const orderId = String(form.get("order_id") ?? "");
@@ -270,8 +283,8 @@ export async function uploadDeliverable(form: FormData) {
     return;
   }
 
-  const { data: order } = await db.from("orders").select("user_id").eq("id", orderId).eq("site", "lk").maybeSingle();
-  if (!order) return;
+  const { site } = await authorizeRecord("orders", orderId);
+  const { data: order } = await db.from("orders").select("user_id,site").eq("id", orderId).maybeSingle();
   const userId = order?.user_id ?? null;
 
   const ext = file.name.split(".").pop() || "pdf";
@@ -285,7 +298,7 @@ export async function uploadDeliverable(form: FormData) {
   if (!error) {
     await db.from("deliverables").insert({
       order_id: orderId,
-      site: "lk",
+      site,
       user_id: userId,
       label,
       kind,
@@ -294,9 +307,9 @@ export async function uploadDeliverable(form: FormData) {
     });
     // Reflect the stage on the order so the customer's timeline moves.
     if (kind === "final") {
-      await db.from("orders").update({ status: "completed", updated_at: new Date().toISOString() }).eq("id", orderId).eq("site", "lk");
+      await db.from("orders").update({ status: "completed", updated_at: new Date().toISOString() }).eq("id", orderId);
     } else {
-      await db.from("orders").update({ status: "draft_delivered", updated_at: new Date().toISOString() }).eq("id", orderId).eq("site", "lk").neq("status", "completed");
+      await db.from("orders").update({ status: "draft_delivered", updated_at: new Date().toISOString() }).eq("id", orderId).neq("status", "completed");
     }
 
     // Record delivery in timeline events table
@@ -348,7 +361,7 @@ export async function uploadDeliverable(form: FormData) {
         file_path: "chat:seller",
         file_name: JSON.stringify(deliveryChatMsg),
         kind: "chat_message",
-        site: "lk",
+        site,
       });
     } catch {}
   }
@@ -359,10 +372,13 @@ export async function uploadDeliverable(form: FormData) {
 }
 
 export async function deleteDeliverable(id: string, orderId: string) {
-  await requireAdmin();
+  await authorizeRecord("orders", orderId);
+  await authorizeRecord("deliverables", id);
   const db = createAdminClient();
-  const { data: row } = await db.from("deliverables").select("file_path").eq("id", id).eq("site", "lk").maybeSingle();
+  const { data: row } = await db.from("deliverables").select("file_path").eq("id", id).maybeSingle();
   if (row?.file_path) await db.storage.from("deliverables").remove([row.file_path]);
-  await db.from("deliverables").delete().eq("id", id).eq("site", "lk");
+  await db.from("deliverables").delete().eq("id", id);
   revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/order-workflow");
+  revalidatePath("/dashboard");
 }

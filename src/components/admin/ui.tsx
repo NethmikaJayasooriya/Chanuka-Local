@@ -19,7 +19,7 @@ export function Stat({ label, value, href }: { label: string; value: React.React
   const inner = (
     <div className="h-full rounded-2xl border border-line bg-white p-4 transition-shadow hover:shadow-sm sm:p-5">
       <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-muted">{label}</p>
-      <p className="mt-2 text-[28px] font-bold leading-none text-ink">{value}</p>
+      <div className="mt-2 text-[28px] font-bold leading-none text-ink">{value}</div>
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : inner;
@@ -34,6 +34,9 @@ const statusStyles: Record<string, string> = {
   cancelled: "bg-gray-100 text-gray-500 border-gray-200",
   draft: "bg-gray-100 text-gray-600 border-gray-200",
   published: "bg-green-50 text-green-700 border-green-200",
+  sent: "bg-sky-50 text-sky-700 border-sky-200",
+  paid: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  overdue: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 export function Badge({ status, label }: { status: string; label?: string }) {
