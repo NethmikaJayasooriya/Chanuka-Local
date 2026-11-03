@@ -177,6 +177,15 @@ export default async function DashboardPage() {
                           </ul>
                         )}
                       </div>
+                      <Link
+                        href={`/order-workflow?id=${o.id}&role=buyer`}
+                        className="flex items-center justify-center gap-2 rounded-[12px] bg-[#1dbf73] px-4 py-2.5 text-[13px] font-bold text-white shadow-xs hover:bg-[#19a463] transition"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <span>Open Order Hub &amp; Revisions</span>
+                      </Link>
                       <a href={`mailto:${site.email}?subject=${encodeURIComponent(`About order ${o.ref}`)}`} className="flex items-center justify-center gap-2 rounded-[12px] border border-line px-4 py-2.5 text-[13px] font-semibold text-ink hover:border-brand hover:text-brand">
                         <MailIcon className="h-4 w-4 text-accent" />
                         <span>Message about this order</span>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Badge, EmptyState, PageTitle } from "@/components/admin/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
@@ -37,7 +37,12 @@ export default async function OrdersPage() {
               {(orders ?? []).map((o) => (
                 <tr key={o.id} className="hover:bg-[#f7f9fc]">
                   <td data-label="Ref" className="px-4 py-3">
-                    <Link href={`/admin/orders/${o.id}`} className="font-semibold text-brand">{o.ref}</Link>
+                    <div className="flex flex-col gap-0.5">
+                      <Link href={`/admin/orders/${o.id}`} className="font-semibold text-brand hover:underline">{o.ref}</Link>
+                      <Link href={`/order-workflow?id=${o.id}&role=seller`} className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1dbf73] hover:underline">
+                        Workflow &rarr;
+                      </Link>
+                    </div>
                   </td>
                   <td data-label="Customer" className="px-4 py-3">
                     <p className="font-medium text-ink">{o.customer_name ?? "-"}</p>

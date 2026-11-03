@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -293,11 +293,69 @@ export async function uploadDeliverable(form: FormData) {
       file_name: file.name,
     });
     // Reflect the stage on the order so the customer's timeline moves.
-    if (kind === "final") await db.from("orders").update({ status: "completed" }).eq("id", orderId).eq("site", "lk");
-    else if (kind === "draft") await db.from("orders").update({ status: "draft_delivered" }).eq("id", orderId).eq("site", "lk").neq("status", "completed");
+    if (kind === "final") {
+      await db.from("orders").update({ status: "completed", updated_at: new Date().toISOString() }).eq("id", orderId).eq("site", "lk");
+    } else {
+      await db.from("orders").update({ status: "draft_delivered", updated_at: new Date().toISOString() }).eq("id", orderId).eq("site", "lk").neq("status", "completed");
+    }
+
+    // Record delivery in timeline events table
+    try {
+      await db.from("order_timeline_events").insert({
+        order_id: orderId,
+        event_type: "delivery",
+        sender_role: "seller",
+        sender_name: "Chanuka Jeewantha",
+        message: `Chanuka delivered: ${label}`,
+        files: [
+          {
+            id: `deliv-${Date.now()}`,
+            name: file.name,
+            url: path,
+            type: ext,
+            size: `${Math.round(file.size / 1024)} KB`,
+          },
+        ],
+        metadata: { is_revision: kind === "revision" },
+      });
+    } catch {}
+
+    // Send an automated delivery notification message into the order's in-app chat
+    try {
+      const { data: ordRow } = await db.from("orders").select("customer_name,ref").eq("id", orderId).maybeSingle();
+      const customerName = ordRow?.customer_name || "there";
+      const timestamp = new Date().toISOString();
+      const formattedTime = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+
+      const deliveryChatMsg = {
+        id: `msg-delivery-${Date.now()}`,
+        sender: "Chanuka Jeewantha",
+        role: "seller",
+        text: `📦 Hi ${customerName}! I have completed and delivered your customized CV (${file.name}). Please download and review your documents below. If you need any tweaks, request a revision, or click Approve & Complete if you love it!`,
+        time: formattedTime,
+        timestamp,
+      };
+
+      await db.from("deliverables").insert({
+        order_id: orderId,
+        label: `Chat from Chanuka Jeewantha: Delivery update`,
+        file_path: "chat:seller",
+        file_name: JSON.stringify(deliveryChatMsg),
+        kind: "chat_message",
+        site: "lk",
+      });
+    } catch {}
   }
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
+  revalidatePath("/order-workflow");
+  revalidatePath("/dashboard");
 }
 
 export async function deleteDeliverable(id: string, orderId: string) {

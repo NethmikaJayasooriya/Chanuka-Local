@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 const nav = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/order-workflow?role=seller", label: "Order Workflow" },
   { href: "/admin/submissions", label: "CV briefs" },
   { href: "/admin/blog", label: "Blog" },
   { href: "/admin/pages", label: "SEO Pages" },

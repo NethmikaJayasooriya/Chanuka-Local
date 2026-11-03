@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OrderControls } from "./OrderControls";
 import { uploadDeliverable, deleteDeliverable } from "../../actions";
@@ -45,9 +45,22 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
   return (
     <>
       <Link href="/admin/orders" className="text-[13px] font-semibold text-brand">← Orders</Link>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-[22px] font-bold text-ink">{o.ref}</h1>
-        <Badge status={o.status} />
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-[22px] font-bold text-ink">{o.ref}</h1>
+          <Badge status={o.status} />
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Link
+            href={`/order-workflow?id=${o.id}&role=seller`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#1dbf73] bg-[#eefaf4] px-3.5 py-1.5 text-[13px] font-bold text-[#1dbf73] shadow-xs hover:bg-[#1dbf73] hover:text-white transition-all"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            Order Workflow View
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px]">
