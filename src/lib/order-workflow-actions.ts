@@ -573,8 +573,8 @@ export async function getOrderWorkflowData(orderId?: string): Promise<FiverrOrde
         },
       ],
       total_price: o.total_usd || 15,
-      currency_symbol: o.site === "lk" ? "Rs " : "$",
-      currency: o.site === "lk" ? "LKR" : "USD",
+      currency_symbol: o.site === "lk" ? "Rs " : o.site === "uk" ? "£" : "$",
+      currency: o.site === "lk" ? "LKR" : o.site === "uk" ? "GBP" : "USD",
       revisions_included: Math.max(
         2 + totalExtraRevisions,
         overrides.revisions_included ?? (2 + totalExtraRevisions)

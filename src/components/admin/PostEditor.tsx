@@ -5,6 +5,7 @@ import { useRef, useState, useTransition } from "react";
 import { deletePost, savePost } from "@/app/admin/(panel)/actions";
 import { Card } from "@/components/admin/ui";
 import { SeoAeoPanel } from "@/components/admin/SeoAeoPanel";
+import type { AdminSite } from "@/lib/supabase/guard";
 
 type Post = {
   id: string;
@@ -29,7 +30,7 @@ type Post = {
 const inputCls =
   "mt-1.5 w-full rounded-[10px] border border-line-strong bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none focus:border-brand";
 
-export function PostEditor({ post, coverUrl, allowedSites = ["com", "lk"] }: { post?: Post; coverUrl?: string | null; allowedSites?: Array<"com" | "lk"> }) {
+export function PostEditor({ post, coverUrl, allowedSites = ["com", "lk", "uk"] }: { post?: Post; coverUrl?: string | null; allowedSites?: AdminSite[] }) {
   const [title, setTitle] = useState(post?.title ?? "");
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [html, setHtml] = useState(post?.body_html ?? "");
@@ -121,6 +122,7 @@ export function PostEditor({ post, coverUrl, allowedSites = ["com", "lk"] }: { p
           <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Site</label>
           <select name="site" defaultValue={post?.site ?? allowedSites[0] ?? "com"} className={inputCls}>
             {allowedSites.includes("com") && <option value="com">chanukajeewantha.com</option>}
+            {allowedSites.includes("uk") && <option value="uk">chanukajeewantha.co.uk (.uk)</option>}
             {allowedSites.includes("lk") && <option value="lk">chanukajeewantha.lk</option>}
           </select>
 

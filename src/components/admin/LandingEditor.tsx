@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { deleteLanding, saveLanding } from "@/app/admin/(panel)/actions";
 import { Card } from "@/components/admin/ui";
 import { SeoAeoPanel } from "@/components/admin/SeoAeoPanel";
+import type { AdminSite } from "@/lib/supabase/guard";
 
 type Landing = {
   id: string;
@@ -31,12 +32,12 @@ export function LandingEditor({
   sections,
   page,
   coverUrl,
-  allowedSites = ["com", "lk"],
+  allowedSites = ["com", "lk", "uk"],
 }: {
   sections: SectionOpt[];
   page?: Landing;
   coverUrl?: string | null;
-  allowedSites?: Array<"com" | "lk">;
+  allowedSites?: AdminSite[];
 }) {
   const [section, setSection] = useState(page?.section ?? sections[0]?.value ?? "");
   const [slug, setSlug] = useState(page?.slug ?? "");
@@ -109,6 +110,7 @@ export function LandingEditor({
           <label className="block text-[12px] font-semibold uppercase tracking-wide text-muted">Site</label>
           <select name="site" defaultValue={page?.site ?? allowedSites[0] ?? "com"} className={inputCls}>
             {allowedSites.includes("com") && <option value="com">chanukajeewantha.com</option>}
+            {allowedSites.includes("uk") && <option value="uk">chanukajeewantha.co.uk (.uk)</option>}
             {allowedSites.includes("lk") && <option value="lk">chanukajeewantha.lk</option>}
           </select>
 

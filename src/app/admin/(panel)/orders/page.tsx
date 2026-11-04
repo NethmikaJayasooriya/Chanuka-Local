@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Badge, EmptyState, PageTitle } from "@/components/admin/ui";
 import { SiteFilter, SiteBadge } from "@/components/admin/SiteFilter";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -65,7 +65,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                     <p className="text-[12px] text-muted">{o.customer_email ?? ""}</p>
                   </td>
                   <td data-label="Package" className="px-4 py-3 text-ink-soft">{o.package_name ?? "-"}<br /><span className="text-[12px] text-muted">{o.level_name} · {o.delivery_window}</span></td>
-                  <td data-label="Total" className="px-4 py-3 font-semibold text-ink">{o.total_usd != null ? (o.site === "lk" ? `Rs ${Number(o.total_usd).toLocaleString()}` : `$${Number(o.total_usd).toLocaleString()}`) : "-"}</td>
+                  <td data-label="Total" className="px-4 py-3 font-semibold text-ink">{o.total_usd != null ? (o.site === "lk" ? `Rs ${Number(o.total_usd).toLocaleString()}` : o.site === "uk" ? `£${Number(o.total_usd).toLocaleString()}` : `$${Number(o.total_usd).toLocaleString()}`) : "-"}</td>
                   <td data-label="Status" className="px-4 py-3"><Badge status={o.status} /></td>
                   <td data-label="Payment" className="px-4 py-3">
                     <span className={`rounded-full px-2.5 py-1 text-[11.5px] font-semibold ${paymentTone[o.payment_status] ?? paymentTone.pending}`}>

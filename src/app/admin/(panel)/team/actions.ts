@@ -6,7 +6,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 function accessFrom(form: FormData) {
   const value = String(form.get("access") ?? "lk");
-  return value === "all" ? ["com", "lk"] : value === "com" ? ["com"] : ["lk"];
+  return value === "all"
+    ? ["com", "lk", "uk"]
+    : value === "com"
+    ? ["com"]
+    : value === "uk"
+    ? ["uk"]
+    : ["lk"];
 }
 
 async function findAuthUser(email: string) {
@@ -51,9 +57,9 @@ export async function updateTeamMember(form: FormData) {
 }
 
 export async function removeTeamMember(form: FormData) {
-  const access = await requireAdmin(undefined, true);
+  await requireAdmin(undefined, true);
   const userId = String(form.get("user_id") ?? "");
-  if (!userId || userId === access.user.id) return;
+  if (!userId) return;
   await createAdminClient().from("admins").delete().eq("user_id", userId).eq("role", "manager");
   revalidatePath("/admin/team");
 }

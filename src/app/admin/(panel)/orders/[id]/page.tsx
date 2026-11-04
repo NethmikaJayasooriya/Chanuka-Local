@@ -43,7 +43,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
     ["Package", o.package_name ?? "-"],
     ["Experience", o.level_name ?? "-"],
     ["Delivery", o.delivery_window ?? "-"],
-    ["Total", o.total_usd != null ? (o.site === "lk" ? `Rs ${o.total_usd}` : `$${o.total_usd}`) : "-"],
+    ["Total", o.total_usd != null ? (o.site === "lk" ? `Rs ${o.total_usd}` : o.site === "uk" ? `£${o.total_usd}` : `$${o.total_usd}`) : "-"],
     ["Placed", new Date(o.created_at).toLocaleString()],
   ];
 
