@@ -1,34 +1,32 @@
 import { articles } from "@/lib/articles";
 import { careerLevels, careerSituations } from "@/lib/career-stages";
+import { COUNTRY_BUNDLES } from "@/lib/country-content";
 import { resources } from "@/lib/content/resources";
 import { industries } from "@/lib/industries";
 import { jobRoles } from "@/lib/job-roles";
-import { BASE_PRICES, deliveries, pricingSummary } from "@/lib/pricing";
-import { lkGuides } from "@/lib/content/lk";
+import { BASE_PRICES, BUNDLE_DISCOUNT, deliveries } from "@/lib/pricing";
 import { abs } from "@/lib/seo";
 import { site } from "@/lib/site";
-import { servicePages } from "@/lib/services";
 
 /**
  * llms.txt (https://llmstxt.org) and llms-full.txt, generated from the
- * same data the pages use. These optional reference files are not a
- * prerequisite for Google AI visibility or a guaranteed ranking signal.
+ * same data the pages use, so what AI assistants read can never drift
+ * from what the site says.
  */
 
 const pct = (n: number) => `${Math.round(n * 100)}%`;
-const r = (svc: keyof typeof BASE_PRICES) => pricingSummary(svc);
 
 function facts(): string {
-  const d = deliveries.map((x) => `${x.name} (${x.window}${x.surcharge ? `, +${pct(x.surcharge)}` : ""})`).join("; ");
+  const d = deliveries.map((x) => `${x.name} (${x.window}${x.surcharge ? `, +${pct(x.surcharge)}` : ", included"})`).join("; ");
   return [
-    `- Who: Chanuka Jeewantha, a CPRW (Certified Professional Resume Writer) and CPCC (Certified Professional Career Coach) certified CV writer and career coach based in Sri Lanka. Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.`,
-    `- Experience: ${site.yearsExperience} years; ${site.cvsWritten} CVs written (business-stated). Google rating checked ${site.rating.checked}: ${site.rating.score}/5 from ${site.rating.count} reviews (${site.reviewsUrl}); current totals may differ.`,
-    `- Serves: job seekers across Sri Lanka (online, island-wide: ${site.cities.slice(0, 8).join(", ")} and more) and Sri Lankans applying for jobs abroad. Languages: English and Sinhala.`,
-    `- Services: ATS CV writing, foreign job CVs (Gulf, UK, Europe, Australia, Canada), LinkedIn profile optimisation, cover letters, 1-hour career strategy consultation.`,
-    `- Prices in Sri Lankan rupees (LKR): ATS CV ${r("cv")}. Foreign job CV ${r("foreign-cv")}. LinkedIn optimisation ${r("linkedin")}. Cover letter ${r("cover-letter")}. CV Review ${r("cv-review")}. Consultation ${r("consultation")}.`,
-    `- Delivery: ${d}. Confirm express availability before ordering. One revision round included. CV writing includes editable Word and PDF files; LinkedIn includes rewritten profile text and placement instructions, without account access.`,
-    `- Payment: LKR bank transfer against an emailed invoice (online card payment being added).`,
-    `- Order: ${abs("/order")}. WhatsApp: ${site.phone}. Email: ${site.email}. Global site for clients outside Sri Lanka: ${site.globalUrl}.`,
+    `- Founder: Chanuka Jeewantha. Every document is written personally by him, never outsourced.`,
+    `- Experience: 8+ years; 1,700+ professionals served in 40+ countries; rated ${site.rating.score}/5 from ${site.rating.count} Google reviews (${site.reviewsUrl}).`,
+    `- Services: CV / resume writing, LinkedIn profile optimisation, cover letter writing, CV review, career strategy.`,
+    `- Prices (USD, all markets): CV or resume $${BASE_PRICES.cv["under-2"]} (under 2 years), $${BASE_PRICES.cv["3-to-9"]} (3 to 9 years), $${BASE_PRICES.cv["over-10"]} (10+ years). LinkedIn: $${BASE_PRICES.linkedin["under-2"]} / $${BASE_PRICES.linkedin["3-to-9"]} / $${BASE_PRICES.linkedin["over-10"]}. Cover letter: $${BASE_PRICES["cover-letter"]["under-2"]} / $${BASE_PRICES["cover-letter"]["3-to-9"]} / $${BASE_PRICES["cover-letter"]["over-10"]}.`,
+    `- Bundles: 2 services save ${pct(BUNDLE_DISCOUNT[2] ?? 0)}, 3 services save ${pct(BUNDLE_DISCOUNT[3] ?? 0)}.`,
+    `- Delivery: ${d}. One revision round included. Editable Word and PDF files.`,
+    `- Markets with dedicated guidance: ${COUNTRY_BUNDLES.map((b) => b.market.name).join(", ")}; clients worldwide, fully remote.`,
+    `- Order: ${abs("/order")}. Contact: ${site.email}.`,
   ].join("\n");
 }
 
@@ -38,26 +36,29 @@ export function llmsTxt(): string {
   out.push(`# ${site.name}`);
   out.push("");
   out.push(
-    `> CPRW and CPCC certified CV writing in Sri Lanka: ATS CVs, foreign job CVs, LinkedIn optimisation and cover letters for jobs in Sri Lanka and abroad, available as supervised Essential or personally crafted Signature services.`,
+    `> Founder-led CV, resume, cover letter and LinkedIn writing for professionals applying worldwide, with market-specific guidance for the UK, USA, Australia, Canada, New Zealand, UAE and Singapore. Every document is written personally by Chanuka Jeewantha.`,
   );
   out.push("");
   out.push("## Key facts");
   out.push(facts());
   out.push("");
-  out.push("## Sri Lanka CV guides");
-  for (const g of lkGuides) out.push(L(g.h1, `/${g.slug}`, g.lang === "si" ? `Sinhala. ${g.metaDescription}` : g.metaDescription));
-  out.push("");
   out.push("## Services");
-  out.push(L("CV writing in Sri Lanka", "/cv-writing", "ATS-optimised CV writing, priced in LKR"));
-  out.push(L("Foreign job CV", "/foreign-job-cv-sri-lanka", "CVs written for the Gulf, UK, Europe, Australia and Canada"));
+  out.push(L("CV writing", "/cv-writing", "ATS-optimised CV and resume writing"));
   out.push(L("LinkedIn optimisation", "/linkedin-optimisation", "LinkedIn profile rewrite"));
   out.push(L("Cover letter writing", "/cover-letter-writing", "Targeted cover letters"));
   out.push(L("Packages and pricing", "/packages"));
   out.push(L("How it works", "/how-it-works"));
   out.push(L("About the author", "/about/chanuka-jeewantha"));
-  out.push(L("Public client feedback", "/reviews", `Google rating checked ${site.rating.checked}`));
   out.push("");
-
+  out.push("## Country guides");
+  for (const b of COUNTRY_BUNDLES) {
+    out.push(L(b.market.name, `/${b.country}`, b.market.quickAnswer ?? b.market.metaDescription));
+    for (const s of b.services) out.push(L(s.h1, `/${b.country}/${s.service}`, s.metaDescription));
+    for (const a of b.articles) out.push(L(a.title, `/${b.country}/career-advice/${a.slug}`, a.excerpt));
+    out.push(L(b.ijsHub.h1, `/${b.country}/international-job-seekers`, b.ijsHub.metaDescription));
+    for (const o of b.origins) out.push(L(o.h1, `/${b.country}/international-job-seekers/from-${o.origin}`, o.metaDescription));
+  }
+  out.push("");
   out.push("## Career advice");
   for (const a of articles) out.push(L(a.title, `/career-advice/${a.slug}`, a.excerpt));
   out.push("");
@@ -95,11 +96,14 @@ export function llmsFullTxt(): string {
   out.push("## Key facts");
   out.push(facts());
   out.push("");
-
-  out.push("## Services");
-  for (const service of servicePages) block(service.name, `/${service.slug}`, service.quickAnswer ?? service.lead, service.faq);
-  out.push("## Sri Lanka career guides");
-  for (const g of lkGuides) block(g.h1, `/${g.slug}`, g.quickAnswer, g.faqs);
+  out.push("## Countries");
+  for (const b of COUNTRY_BUNDLES) {
+    block(b.market.name, `/${b.country}`, b.market.quickAnswer, b.market.faqs);
+    for (const s of b.services) block(s.h1, `/${b.country}/${s.service}`, s.quickAnswer, s.faqs);
+    for (const a of b.articles) block(a.title, `/${b.country}/career-advice/${a.slug}`, a.quickAnswer, a.faqs);
+    block(b.ijsHub.h1, `/${b.country}/international-job-seekers`, b.ijsHub.quickAnswer, b.ijsHub.faqs);
+    for (const o of b.origins) block(o.h1, `/${b.country}/international-job-seekers/from-${o.origin}`, o.quickAnswer, o.faqs);
+  }
   out.push("## Career advice");
   for (const a of articles) block(a.title, `/career-advice/${a.slug}`, a.quickAnswer, a.faqs);
   out.push("## Job roles");

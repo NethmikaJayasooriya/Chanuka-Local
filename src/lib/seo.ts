@@ -1,45 +1,48 @@
 import type { Metadata } from "next";
-import { BASE_PRICES, TIER_PRICES, tiers, levels, type ServiceId } from "@/lib/pricing";
+import { COUNTRY_BUNDLES } from "@/lib/country-content";
 import { site } from "@/lib/site";
 
 /**
- * SEO CORE (Sri Lanka site)
+ * SEO CORE
  * ------------------------------------------------------------------
  * One place that builds page metadata, hreflang clusters and the
  * JSON-LD entity graph, so every template (and every future page
- * added from the CMS) inherits the same Sri Lanka signals: en-LK
- * locale, LKR prices, island-wide areaServed and one consistent
- * Chanuka Jeewantha entity shared with chanukajeewantha.com.
+ * added from the CMS) inherits the same signals.
  */
 
 export const BASE_URL = site.url.replace(/\/$/, "");
-export const GLOBAL_URL = site.globalUrl.replace(/\/$/, "");
 export const ORG_ID = `${BASE_URL}/#organization`;
 export const PERSON_ID = `${BASE_URL}/#chanuka-jeewantha`;
 export const WEBSITE_ID = `${BASE_URL}/#website`;
-/** The same person entity on the global site, so engines merge the two. */
-export const GLOBAL_PERSON_ID = `${GLOBAL_URL}/#chanuka-jeewantha`;
 export const AUTHOR_PATH = "/about/chanuka-jeewantha";
-export const LINKEDIN_URL = site.sameAs[0];
+export const LINKEDIN_URL = "https://www.linkedin.com/in/chanukajeewantha";
 
 export const abs = (path: string) => (path.startsWith("http") ? path : `${BASE_URL}${path === "/" ? "" : path}`);
 
-/** Lowest and highest published single-service prices (LKR). */
-const allPrices = Object.values(TIER_PRICES).flatMap((prices) => Object.values(prices).flatMap((p) => Object.values(p)));
-export const PRICE_MIN = Math.min(...allPrices);
-export const PRICE_MAX = Math.max(...allPrices);
+/** hreflang locale per country slug. */
+export const COUNTRY_LOCALES: Record<string, string> = {
+  uk: "en-GB",
+  usa: "en-US",
+  australia: "en-AU",
+  canada: "en-CA",
+  "new-zealand": "en-NZ",
+  uae: "en-AE",
+  singapore: "en-SG",
+};
 
 /**
- * Self-reference for local pages. Cross-domain variants are intentionally
- * omitted until the .com deployment emits matching reciprocal links to
- * final canonical URLs. Sinhala/English guide pairs are declared in their
- * own metadata builder and remain reciprocal within this site.
+ * hreflang cluster for a page that has genuine regional equivalents.
+ * `globalPath` is the international version (also x-default);
+ * `countryPath(c)` builds the regional URL for country c.
  */
-export const lkCluster = (path: string): Record<string, string> => ({
-  "en-LK": abs(path),
-});
-export const homeCluster = () => lkCluster("/");
-export const serviceCluster = (service: string) => lkCluster(`/${service}`);
+export function regionalCluster(globalPath: string, countryPath: (c: string) => string): Record<string, string> {
+  const langs: Record<string, string> = { "x-default": globalPath, en: globalPath };
+  for (const b of COUNTRY_BUNDLES) langs[COUNTRY_LOCALES[b.country]] = countryPath(b.country);
+  return langs;
+}
+
+export const homeCluster = () => regionalCluster("/", (c) => `/${c}`);
+export const serviceCluster = (service: string) => regionalCluster(`/${service}`, (c) => `/${c}/${service}`);
 
 export function pageMetadata({
   title,
@@ -51,7 +54,6 @@ export function pageMetadata({
   publishedTime,
   modifiedTime,
   absoluteTitle = false,
-  locale = "en_LK",
 }: {
   title: string;
   description: string;
@@ -62,7 +64,6 @@ export function pageMetadata({
   publishedTime?: string;
   modifiedTime?: string;
   absoluteTitle?: boolean;
-  locale?: string;
 }): Metadata {
   const url = abs(path);
   // The layout appends " | Chanuka Jeewantha". Drop it when the result
@@ -79,7 +80,7 @@ export function pageMetadata({
       title,
       description,
       siteName: site.name,
-      locale,
+      locale: "en_GB",
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: site.name }],
       ...(type === "article" ? { publishedTime, modifiedTime, authors: [abs(AUTHOR_PATH)] } : {}),
     },
@@ -102,40 +103,15 @@ export function breadcrumbLd(items: Array<{ name: string; path?: string }>) {
   };
 }
 
-export function faqLd(faqs: Array<{ q: string; a: string }>, inLanguage = "en") {
+export function faqLd(faqs: Array<{ q: string; a: string }>) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    inLanguage,
     mainEntity: faqs.map((f) => ({
       "@type": "Question",
       name: f.q,
       acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
-  };
-}
-
-export function howToLd({
-  name,
-  description,
-  path,
-  steps,
-  inLanguage = "en",
-}: {
-  name: string;
-  description: string;
-  path: string;
-  steps: Array<{ name: string; text: string }>;
-  inLanguage?: string;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name,
-    description,
-    url: abs(path),
-    inLanguage,
-    step: steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, name: s.name, text: s.text })),
   };
 }
 
@@ -147,8 +123,6 @@ export function articleLd({
   updated,
   section,
   about,
-  inLanguage = "en",
-  editorial = false,
 }: {
   title: string;
   description: string;
@@ -157,8 +131,6 @@ export function articleLd({
   updated: string;
   section?: string;
   about?: string;
-  inLanguage?: string;
-  editorial?: boolean;
 }) {
   return {
     "@context": "https://schema.org",
@@ -169,46 +141,23 @@ export function articleLd({
     url: abs(path),
     datePublished: published,
     dateModified: updated,
-    inLanguage,
+    inLanguage: "en",
     ...(section ? { articleSection: section } : {}),
     ...(about ? { about: { "@type": "Thing", name: about } } : {}),
-    contentLocation: { "@type": "Country", name: site.country },
-    author: { "@id": editorial ? ORG_ID : PERSON_ID },
+    author: { "@id": PERSON_ID },
     publisher: { "@id": ORG_ID },
     isPartOf: { "@id": WEBSITE_ID },
-    image: abs("/og-image.png"),
   };
 }
-
-export function webPageLd({ name, description, path, mainEntity }: { name: string; description: string; path: string; mainEntity?: string }) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "@id": `${abs(path)}#webpage`,
-    url: abs(path),
-    name,
-    description,
-    inLanguage: "en-LK",
-    isPartOf: { "@id": WEBSITE_ID },
-    about: { "@id": PERSON_ID },
-    ...(mainEntity ? { mainEntity: { "@id": abs(mainEntity) } } : {}),
-  };
-}
-
-const areaServed = () => [
-  { "@type": "Country", name: site.country },
-  ...site.cities.map((c) => ({ "@type": "City", name: c, containedInPlace: { "@type": "Country", name: site.country } })),
-];
 
 export function serviceLd({
   name,
   description,
   path,
   serviceType,
-  areaServed: area,
-  lowPrice,
-  highPrice,
-  packageService,
+  areaServed,
+  lowPrice = 79,
+  highPrice = 279,
 }: {
   name: string;
   description: string;
@@ -217,33 +166,24 @@ export function serviceLd({
   areaServed?: string;
   lowPrice?: number;
   highPrice?: number;
-  packageService?: ServiceId;
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
-    "@id": `${abs(path)}#service`,
     name,
     description,
     url: abs(path),
     serviceType,
     provider: { "@id": ORG_ID },
-    areaServed: area ? { "@type": "Country", name: area } : { "@type": "Country", name: site.country },
-    availableChannel: { "@type": "ServiceChannel", serviceUrl: abs("/order"), availableLanguage: ["English", "Sinhala"] },
-    ...(packageService ? { offers: tiers.flatMap((tier) => levels.map((level) => ({
-      "@type": "Offer",
-      name: `${tier.name} ${name} — ${level.name}`,
-      description: `${level.hint}. ${tier.description}`,
-      priceCurrency: "LKR",
-      price: TIER_PRICES[tier.id][packageService][level.id],
-      url: abs("/order"),
-    }))) } : lowPrice !== undefined && highPrice !== undefined ? { offers: {
+    areaServed: areaServed ? { "@type": "Country", name: areaServed } : "Worldwide",
+    availableChannel: { "@type": "ServiceChannel", serviceUrl: abs("/order") },
+    offers: {
       "@type": "AggregateOffer",
-      priceCurrency: "LKR",
+      priceCurrency: "USD",
       lowPrice,
       highPrice,
       url: abs("/order"),
-    } } : {}),
+    },
   };
 }
 
@@ -262,61 +202,43 @@ export function itemListLd(name: string, items: Array<{ name: string; path: stri
   };
 }
 
-const offer = (name: string, path: string, price: number) => ({
-  "@type": "Offer",
-  priceCurrency: "LKR",
-  price,
-  priceSpecification: { "@type": "PriceSpecification", priceCurrency: "LKR", minPrice: price },
-  url: abs("/order"),
-  itemOffered: { "@type": "Service", name, url: abs(path), areaServed: { "@type": "Country", name: site.country } },
-});
-
 /** Site-wide entity graph: organisation, founder/author and website. */
 export function siteGraphLd() {
-  const credentials = site.credentials.map((c) => ({
-    "@type": "EducationalOccupationalCredential",
-    credentialCategory: "certification",
-    name: `${c.name} (${c.short})`,
-  }));
+  const areas = COUNTRY_BUNDLES.map((b) => ({ "@type": "Country", name: b.market.name }));
   return {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "Organization",
+        "@type": "ProfessionalService",
         "@id": ORG_ID,
         name: site.name,
-        alternateName: ["Chanuka Jeewantha CV Writing", "Chanuka Jeewantha Career Branding"],
+        alternateName: "Chanuka Jeewantha Career Branding",
         url: BASE_URL,
         logo: abs("/icon.png"),
         image: abs("/images/chanuka.jpg"),
         email: site.email,
-        telephone: site.phone,
-        description: `CPRW and CPCC certified CV writing, LinkedIn optimisation, cover letters and foreign job CVs in Sri Lanka. ${site.cvsWritten} CVs over ${site.yearsExperience} years. Essential is team-crafted and quality-checked by Chanuka; Signature is personally crafted by him.`,
-        slogan: site.tagline,
+        description:
+          "Founder-led CV, resume, cover letter and LinkedIn writing for professionals applying worldwide. Every document is written personally by Chanuka Jeewantha.",
         founder: { "@id": PERSON_ID },
-        areaServed: areaServed(),
-        knowsLanguage: ["en", "si"],
-        sameAs: [...site.sameAs, site.reviewsUrl, GLOBAL_URL],
-        contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "customer service",
-          telephone: site.phone,
-          email: site.email,
-          areaServed: "LK",
-          availableLanguage: ["English", "Sinhala"],
+        priceRange: "$79 to $502 USD",
+        currenciesAccepted: "USD",
+        areaServed: [{ "@type": "Place", name: "Worldwide" }, ...areas],
+        knowsLanguage: "en",
+        sameAs: [LINKEDIN_URL, site.reviewsUrl],
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: site.rating.score,
+          reviewCount: site.rating.count,
+          bestRating: "5",
+          worstRating: "1",
         },
-        // Reviews are visible and linked to Google. A business's own
-        // reviews are not eligible for Google's self-serving review stars.
         hasOfferCatalog: {
           "@type": "OfferCatalog",
-          name: "CV and career services in Sri Lanka",
+          name: "Career documents",
           itemListElement: [
-            offer("Essential ATS CV writing", "/cv-writing", BASE_PRICES.cv["under-2"]),
-            offer("Foreign job CV writing", "/foreign-job-cv-sri-lanka", BASE_PRICES["foreign-cv"]["under-2"]),
-            offer("LinkedIn profile optimisation", "/linkedin-optimisation", BASE_PRICES.linkedin["under-2"]),
-            offer("Cover letter writing", "/cover-letter-writing", BASE_PRICES["cover-letter"]["under-2"]),
-            offer("Essential CV Review", "/cv-review", BASE_PRICES["cv-review"]["under-2"]),
-            offer("Career strategy consultation", "/career-strategy", BASE_PRICES.consultation["under-2"]),
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "CV and resume writing", url: abs("/cv-writing") } },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "LinkedIn profile optimisation", url: abs("/linkedin-optimisation") } },
+            { "@type": "Offer", itemOffered: { "@type": "Service", name: "Cover letter writing", url: abs("/cover-letter-writing") } },
           ],
         },
       },
@@ -326,33 +248,26 @@ export function siteGraphLd() {
         name: site.name,
         url: abs(AUTHOR_PATH),
         image: abs("/images/chanuka.jpg"),
-        jobTitle: "CV Writer and Career Coach (CPRW, CPCC)",
-        description: `Sri Lankan CPRW and CPCC certified CV writer and career coach with ${site.yearsExperience} years of experience and ${site.cvsWritten} CVs written.`,
-        nationality: { "@type": "Country", name: site.country },
-        homeLocation: { "@type": "Country", name: site.country },
+        jobTitle: "CV Writer and Career Branding Specialist",
         worksFor: { "@id": ORG_ID },
-        hasCredential: credentials,
-        knowsLanguage: ["en", "si"],
-        sameAs: [...site.sameAs, `${GLOBAL_URL}/about/chanuka-jeewantha`],
+        sameAs: [LINKEDIN_URL],
         knowsAbout: [
           "CV writing",
-          "CV format in Sri Lanka",
+          "Resume writing",
           "Applicant tracking systems",
-          "Foreign employment CVs",
-          "Government job applications in Sri Lanka",
           "LinkedIn profile optimisation",
           "Cover letter writing",
-          "Career coaching",
+          "International job search",
+          "Executive career positioning",
         ],
       },
       {
         "@type": "WebSite",
         "@id": WEBSITE_ID,
         url: BASE_URL,
-        name: `${site.name} | CV Writing Sri Lanka`,
-        inLanguage: ["en-LK", "si-LK"],
+        name: site.name,
+        inLanguage: "en",
         publisher: { "@id": ORG_ID },
-        about: { "@type": "Thing", name: "CV writing in Sri Lanka" },
       },
     ],
   };

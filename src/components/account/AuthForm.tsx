@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { signIn, signUp, AUTH_ON } from "@/lib/auth";
 import { GoogleButton } from "@/components/account/GoogleButton";
-import { safeReturnPath } from "@/lib/auth-redirect";
 
 const field =
   "mt-1.5 w-full rounded-[10px] border border-line-strong bg-paper px-4 py-3 text-[14.5px] text-ink outline-none transition-colors focus:border-brand";
@@ -13,13 +12,13 @@ const field =
 export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
   const router = useRouter();
   const search = useSearchParams();
-  const next = safeReturnPath(search.get("next"));
+  const next = search.get("next") || "/dashboard";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(search.get("error") === "oauth" ? "Google sign-in was cancelled or could not finish. Please try again or sign in with email." : "");
+  const [error, setError] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,18 +29,17 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
       return;
     }
     setBusy(true);
-    try {
-      const res = mode === "signup"
+    const res =
+      mode === "signup"
         ? await signUp(email, password, name)
         : await signIn(email, password);
-      if (!res.ok) { setError(res.message); return; }
-      router.push(next);
-      router.refresh();
-    } catch {
-      setError("Could not connect. Please check your connection and try again.");
-    } finally {
+    if (!res.ok) {
+      setError(res.message);
       setBusy(false);
+      return;
     }
+    router.push(next);
+    router.refresh();
   };
 
   return (
@@ -70,7 +68,6 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
           type="password"
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
           required
-          minLength={mode === "signup" ? 8 : undefined}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={field}
@@ -78,7 +75,7 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
         />
       </div>
 
-      {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-700">{error}</p>}
+      {error && <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-700">{error}</p>}
 
       <button
         type="submit"
@@ -90,9 +87,9 @@ export function AuthForm({ mode }: { mode: "signin" | "signup" }) {
 
       <p className="pt-1 text-center text-[13px] text-muted">
         {mode === "signup" ? (
-          <>Already have an account? <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-brand hover:underline">Sign in</Link></>
+          <>Already have an account? <Link href="/login" className="font-semibold text-brand hover:underline">Sign in</Link></>
         ) : (
-          <>No account yet? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-semibold text-brand hover:underline">Create one</Link>, or just <Link href="/order" className="font-semibold text-brand hover:underline">start an order</Link>.</>
+          <>No account yet? <Link href="/signup" className="font-semibold text-brand hover:underline">Create one</Link>, or just <Link href="/order" className="font-semibold text-brand hover:underline">start an order</Link>.</>
         )}
       </p>
       </form>

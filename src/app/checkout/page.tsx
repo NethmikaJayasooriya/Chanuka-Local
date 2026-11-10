@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { isPayHereConfigured, getPayHereConfig } from "@/lib/payhere";
-import { PayHerePaymentForm } from "@/components/PayHerePaymentForm";
-import { PaymentStatusPoller } from "@/components/PaymentStatusPoller";
 import { PageHeader } from "@/components/PageHeader";
 import {
-  type TierId,
   deliveries,
   levels,
   packages,
+  quote,
+  services,
   usd,
   type DeliveryId,
   type LevelId,
@@ -17,6 +15,9 @@ import {
 import { site } from "@/lib/site";
 import { getMyOrder } from "@/lib/customer";
 import { requireUser, supabaseConfigured } from "@/lib/supabase/guard";
+import { isPayHereConfigured } from "@/lib/payhere";
+import { PayHerePaymentForm } from "@/components/PayHerePaymentForm";
+import { PaymentStatusPoller } from "@/components/PaymentStatusPoller";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -80,7 +81,7 @@ function Summary({
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string; payment?: string }>;
+  searchParams: Promise<{ order?: string; package?: string; level?: string; delivery?: string; payment?: string }>;
 }) {
   const params = await searchParams;
 
@@ -91,7 +92,6 @@ export default async function CheckoutPage({
     if (!order) redirect("/order");
 
     const paid = order.payment_status === "paid";
-    const awaitingConfirmation = order.payment_status === "pending" && params.payment === "return";
     const paymentBlocked = order.payment_status === "refunded" || order.payment_status === "charged_back";
     const paymentLabel: Record<string, string> = {
       pending: "Payment pending",
@@ -110,7 +110,6 @@ export default async function CheckoutPage({
       charged_back: "bg-red-100 text-red-800",
     };
     const payHereReady = isPayHereConfigured();
-    const sandbox = payHereReady && getPayHereConfig().sandbox;
     const intakeHref = `/intake?order=${order.id}`;
 
     return (
@@ -121,7 +120,7 @@ export default async function CheckoutPage({
           crumbs={[{ label: "Order", href: "/order" }, { label: "Checkout" }]}
         />
         <section className="py-8 sm:py-12 lg:py-16">
-          <PaymentStatusPoller active={awaitingConfirmation} />
+          <PaymentStatusPoller active={!paid && params.payment === "return"} />
           <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
             <Summary
               title={order.package_name ?? "Your package"}
@@ -148,9 +147,9 @@ export default async function CheckoutPage({
                   Payment was cancelled. Your order is still saved, and you can try again safely below.
                 </p>
               )}
-              {awaitingConfirmation && (
+              {params.payment === "return" && !paid && (
                 <p className="mt-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-[13.5px] text-blue-800">
-                  PayHere is confirming the payment. This page checks automatically for the signed confirmation. Please do not pay again while confirmation is pending; check your dashboard or contact us if it does not arrive.
+                  PayHere is confirming the payment. This page updates automatically when the signed confirmation arrives.
                 </p>
               )}
 
@@ -169,14 +168,9 @@ export default async function CheckoutPage({
                     Online repayment is paused for this order. Please contact {site.email} and include order reference {order.ref}.
                   </p>
                 </div>
-              ) : awaitingConfirmation ? (
-                <div className="mt-6 flex flex-wrap gap-4 text-[13.5px] font-semibold text-brand">
-                  <Link href="/dashboard" className="underline underline-offset-4">Check my dashboard</Link>
-                  <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Payment confirmation: ${order.ref}`)}`} className="underline underline-offset-4">Get payment help</a>
-                </div>
               ) : payHereReady ? (
                 <>
-                  <PayHerePaymentForm orderId={order.id} defaultPhone={order.customer_phone ?? ""} sandbox={sandbox} />
+                  <PayHerePaymentForm orderId={order.id} defaultPhone={order.customer_phone ?? ""} />
                   <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                     <Link href={intakeHref} className="text-center text-[13.5px] font-semibold text-brand underline underline-offset-4">
                       Complete my brief before paying
@@ -190,7 +184,7 @@ export default async function CheckoutPage({
               ) : (
                 <div className="mt-6 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
                   <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
-                    Online payment is not currently available. Your order is saved; request an invoice or complete your brief now.
+                    Secure PayHere checkout is prepared and awaiting the merchant credentials. Until they are added, request an invoice or complete your brief now.
                   </p>
                   <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                     <Link href={intakeHref} className="w-full rounded-full bg-brand px-7 py-3.5 text-center text-[15px] font-semibold text-paper hover:bg-brand-deep sm:w-auto">Complete my brief</Link>
@@ -201,7 +195,7 @@ export default async function CheckoutPage({
 
               <ul className="mt-6 sm:mt-7 space-y-2 border-t border-line pt-5 sm:pt-6 text-[13px] sm:text-[13.5px] text-muted">
                 <li>Track this order any time from your <Link href="/dashboard" className="font-medium text-ink underline underline-offset-2">dashboard</Link>.</li>
-                <li>Prices are in Sri Lankan rupees (LKR) and include everything listed.</li>
+                <li>Prices are in USD and include everything listed.</li>
                 <li>Cancellation and refunds are covered by the <Link href="/refund-policy" className="font-medium text-ink underline underline-offset-2">refund policy</Link>.</li>
               </ul>
             </div>
@@ -212,10 +206,47 @@ export default async function CheckoutPage({
   }
 
   // -------- Legacy / guest checkout (no account) --------
-  const tier: TierId = params.tier === "signature" ? "signature" : "essential";
   const pkg = packages.find((p) => p.id === params.package) ?? packages[4];
   const level = (levels.find((l) => l.id === params.level)?.id ?? "3-to-9") as LevelId;
   const delivery = (deliveries.find((d) => d.id === params.delivery)?.id ?? "normal") as DeliveryId;
+  const q = quote(pkg, level, delivery);
+  const levelName = levels.find((l) => l.id === level)?.name ?? "";
+  const deliveryOption = deliveries.find((d) => d.id === delivery);
 
-  redirect(`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`);
+  return (
+    <>
+      <PageHeader eyebrow="Checkout" title="One payment, then we start." crumbs={[{ label: "Order", href: "/order" }, { label: "Checkout" }]} />
+      <section className="py-8 sm:py-12 lg:py-16">
+        <div className="container-page grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-start">
+          <Summary
+            title={pkg.name}
+            levelName={levelName}
+            window={deliveryOption?.window ?? ""}
+            includes={pkg.includes.map((s) => services[s].name)}
+            total={q.total}
+            changeHref={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}`}
+          />
+          <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
+            <h2 className="display text-[19px] sm:text-[21px] text-ink">Payment</h2>
+            <p className="mt-1.5 sm:mt-2 text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
+              Card payment in USD. Your receipt and order number arrive by email immediately, and the CV upload step opens straight after.
+            </p>
+            <div className="mt-5 rounded-[14px] border border-dashed border-line-strong bg-sand/40 p-4.5 sm:p-6">
+              <p className="text-[13.5px] sm:text-[14px] leading-relaxed text-muted">
+                The secure card and PayPal checkout connects here once the merchant account is live. Until then, you are invoiced directly, then you complete your brief so the writing can start.
+              </p>
+              <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                <Link href={`/intake?package=${pkg.id}&level=${level}&delivery=${delivery}`} className="w-full sm:w-auto rounded-full bg-brand px-7 py-3.5 text-center text-[14.5px] sm:text-[15px] font-semibold text-paper transition-all hover:bg-brand-deep">
+                  Confirm &amp; continue
+                </Link>
+                <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Invoice Request: ${pkg.name} (${levelName})`)}`} className="w-full sm:w-auto rounded-full border border-line-strong bg-surface px-7 py-3.5 text-center text-[14px] sm:text-[15px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand shadow-2xs">
+                  Request invoice by email
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
 }

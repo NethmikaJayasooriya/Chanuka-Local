@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_KEY } from "@/lib/site";
 import { supabaseConfigured } from "@/lib/supabase/guard";
-import { resolveOrder } from "@/lib/pricing";
-import { InputError, readJsonBody, inputText } from "@/lib/request-validation";
+import { deliveries, levels, packages, quote, type DeliveryId, type LevelId } from "@/lib/pricing";
+import { notifyOrderCreated } from "@/lib/email/notifications";
 
 export const runtime = "nodejs";
 
@@ -26,24 +26,23 @@ export async function POST(request: Request) {
   } = await auth.auth.getUser();
   if (!user) return NextResponse.json({ ok: false, reason: "not_signed_in" }, { status: 401 });
 
-  let b: Record<string, unknown>;
+  let b: Record<string, string>;
   try {
-    b = await readJsonBody(request);
-  } catch (error) {
-    return NextResponse.json({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, { status: error instanceof InputError ? error.status : 400 });
+    b = await request.json();
+  } catch {
+    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
 
-  const selection = resolveOrder(b.package_id, b.level_id, b.delivery_id, b.tier_id);
-  if (!selection) {
+  const pkg = packages.find((p) => p.id === b.package_id);
+  const level = levels.find((l) => l.id === b.level_id)?.id as LevelId | undefined;
+  const delivery = deliveries.find((d) => d.id === b.delivery_id)?.id as DeliveryId | undefined;
+  if (!pkg || !level || !delivery) {
     return NextResponse.json({ ok: false, reason: "invalid_order" }, { status: 400 });
   }
-  const name = inputText(b.name, 200);
-  const phone = inputText(b.phone, 60);
-  const targetRole = inputText(b.target_role, 200);
-  const targetCountry = inputText(b.target_country, 120);
-  if (name.length < 2 || targetRole.length < 2 || targetCountry.length < 2) {
-    return NextResponse.json({ ok: false, reason: "invalid_details" }, { status: 400 });
-  }
+
+  const q = quote(pkg, level, delivery);
+  const levelName = levels.find((l) => l.id === level)?.name ?? "";
+  const deliveryWindow = deliveries.find((d) => d.id === delivery)?.window ?? "";
 
   const db = createAdminClient();
   const { data, error } = await db
@@ -51,29 +50,48 @@ export async function POST(request: Request) {
     .insert({
       site: SITE_KEY,
       user_id: user.id,
-      ...selection,
+      package_id: pkg.id,
+      package_name: pkg.name,
+      level_id: level,
+      level_name: levelName,
+      delivery_id: delivery,
+      delivery_window: deliveryWindow,
+      total_usd: q.total,
       status: "new",
       payment_status: "pending",
-      customer_name: name,
-      customer_email: user.email ?? null,
-      customer_phone: phone || null,
-      target_role: targetRole,
-      target_country: targetCountry,
-      deadline: inputText(b.deadline, 200) || null,
-      brief_notes: inputText(b.notes, 4000) || null,
+      customer_name: (b.name ?? "").slice(0, 200) || null,
+      customer_email: user.email ?? ((b.email ?? "").slice(0, 200) || null),
+      customer_phone: (b.phone ?? "").slice(0, 60) || null,
+      target_role: (b.target_role ?? "").slice(0, 200) || null,
+      target_country: (b.target_country ?? "").slice(0, 120) || null,
+      deadline: (b.deadline ?? "").slice(0, 200) || null,
+      brief_notes: (b.notes ?? "").slice(0, 4000) || null,
     })
     .select("id, ref")
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ ok: false, reason: "insert_failed" }, { status: 500 });
+    return NextResponse.json({ ok: false, reason: error?.message ?? "insert_failed" }, { status: 500 });
   }
 
   // Keep the customer's profile name/phone current.
   await db.from("profiles").upsert(
-    { user_id: user.id, full_name: name, phone: phone || null },
+    { user_id: user.id, full_name: (b.name ?? "").slice(0, 200) || null, phone: (b.phone ?? "").slice(0, 60) || null },
     { onConflict: "user_id" },
   );
+
+  await notifyOrderCreated({
+    id: data.id,
+    ref: data.ref,
+    customerName: (b.name ?? "").slice(0, 200),
+    customerEmail: user.email ?? (b.email ?? "").slice(0, 200),
+    packageName: pkg.name,
+    levelName,
+    deliveryWindow,
+    totalUsd: q.total,
+    targetRole: (b.target_role ?? "").slice(0, 200),
+    targetCountry: (b.target_country ?? "").slice(0, 120),
+  });
 
   return NextResponse.json({ ok: true, id: data.id, ref: data.ref });
 }

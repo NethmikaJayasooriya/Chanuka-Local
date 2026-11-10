@@ -81,3 +81,4 @@ $$;
 
 revoke all on function public.record_payhere_notification(uuid,text,text,integer,numeric,text,text,text) from public, anon, authenticated;
 grant execute on function public.record_payhere_notification(uuid,text,text,integer,numeric,text,text,text) to service_role;
+

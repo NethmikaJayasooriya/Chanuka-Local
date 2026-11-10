@@ -11,7 +11,7 @@ function md5(value: string) {
 }
 
 export function isPayHereConfigured() {
-  try { getPayHereConfig(); return true; } catch { return false; }
+  return Boolean(process.env.PAYHERE_MERCHANT_ID && process.env.PAYHERE_MERCHANT_SECRET);
 }
 
 export function getPayHereConfig() {
@@ -19,16 +19,9 @@ export function getPayHereConfig() {
   const merchantSecret = process.env.PAYHERE_MERCHANT_SECRET;
   if (!merchantId || !merchantSecret) throw new Error("PayHere is not configured");
 
-  if (!/^\d+$/.test(merchantId)) throw new Error("Invalid merchant ID");
   const sandbox = process.env.PAYHERE_SANDBOX !== "false";
-  // Secrets are registered per domain: never fall back to the global site's origin.
-  const parsedSiteUrl = new URL(process.env.PAYHERE_SITE_URL || site.url);
-  if (!["chanukajeewantha.lk", "www.chanukajeewantha.lk"].includes(parsedSiteUrl.hostname) ||
-      parsedSiteUrl.username || parsedSiteUrl.password || parsedSiteUrl.port ||
-      parsedSiteUrl.pathname !== "/" || parsedSiteUrl.search || parsedSiteUrl.hash) {
-    throw new Error("PayHere must be configured for the Sri Lanka domain");
-  }
-  const siteUrl = site.url;
+  const siteUrl = (process.env.PAYHERE_SITE_URL || site.url).replace(/\/$/, "");
+  const parsedSiteUrl = new URL(siteUrl);
   if (process.env.NODE_ENV === "production" && parsedSiteUrl.protocol !== "https:") {
     throw new Error("PAYHERE_SITE_URL must use HTTPS in production");
   }
@@ -79,8 +72,7 @@ export function amountToMinorUnits(value: string): number | null {
   const whole = Number(match[1]);
   const cents = Number((match[2] ?? "").padEnd(2, "0"));
   if (!Number.isSafeInteger(whole)) return null;
-  const minor = whole * 100 + cents;
-  return Number.isSafeInteger(minor) ? minor : null;
+  return whole * 100 + cents;
 }
 
 export function safePaymentText(value: unknown, maxLength: number) {

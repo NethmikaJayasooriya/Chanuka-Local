@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -9,6 +9,13 @@ import { StickyBar } from "@/components/StickyBar";
 import { ConsentAnalytics } from "@/components/ConsentAnalytics";
 import { site } from "@/lib/site";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#17355c",
+};
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -27,11 +34,11 @@ const display = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
+    default: "Professional CV Writing for International Careers | Chanuka Jeewantha",
     template: "%s | Chanuka Jeewantha",
   },
   description:
-    "Sri Lanka's CPRW and CPCC certified CV writer. ATS CVs, foreign job CVs, LinkedIn and cover letters in LKR, with Essential and personally crafted Signature options. Delivery from 24 hours.",
+    "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally. Written for the market you are applying into. Delivery from 24 hours.",
   applicationName: site.name,
   authors: [{ name: site.name, url: `${site.url}/about/chanuka-jeewantha` }],
   creator: site.name,
@@ -41,43 +48,34 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    locale: "en_LK",
-    title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
+    locale: "en_GB",
+    title: "Professional CV Writing for International Careers",
     description:
-      `CPRW and CPCC certified CV writing and LinkedIn optimization in Sri Lanka. ${site.rating.score} from ${site.rating.count} Google reviews.`,
+      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Chanuka Jeewantha, CPRW certified CV writer in Sri Lanka",
+        alt: "Chanuka Jeewantha — CV, LinkedIn and career branding",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CV Writing Service in Sri Lanka | Chanuka Jeewantha",
+    title: "Professional CV Writing for International Careers",
     description:
-      `CPRW and CPCC certified CV writing and LinkedIn optimization in Sri Lanka. ${site.rating.score} from ${site.rating.count} Google reviews.`,
+      "ATS-optimised CV writing, cover letters and LinkedIn optimisation for professionals competing internationally.",
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" },
   verification: {
-    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : {}),
     // Bing Webmaster Tools site verification (renders <meta name="msvalidate.01" ...>)
     other: { "msvalidate.01": "7B0FD319711D2F6A1E4649C72DC92F65" },
   },
   // Canonical + hreflang are set per page (never inherited from here),
   // so no page silently canonicalises to the home page.
 };
-
-/**
- * Sets data-js before first paint so the scroll-reveal hidden state
- * only ever applies when JavaScript is running. With JS off, and for
- * any crawler that does not execute scripts, every section renders
- * visible.
- */
-const jsFlag = `document.documentElement.setAttribute("data-js","1");window.__revealFallback=setTimeout(function(){document.documentElement.removeAttribute("data-js")},2500)`;
 
 // Google Analytics 4. Override the property with NEXT_PUBLIC_GA_ID if needed.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-JBG5EY2YXW";
@@ -88,12 +86,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en-LK"
+      lang="en"
       className={`${sans.variable} ${display.variable}`}
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
         <JsonLd data={siteGraphLd()} />
       </head>
       <body suppressHydrationWarning>

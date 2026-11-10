@@ -6,12 +6,8 @@ import { BoltIcon } from "./CountryFlags";
 
 export function StickyBar() {
   const pathname = usePathname() ?? "/";
-  if (pathname.startsWith("/admin")) return null;
 
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const isHome = pathname === "/";
-  const [inHero, setInHero] = useState(isHome);
 
   useEffect(() => {
     function handleMenuState(e: Event) {
@@ -22,34 +18,9 @@ export function StickyBar() {
     return () => window.removeEventListener("mobile-menu-state", handleMenuState);
   }, []);
 
-  useEffect(() => {
-    if (!isHome) {
-      setInHero(false);
-      return;
-    }
-
-    function checkPosition() {
-      const trustBar = document.getElementById("trust-bar");
-      if (trustBar) {
-        const rect = trustBar.getBoundingClientRect();
-        // Transition when the trustBar section reaches the sticky bar at the bottom of the viewport
-        setInHero(rect.top > window.innerHeight - 30);
-      } else {
-        setInHero(window.scrollY < 750);
-      }
-    }
-
-    checkPosition();
-    window.addEventListener("scroll", checkPosition, { passive: true });
-    window.addEventListener("resize", checkPosition, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", checkPosition);
-      window.removeEventListener("resize", checkPosition);
-    };
-  }, [isHome]);
-
   // Suppress sticky bar on order funnel pages or when the mobile navigation drawer is active
   if (
+    pathname.startsWith("/admin") ||
     menuOpen ||
     pathname.startsWith("/order") ||
     pathname.startsWith("/checkout") ||
@@ -58,12 +29,8 @@ export function StickyBar() {
     return null;
   }
 
-  const barThemeCls = "border-t border-line bg-paper/95 shadow-lg";
-
   return (
-    <div
-      className={`fixed inset-x-0 bottom-[-2px] z-40 px-3 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px)+2px)] backdrop-blur-md lg:hidden transition-colors duration-300 ${barThemeCls}`}
-    >
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 px-3 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md lg:hidden shadow-lg">
       <div className="max-w-md mx-auto">
         <a
           href="/#build"

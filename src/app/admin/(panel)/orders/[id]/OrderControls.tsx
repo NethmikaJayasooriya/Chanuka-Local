@@ -45,6 +45,8 @@ export function OrderControls({ id, status, payment, notes }: { id: string; stat
         <option value="paid">Paid</option>
         <option value="refunded">Refunded</option>
         <option value="cancelled">Cancelled</option>
+        <option value="failed">Failed</option>
+        <option value="charged_back">Charged back</option>
       </select>
 
       <label className="mt-5 block text-[12px] font-semibold uppercase tracking-wide text-muted">Internal notes</label>

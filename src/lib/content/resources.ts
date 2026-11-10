@@ -826,20 +826,19 @@ export type AuthorProfile = {
 };
 
 export const authorProfile: AuthorProfile = {
-  metaTitle: "Chanuka Jeewantha: CPRW Certified CV Writer in Sri Lanka",
+  metaTitle: "Chanuka Jeewantha: CV Writer and Career Branding Expert",
   metaDescription:
-    `Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. ${site.yearsExperience} years; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
+    "Chanuka Jeewantha personally writes every CV, cover letter and LinkedIn profile. 8+ years and 1,700+ professionals in 40+ countries. His expertise and method.",
   h1: "Chanuka Jeewantha",
-  lead: "CPRW and CPCC certified CV writer and career coach in Sri Lanka. For more than eight years I have written CVs, cover letters and LinkedIn profiles for Sri Lankan professionals applying at home and abroad, and I write every one of them myself.",
+  lead: "Career branding specialist and CV writer. For more than eight years I have written CVs, cover letters and LinkedIn profiles for professionals applying into markets around the world, and I write every one of them myself.",
   quickAnswer:
-    `Chanuka Jeewantha is a Sri Lankan CV writer and career coach, certified as a Certified Professional Resume Writer (CPRW) and Certified Professional Career Coach (CPCC). He writes CVs and LinkedIn profiles for students, professionals and executives applying for jobs in Sri Lanka and overseas, has ${site.yearsExperience} years of experience, and is rated ${site.rating.score} from ${site.rating.count} Google reviews.`,
+    "Chanuka Jeewantha is a career branding specialist who has written CVs, cover letters and LinkedIn profiles for more than eight years. He has worked with 1,700+ professionals in 40+ countries, from graduates to C-suite, is rated 4.9 from 107 Google reviews, and personally writes every client document and the guides on this site.",
   bio: [
-    "I write CVs, cover letters and LinkedIn profiles, and I have done it for more than eight years. In that time I have written more than 5,000 CVs: for school leavers and fresh graduates writing a first CV, for professionals moving up in Sri Lankan companies, and for senior leaders and people applying for jobs overseas.",
-    "I hold two professional certifications, Certified Professional Resume Writer (CPRW) and Certified Professional Career Coach (CPCC). They set an international standard for how I write and coach, and I apply that standard to what Sri Lankan employers, government recruiters and overseas employers actually expect.",
+    "I write CVs, cover letters and LinkedIn profiles, and I have done it for more than eight years. In that time I have worked with more than 1,700 professionals in more than 40 countries, from graduates writing a first professional CV to senior leaders and C-suite executives.",
     "The work sits where a strong career meets a weak document. Most of the people I work with are good at what they do. What they struggle with is translation: turning years of responsibility into evidence a stranger can judge in seconds, in the conventions of the market they are applying into.",
-    "That cross-border part matters in Sri Lanka, where many careers lead to the Gulf, Europe, Australia or the UK. A CV that is right for a Colombo employer can read as too long or oddly personal to a recruiter in London or Dubai. Working with both has made me careful about separating conventions that are genuinely local from ones that are simply habit.",
+    "That cross-border part is where much of my attention goes. A CV that is correct in one country can read as too long, oddly personal or understated in another. Working with clients across so many markets has made me careful about separating conventions that are genuinely local from ones that are simply habit.",
     "I also write on LinkedIn, where more than 30,000 people follow what I publish about CVs and job search. It is the same platform I optimise profiles for, so I see first-hand how headlines, About sections and activity are read there.",
-    "Everything on this site carries my name because I am responsible for it. Essential documents are team-crafted under my supervision and quality-checked by me; Signature documents are written personally by me, and every guide and resource is written or reviewed and edited by me before it is published.",
+    "Everything on this site carries my name because I am responsible for it. Client documents are written by me personally, with no team and no outsourced writers, and every guide and resource is written or reviewed and edited by me before it is published.",
   ],
   expertise: [
     "CV and resume writing, from graduate to C-suite level",
@@ -847,8 +846,7 @@ export const authorProfile: AuthorProfile = {
     "Cover letters and written application statements",
     "ATS-compatible structure and keyword research from live job descriptions",
     "Turning responsibilities into measurable, evidence-based achievements",
-    "Sri Lankan CV conventions, from private sector roles to government applications",
-    "Foreign job CVs for the Gulf, Europe, the UK, Australia and Canada",
+    "Market-specific CV conventions for international applications",
     "Positioning for career changes, career breaks and relocation abroad",
     "Senior leadership and executive positioning",
   ],
@@ -877,9 +875,8 @@ export const authorProfile: AuthorProfile = {
   facts: [
     { label: "Role", value: "Founder and writer of a founder-led career branding practice" },
     { label: "Experience", value: "8+ years in CV writing and career branding" },
-    { label: "Certifications", value: "CPRW (Certified Professional Resume Writer), CPCC (Certified Professional Career Coach)" },
-    { label: "CVs written", value: "5,000+" },
-    { label: "Based in", value: "Sri Lanka, serving clients island-wide and Sri Lankans overseas online" },
+    { label: "Professionals served", value: "1,700+" },
+    { label: "Reach", value: "Clients in 40+ countries, working remotely across time zones" },
     { label: "Rating", value: `${site.rating.score} from ${site.rating.count} ${site.rating.label}` },
     { label: "LinkedIn", value: "30,000+ followers" },
     { label: "Writes", value: "CVs, resumes, cover letters, LinkedIn profiles and career guides" },
@@ -887,11 +884,11 @@ export const authorProfile: AuthorProfile = {
   faqs: [
     {
       q: "Who is Chanuka Jeewantha?",
-      a: "Chanuka Jeewantha is a CPRW and CPCC certified CV writer and career coach in Sri Lanka. He has more than eight years of experience, has written 5,000+ CVs for jobs in Sri Lanka and overseas, and runs a founder-led practice offering supervised Essential and personally crafted Signature services.",
+      a: "Chanuka Jeewantha is a career branding specialist who writes CVs, resumes, cover letters and LinkedIn profiles for professionals worldwide. He has more than eight years of experience, has worked with 1,700+ professionals in 40+ countries, and runs a founder-led practice in which he writes every client document personally.",
     },
     {
       q: "Does Chanuka Jeewantha write the CVs himself?",
-      a: "Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support. Express slots depend on availability.",
+      a: "Yes. Every CV, cover letter and LinkedIn profile is written personally by Chanuka. Nothing is outsourced or passed to a team of writers, and no template library is used with your name dropped in. That limits how many orders can run at once, which is why the faster delivery options carry a fee.",
     },
     {
       q: "Who writes the career advice on this site?",
@@ -953,7 +950,7 @@ export const editorialPolicy: LegalDoc = {
       heading: "Use of AI and writing tools",
       body: [
         "Drafts and research notes for articles and resources may be assisted by writing tools, including AI tools. That is stated here plainly rather than hidden.",
-        "No page is published as a tool produced it. Every page is reviewed, edited and checked by Chanuka, who is responsible for what it says. Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.",
+        "No page is published as a tool produced it. Every page is reviewed, edited and checked by Chanuka, who is responsible for what it says. Client documents are covered separately: each one is written personally by Chanuka.",
       ],
     },
     {
@@ -982,8 +979,8 @@ export const cookiePolicy: LegalDoc = {
     {
       heading: "The short version",
       body: [
-        "You can read the public site without accepting analytics cookies. Google Analytics loads only after you choose Accept in the cookie banner.",
-        "Declining keeps analytics disabled. Your choice is remembered in local storage in your browser.",
+        "The public site does not currently set advertising or analytics cookies. You can read every page without a tracking cookie being placed on your device.",
+        "The only cookies used are strictly necessary ones, described below.",
       ],
     },
     {
@@ -1009,7 +1006,7 @@ export const cookiePolicy: LegalDoc = {
     {
       heading: "Changes to this policy",
       body: [
-        "The consent banner controls optional Google Analytics measurement. Non-essential tracking stays disabled until you accept. Changes to cookie use will be reflected in this policy.",
+        "If analytics or any other non-essential cookies are added in future, this policy will be updated before they are introduced, and you will be asked for consent where the law requires it.",
         "Questions about cookies can be sent to the contact address on this site.",
       ],
     },

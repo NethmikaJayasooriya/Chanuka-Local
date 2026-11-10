@@ -1,7 +1,4 @@
-import { homeCluster, pageMetadata, webPageLd } from "@/lib/seo";
-import { JsonLd } from "@/components/Seo";
-import { LocalExpertise } from "@/components/LocalExpertise";
-import { site } from "@/lib/site";
+import { homeCluster, pageMetadata } from "@/lib/seo";
 import { Configurator } from "@/components/Configurator";
 import { CtaBand } from "@/components/CtaBand";
 import { Faq } from "@/components/Faq";
@@ -9,15 +6,14 @@ import { Hero } from "@/components/Hero";
 import { Process } from "@/components/Process";
 import { Reviews } from "@/components/Reviews";
 import { Services } from "@/components/Services";
-import { SriLankaGuides } from "@/components/SriLankaGuides";
 import { TrustBar } from "@/components/TrustBar";
 
 
 export const metadata = pageMetadata({
-  title: "CV Writer & LinkedIn Optimization Sri Lanka | Chanuka Jeewantha",
+  title: "Professional CV Writing for International Careers | Chanuka Jeewantha",
   absoluteTitle: true,
   description:
-    `CPRW & CPCC certified CV writing and LinkedIn optimization in Sri Lanka. Essential from LKR 3,950; personally crafted Signature from LKR 7,500; ${site.rating.score}/5 from ${site.rating.count} Google reviews.`,
+    "Founder-written, ATS-optimised CVs, resumes, cover letters and LinkedIn profiles for professionals applying in the UK, USA, Australia, Canada, NZ, UAE and Singapore.",
   path: "/",
   languages: homeCluster(),
 });
@@ -25,15 +21,12 @@ export const metadata = pageMetadata({
 export default function HomePage() {
   return (
     <>
-      <JsonLd data={webPageLd({ name: "CV writing and LinkedIn optimization in Sri Lanka", description: site.tagline, path: "/" })} />
       <Hero />
       <TrustBar />
-      <LocalExpertise />
       <Configurator />
       <Services />
       <Process />
       <Reviews />
-      <SriLankaGuides />
       <Faq />
       <CtaBand />
     </>

@@ -11,7 +11,6 @@
  * licensing notes are orientation only and point to official sources.
  */
 
-import { pricingSummary } from "@/lib/pricing";
 import type { AeoFields } from "@/lib/content/types";
 
 /* ------------------------------------------------------------------ */
@@ -37,7 +36,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "How much does a software engineer CV rewrite cost?",
-        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
+        a: "With Chanuka Jeewantha it costs $129, $189 or $279 in USD, depending on whether you have under 2 years, 3 to 9 years, or 10 or more years of experience. Standard delivery is 5 to 7 days, with faster options at a surcharge, and one revision round is included. Chanuka writes every CV personally, and you receive editable Word and PDF files.",
       },
     ],
   },
@@ -81,7 +80,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "Which CV package fits a senior project manager with 10 or more years?",
-        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
+        a: "The $279 tier covers CV writing for 10 or more years of experience, including programme and executive-level candidates. It includes one revision round and editable Word and PDF files, with standard delivery in 5 to 7 days. Adding LinkedIn optimisation or a cover letter saves 20% on two services, or 30% if you take all three.",
       },
     ],
   },
@@ -103,7 +102,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "Can I get my accountant CV and LinkedIn profile done together?",
-        a: "Yes. CV writing and LinkedIn optimisation can be booked together, and the career packs add a cover letter as well. Your selected Essential team or Signature writer works from the same brief, so your qualification, systems and scope read consistently everywhere, which matters when a recruiter checks your LinkedIn straight after reading your CV.",
+        a: "Yes. Booking CV writing and LinkedIn optimisation together saves 20%, and adding a cover letter as well saves 30% across all three. Chanuka writes each one personally from the same brief, so your qualification, systems and scope read consistently everywhere, which matters when a recruiter checks your LinkedIn straight after reading your CV.",
       },
     ],
   },
@@ -125,7 +124,7 @@ export const aeoRoles: Record<string, AeoFields> = {
       },
       {
         q: "How quickly can I get a business analyst CV written?",
-        a: "Standard delivery is 48 to 72 hours. If you have an application deadline, Priority Express delivers in 24 to 48 hours and the VIP option within 24 hours. The clock starts once your brief and current CV are in, so a complete brief that lists your artefacts and outcomes speeds everything up.",
+        a: "Standard delivery is 5 to 7 days and is included in the price. If you have an application deadline, fast delivery in 2 to 3 days adds 20%, and delivery within 24 hours adds 50%. The clock starts once your brief and current CV are in, so a complete brief that lists your artefacts and outcomes speeds everything up.",
       },
     ],
   },
@@ -289,7 +288,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "Which CV package is right for a recent graduate?",
-        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
+        a: "The $129 tier covers anyone with under two years of experience, which includes graduates and first-time applicants. It includes a personal brief, one revision round, and editable Word and PDF files, with standard delivery in 5 to 7 days. If you are applying to schemes with close deadlines, fast delivery in 2 to 3 days adds 20%.",
       },
       {
         q: "Should a graduate CV include a personal statement?",
@@ -315,7 +314,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "What does a CV rewrite cost with 3 to 9 years of experience?",
-        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
+        a: "CV writing for 3 to 9 years of experience is $189 in USD. That covers the brief, a first draft written personally by Chanuka, one revision round, and final editable Word and PDF files, with standard delivery in 5 to 7 days. Pairing it with LinkedIn optimisation saves 20%, and adding a cover letter as well saves 30%.",
       },
     ],
   },
@@ -359,7 +358,7 @@ export const aeoLevels: Record<string, AeoFields> = {
       },
       {
         q: "How much does executive CV writing cost?",
-        a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.`,
+        a: "Executive CV writing is $279 in USD for 10 or more years of experience, written personally by Chanuka Jeewantha. LinkedIn optimisation at the same level is also $279, and an executive cover letter is $159. Booking all three together saves 30%. Standard delivery is 5 to 7 days, with one revision round and editable Word and PDF files.",
       },
     ],
   },
@@ -476,7 +475,7 @@ export const aeoSituations: Record<string, AeoFields> = {
       },
       {
         q: "How quickly can I get my CV updated after redundancy?",
-        a: "Standard CV writing takes 48 to 72 hours once your brief is in, and Priority Express takes 24 to 48 hours. If an opportunity closes almost immediately, the VIP option delivers within 24 hours. You receive editable Word and PDF files plus one revision round, so you can keep adapting the CV for each application.",
+        a: "Standard CV writing takes 5 to 7 days once your brief is in, and fast delivery in 2 to 3 days costs 20% extra. If an opportunity closes almost immediately, delivery within 24 hours costs 50% extra. You receive editable Word and PDF files plus one revision round, so you can keep adapting the CV for each application.",
       },
     ],
   },

@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
-import { resolveOrder } from "@/lib/pricing";
-import { SITE_KEY } from "@/lib/site";
-import { InputError, readJsonBody } from "@/lib/request-validation";
+import { deliveries, levels, packages, quote, type DeliveryId, type LevelId } from "@/lib/pricing";
 import {
   createCheckoutHash,
   formatPayHereAmount,
@@ -54,12 +52,10 @@ export async function POST(request: Request) {
 
   let body: Record<string, unknown>;
   try {
-    body = await readJsonBody(request, 8_192);
-  } catch (error) {
-    return noStore({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, error instanceof InputError ? error.status : 400);
+    body = await request.json();
+  } catch {
+    return noStore({ ok: false, reason: "bad_request" }, 400);
   }
-
-  if (!body || typeof body !== "object" || Array.isArray(body)) return noStore({ ok: false, reason: "bad_request" }, 400);
 
   const orderId = typeof body.order_id === "string" ? body.order_id : "";
   if (!/^[0-9a-f-]{36}$/i.test(orderId)) {
@@ -80,7 +76,6 @@ export async function POST(request: Request) {
     .select("id,ref,user_id,package_id,package_name,level_id,delivery_id,total_usd,payment_status,customer_name,customer_email")
     .eq("id", orderId)
     .eq("user_id", user.id)
-    .eq("site", SITE_KEY)
     .maybeSingle();
 
   if (!order) return noStore({ ok: false, reason: "order_not_found" }, 404);
@@ -89,13 +84,13 @@ export async function POST(request: Request) {
     return noStore({ ok: false, reason: "payment_blocked" }, 409);
   }
 
-  // New local orders persist an explicit tier:package selection.
-  // Older or repriced orders need an invoice review, never a silent price change.
-  const parts = String(order.package_id ?? "").split(":");
-  const selection = parts.length === 2
-    ? resolveOrder(parts[1], order.level_id, order.delivery_id, parts[0])
-    : null;
-  if (!selection || Number(order.total_usd) !== selection.total_usd) {
+  const pkg = packages.find((p) => p.id === order.package_id);
+  const level = levels.find((l) => l.id === order.level_id)?.id as LevelId | undefined;
+  const delivery = deliveries.find((d) => d.id === order.delivery_id)?.id as DeliveryId | undefined;
+  if (!pkg || !level || !delivery) return noStore({ ok: false, reason: "invalid_order" }, 409);
+
+  const authoritativeQuote = quote(pkg, level, delivery);
+  if (order.total_usd !== authoritativeQuote.total) {
     return noStore({ ok: false, reason: "price_mismatch" }, 409);
   }
 
@@ -105,8 +100,8 @@ export async function POST(request: Request) {
   }
 
   const { firstName, lastName } = splitCustomerName(String(order.customer_name ?? ""));
-  const amount = formatPayHereAmount(selection.total_usd);
-  const currency = "LKR";
+  const amount = formatPayHereAmount(authoritativeQuote.total);
+  const currency = "USD";
   const hash = createCheckoutHash(
     config.merchantId,
     order.ref,
@@ -120,7 +115,7 @@ export async function POST(request: Request) {
     billing_address: address,
     billing_city: city,
     billing_country: country,
-  }).eq("id", order.id).eq("user_id", user.id).eq("site", SITE_KEY);
+  }).eq("id", order.id).eq("user_id", user.id);
   if (billingError) {
     return noStore({ ok: false, reason: "billing_details_not_saved" }, 500);
   }
@@ -147,7 +142,7 @@ export async function POST(request: Request) {
       amount,
       hash,
       custom_1: order.id,
-      custom_2: SITE_KEY,
+      custom_2: "",
     },
   });
 }

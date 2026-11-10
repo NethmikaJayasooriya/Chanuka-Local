@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
-import { InputError, readJsonBody, inputText } from "@/lib/request-validation";
 
 export const runtime = "nodejs";
 
@@ -19,22 +18,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, reason: "not_configured" }, { status: 503 });
   }
 
-  let body: Record<string, unknown>;
+  let body: { email?: string; password?: string; full_name?: string; phone?: string };
   try {
-    body = await readJsonBody(request, 8192);
-  } catch (error) {
-    return NextResponse.json({ ok: false, reason: error instanceof InputError ? error.reason : "bad_request" }, { status: error instanceof InputError ? error.status : 400 });
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ ok: false, reason: "bad_request" }, { status: 400 });
   }
 
-  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const password = typeof body.password === "string" ? body.password : "";
-  const full_name = inputText(body.full_name, 200);
-  const phone = inputText(body.phone, 60);
+  const email = String(body.email ?? "").trim().toLowerCase();
+  const password = String(body.password ?? "");
+  const full_name = String(body.full_name ?? "").trim();
+  const phone = String(body.phone ?? "").trim();
 
-  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email || !email.includes("@")) {
     return NextResponse.json({ ok: false, reason: "invalid_email" }, { status: 400 });
   }
-  if (password.length < 8 || password.length > 128) {
+  if (password.length < 8) {
     return NextResponse.json({ ok: false, reason: "weak_password" }, { status: 400 });
   }
 
@@ -43,7 +42,7 @@ export async function POST(request: Request) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: full_name.slice(0, 200) },
+    user_metadata: { full_name },
   });
 
   if (error) {
@@ -51,13 +50,13 @@ export async function POST(request: Request) {
     if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
       return NextResponse.json({ ok: false, reason: "exists" }, { status: 409 });
     }
-    return NextResponse.json({ ok: false, reason: "create_failed" }, { status: 400 });
+    return NextResponse.json({ ok: false, reason: error.message }, { status: 400 });
   }
 
   const userId = data.user?.id;
   if (userId) {
     await db.from("profiles").upsert(
-      { user_id: userId, full_name: full_name.slice(0, 200) || null, phone: phone.slice(0, 60) || null },
+      { user_id: userId, full_name: full_name || null, phone: phone || null },
       { onConflict: "user_id" },
     );
   }

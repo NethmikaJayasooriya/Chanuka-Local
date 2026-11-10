@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { supabaseConfigured } from "@/lib/supabase/guard";
-import { safeReturnPath } from "@/lib/auth-redirect";
 
 export const runtime = "nodejs";
 
@@ -16,19 +15,16 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const rawNext = url.searchParams.get("next") || "/dashboard";
   // Only allow same-site relative redirects.
-  const next = safeReturnPath(rawNext);
-  const failure = new URL("/login", url.origin);
-  failure.searchParams.set("error", "oauth");
-  failure.searchParams.set("next", next);
+  const next = rawNext.startsWith("/") ? rawNext : "/dashboard";
 
   if (!code || !supabaseConfigured()) {
-    return NextResponse.redirect(failure);
+    return NextResponse.redirect(new URL("/login?error=oauth", url.origin));
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    return NextResponse.redirect(failure);
+    return NextResponse.redirect(new URL("/login?error=oauth", url.origin));
   }
 
   // Ensure a profile exists (Google users skip the account-create route).

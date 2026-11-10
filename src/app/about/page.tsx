@@ -8,16 +8,15 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "About Chanuka Jeewantha",
-  description: "CPRW and CPCC certified CV writer in Sri Lanka. 8+ years and 5,000+ CVs written for graduates through to executives, for jobs in Sri Lanka and overseas.",
+  description: "Founder-led career branding. Eight years writing CVs, cover letters and LinkedIn profiles for graduates through to C-suite, for professionals competing anywhere in the world.",
   path: "/about",
 });
 
 const facts: Array<[string, string]> = [
-  ["Founded", "Founder-led Essential and Signature services"],
+  ["Founded", "Founder-led practice, every document written personally"],
   ["Experience", "8+ years in career branding and CV writing"],
-  ["Certifications", "CPRW and CPCC"],
-  ["CVs written", "5,000+"],
-  ["Based in", "Sri Lanka, island-wide online service"],
+  ["Clients", "1,700+ professionals"],
+  ["Reach", "Worldwide, remote"],
   ["Rating", `${site.rating.score} from ${site.rating.count} Google reviews`],
   ["LinkedIn", "30,000+ followers built on the platform I optimise for clients"],
 ];
@@ -70,8 +69,8 @@ const method = [
 
 const principles = [
   {
-    title: "Two tiers, one quality commitment",
-    body: "Essential documents are team-crafted under Chanuka’s supervision and quality-checked by him. Signature documents are personally crafted by Chanuka, with 30-day support.",
+    title: "One writer, every document",
+    body: "Nothing is passed to a team or outsourced. That caps how many orders run at once, and it is the reason the faster delivery options carry a fee.",
   },
   {
     title: "Evidence over adjectives",
@@ -92,8 +91,8 @@ export default function AboutPage() {
     <>
       <PageHeader
         eyebrow="About"
-        title="Chanuka Jeewantha, CPRW certified CV writer in Sri Lanka."
-        lead="I help Sri Lankan professionals present themselves clearly, confidently and competitively, for jobs at home and abroad. More than 5,000 CVs so far. Choose supervised Essential or personally crafted Signature services."
+        title="Chanuka Jeewantha, career branding specialist."
+        lead="I help professionals present themselves clearly, confidently and competitively, in whichever market they are applying into. Around 1,700 people have used the service so far, and every document has been written personally."
         crumbs={[{ label: "About" }]}
         primary={{ href: "/#build", label: "Build your package" }}
         secondary={{ href: "/reviews", label: "Read reviews" }}
@@ -141,9 +140,10 @@ export default function AboutPage() {
             </p>
             <p>
               <strong className="font-semibold text-ink">
-                Essential work is team-crafted under my supervision and quality-checked by me. Signature work is personally written by me.
+                Everything is written by me. No team, no outsourcing and no template library
               </strong>{" "}
-              Both options start with your career evidence and target role, rather than a generic template with your name dropped into it.
+              with your name dropped into it. That is a hard limit on volume, and it is the
+              reason the work holds up.
             </p>
           </div>
 

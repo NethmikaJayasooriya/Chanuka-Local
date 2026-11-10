@@ -25,7 +25,7 @@ const expectations = [
     title: "What you get from me",
     points: [
       "A confirmed delivery date at the point of order",
-      "A first draft crafted for your brief by the selected Essential or Signature service",
+      "A first draft written personally, not assembled from a template",
       "One full revision round on your comments",
       "Final files in Word and PDF, ready to send the same day",
     ],

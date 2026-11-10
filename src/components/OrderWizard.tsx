@@ -2,18 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { TierSelector } from "./TierSelector";
 import { useRouter } from "next/navigation";
 import { AUTH_ON, ensureAccount } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleButton } from "@/components/account/GoogleButton";
 import {
-  tiers,
-  type TierId,
   deliveries,
   levels,
   packages,
-  getPackageDisplayName,
   quote,
   services,
   usd,
@@ -59,7 +55,6 @@ const optionOn = "border-accent bg-accent-soft/60 shadow-[0_0_0_1px_var(--color-
 const optionOff = "border-line bg-surface hover:border-line-strong";
 
 export function OrderWizard({
-  initialTier = "essential",
   initialPackage,
   initialLevel,
   initialDelivery,
@@ -67,7 +62,6 @@ export function OrderWizard({
   initialRole = "",
   preconfigured = false,
 }: {
-  initialTier?: TierId;
   initialPackage: string;
   initialLevel: LevelId;
   initialDelivery: DeliveryId;
@@ -97,7 +91,6 @@ export function OrderWizard({
   // again. The package stays editable through the "Change" link below.
   const [step, setStep] = useState(preconfigured ? 1 : 0);
   const [packageId, setPackageId] = useState(initialPackage);
-  const [tier, setTier] = useState<TierId>(initialTier);
   const [level, setLevel] = useState<LevelId>(initialLevel);
   const [delivery, setDelivery] = useState<DeliveryId>(initialDelivery);
   const [details, setDetails] = useState<Details>({
@@ -110,8 +103,7 @@ export function OrderWizard({
     () => packages.find((p) => p.id === packageId) ?? packages[0],
     [packageId]
   );
-  const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
-  const packageName = `${tiers.find((item) => item.id === tier)!.name} · ${getPackageDisplayName(pkg, level)}`;
+  const q = useMemo(() => quote(pkg, level, delivery), [pkg, level, delivery]);
   const levelName = levels.find((l) => l.id === level)?.name ?? "";
   const deliveryOption = deliveries.find((d) => d.id === delivery);
 
@@ -129,7 +121,7 @@ export function OrderWizard({
 
   const summaryText = `Order request
 
-Package: ${packageName}
+Package: ${pkg.name}
 Experience: ${levelName}
 Delivery: ${deliveryOption?.name} (${deliveryOption?.window})
 Total: ${usd(q.total)}
@@ -142,7 +134,7 @@ Target market: ${details.targetCountry}
 Deadline: ${details.deadline || "-"}
 Notes: ${details.notes || "-"}`;
 
-  const checkoutHref = `/checkout?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`;
+  const checkoutHref = `/checkout?package=${pkg.id}&level=${level}&delivery=${delivery}`;
 
   // With accounts on: create/sign in the account, save the order to the
   // database, then go to checkout for that order. Without Supabase the
@@ -165,7 +157,6 @@ Notes: ${details.notes || "-"}`;
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           package_id: pkg.id,
-          tier_id: tier,
           level_id: level,
           delivery_id: delivery,
           name: details.name,
@@ -197,7 +188,7 @@ Notes: ${details.notes || "-"}`;
         <div className="lg:hidden mb-5 rounded-xl border border-brand/20 bg-brand-soft/40 px-3.5 py-2.5 flex items-center justify-between">
           <div className="min-w-0 pr-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-accent-deep block">Selected Package</span>
-            <span className="text-[13px] font-bold text-ink truncate block">{packageName}</span>
+            <span className="text-[13px] font-bold text-ink truncate block">{pkg.name}</span>
           </div>
           <span className="stat-number text-[20px] font-extrabold text-ink shrink-0">{usd(q.total)}</span>
         </div>
@@ -250,7 +241,7 @@ Notes: ${details.notes || "-"}`;
               <div className="min-w-0">
                 <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">Your package</span>
                 <span className="block truncate text-[13px] font-semibold text-ink">
-                  {packageName} · {levelName} · {deliveryOption?.name}
+                  {pkg.name} · {levelName} · {deliveryOption?.name}
                 </span>
               </div>
               <button
@@ -266,7 +257,6 @@ Notes: ${details.notes || "-"}`;
           {/* 1. Package */}
           {step === 0 && (
             <div className="space-y-6 sm:space-y-8">
-              <TierSelector value={tier} onChange={setTier} />
               <div>
                 <h2 className="text-[14.5px] sm:text-[15px] font-semibold text-ink">Confirm your package</h2>
                 <div className="mt-3.5 sm:mt-4 grid gap-2.5 sm:grid-cols-2">
@@ -329,8 +319,8 @@ Notes: ${details.notes || "-"}`;
               <h2 className="text-[15px] font-semibold text-ink">Your details</h2>
               <p className="text-[13.5px] text-muted">
                 {AUTH_ON
-                  ? "This creates your account, so you can track your order, upload your CV and download your final documents from your dashboard."
-                  : "Use the email associated with your account to track this order and access your documents from your dashboard."}
+                  ? "This creates your account, so you can track your order, upload your CV and download your final documents. Your receipt and draft links are emailed to you too."
+                  : "Your order receipt, intake confirmation, and draft delivery links will be sent to your email."}
               </p>
               <div>
                 <label className={label} htmlFor="name">
@@ -361,7 +351,7 @@ Notes: ${details.notes || "-"}`;
               {needsPassword && (
                 <div className="rounded-xl border border-line bg-sand/30 p-4 sm:p-5">
                   <GoogleButton
-                    next={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`}
+                    next={`/order?package=${pkg.id}&level=${level}&delivery=${delivery}`}
                     label="Continue with Google"
                   />
                   <div className="my-4 flex items-center gap-3 text-[12px] text-muted">
@@ -389,7 +379,7 @@ Notes: ${details.notes || "-"}`;
                   )}
                   <p className="mt-3 text-[12px] text-muted">
                     Already ordered before? Just use the same email and password.{" "}
-                    <Link href={`/login?next=${encodeURIComponent(`/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`)}`} className="font-semibold text-brand">Sign in instead</Link>
+                    <Link href="/login" className="font-semibold text-brand">Sign in instead</Link>
                   </p>
                 </div>
               )}
@@ -484,7 +474,7 @@ Notes: ${details.notes || "-"}`;
               )}
 
               <a
-                href={emailLink(`Order Request Inquiry: ${packageName} (${levelName})`, summaryText)}
+                href={emailLink(`Order Request Inquiry: ${pkg.name} (${levelName})`, summaryText)}
                 className="flex items-center justify-center gap-2 rounded-full border border-line-strong px-6 py-3.5 text-center text-[14.5px] font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
               >
                 <MailIcon className="h-4 w-4 text-accent" />
@@ -521,14 +511,14 @@ Notes: ${details.notes || "-"}`;
       <aside className="card sticky top-20 overflow-hidden">
         <div className="border-b border-line bg-sand/50 px-6 py-5">
           <p className="eyebrow">Your order</p>
-          <p className="display mt-2 text-[21px] leading-tight text-ink">{packageName}</p>
+          <p className="display mt-2 text-[21px] leading-tight text-ink">{pkg.name}</p>
           <p className="mt-1.5 text-[13px] text-muted">
             {levelName} · {deliveryOption?.window}
           </p>
         </div>
         <div className="px-6 py-5">
           <ul className="space-y-2.5">
-            {q.includedServices.map((s) => (
+            {pkg.includes.map((s) => (
               <li key={s} className="flex items-start gap-2.5 text-[13.5px] text-ink-soft">
                 <svg viewBox="0 0 16 16" aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-accent">
                   <path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M3 8.5l3.2 3.2L13 5" />
@@ -549,7 +539,7 @@ Notes: ${details.notes || "-"}`;
             <span className="stat-number text-[32px] leading-none text-ink">{usd(q.total)}</span>
           </div>
           <p className="mt-4 text-center text-[12px] leading-relaxed text-muted">
-            Prices in LKR. Nothing is added at checkout.
+            Prices in USD. Nothing is added at checkout.
           </p>
         </div>
       </aside>

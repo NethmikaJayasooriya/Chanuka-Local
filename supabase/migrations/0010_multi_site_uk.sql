@@ -20,3 +20,4 @@ end $$;
 alter table public.admins drop constraint if exists admins_site_access_valid;
 alter table public.admins add constraint admins_site_access_valid
   check (site_access <@ array['com','lk','uk']::text[] and cardinality(site_access) > 0);
+

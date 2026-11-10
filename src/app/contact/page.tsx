@@ -2,31 +2,27 @@ import { pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { site, whatsappUrl } from "@/lib/site";
-import { JsonLd } from "@/components/Seo";
-import { ORG_ID, abs } from "@/lib/seo";
+import { site } from "@/lib/site";
 import { MailIcon } from "@/components/CountryFlags";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contact Chanuka: CV & LinkedIn Services Sri Lanka",
+  title: "Contact",
   description: "Ask a question about CV writing, LinkedIn optimisation or cover letters. Replies come from Chanuka directly, usually within 12 hours.",
   path: "/contact",
 });
 
 const channels = [
-  { label: "WhatsApp · Sri Lanka", value: site.phone, note: "Discuss your target role, career level and deadline in Sinhala or English. Online service across Sri Lanka.", href: whatsappUrl("Hi Chanuka, I would like advice about CV writing or LinkedIn optimization.") },
   {
     label: "Official Client Email",
     value: site.email,
     note: "Primary channel for CV reviews, package advice, and consultation requests. Answered directly by Chanuka.",
-    href: `mailto:${site.email}?subject=${encodeURIComponent("Sri Lanka CV and LinkedIn inquiry")}`,
+    href: `mailto:${site.email}?subject=${encodeURIComponent("Client Inquiry - International Career Branding")}`,
   },
 ];
 
 export default function ContactPage() {
   return (
     <>
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "ContactPage", url: abs("/contact"), mainEntity: { "@id": ORG_ID } }} />
       <PageHeader
         eyebrow="Contact"
         title="Ask before you order. That is what it is for."
@@ -103,7 +99,7 @@ export default function ContactPage() {
             </ol>
 
             <p className="mt-6 text-[13px] leading-relaxed text-muted">
-              Online service across Sri Lanka and for Sri Lankans overseas. Messages are answered in order, and
+              Remote service, clients in 40+ countries. Messages are answered in order, and
               a reply within 12 hours is the standard, not a promise made per message.
             </p>
           </div>

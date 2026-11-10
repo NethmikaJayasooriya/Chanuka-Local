@@ -6,7 +6,6 @@
  * choosing a writer, graduate CVs and using AI tools.
  */
 
-import { pricingSummary } from "@/lib/pricing";
 import type { Article } from "@/lib/articles";
 
 export const articlesB: Article[] = [
@@ -913,8 +912,8 @@ export const articlesB: Article[] = [
       {
         heading: "How Chanuka works",
         paragraphs: [
-          "For transparency, since this guide appears on his site: Essential documents are team-crafted under Chanuka’s supervision and checked by him, while Signature documents are personally crafted by Chanuka. You choose a package and pay, complete a brief and upload your current CV, and the selected tier determines who crafts the documents. You receive a draft, have one revision round included, and get final files in editable Word and PDF formats.",
-          `CV writing has two tiers at every experience level. ${pricingSummary("cv")}. Standard delivery is 48 to 72 hours; confirm express availability before ordering.`,
+          "For transparency, since this guide appears on his site: every CV, cover letter and LinkedIn profile here is written personally by Chanuka Jeewantha, never outsourced. You choose a package and pay, complete a brief and upload your current CV, and Chanuka writes the documents. You receive a draft, have one revision round included, and get final files in editable Word and PDF formats.",
+          "CV writing is priced by experience level: $129 for under two years, $189 for three to nine years, and $279 for ten or more years and executive roles. Standard delivery is five to seven days, with faster options available at an additional charge. That is the full model. Use the questions above to compare it fairly with any other option you are considering.",
         ],
       },
       {

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { PostEditor } from "@/components/admin/PostEditor";
 import { PageTitle } from "@/components/admin/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseConfigured } from "@/lib/supabase/guard";
+import { canManageSite, requireAdmin, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +11,10 @@ export default async function EditPost({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: post } = await db.from("blog_posts").select("*").eq("id", id).eq("site", "lk").maybeSingle();
+  const { data: post } = await db.from("blog_posts").select("*").eq("id", id).maybeSingle();
   if (!post) notFound();
+  const access = await requireAdmin();
+  if (!canManageSite(access, post.site)) notFound();
 
   let coverUrl: string | null = null;
   if (post.cover_image_path) {
@@ -26,7 +28,7 @@ export default async function EditPost({ params }: { params: Promise<{ id: strin
       <div className="mt-3">
         <PageTitle title="Edit post" />
       </div>
-      <PostEditor post={post} coverUrl={coverUrl} />
+      <PostEditor post={post} coverUrl={coverUrl} allowedSites={access.sites} />
     </>
   );
 }

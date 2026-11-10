@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { IntakeForm, type OrderInfo } from "@/components/IntakeForm";
 import { PageHeader } from "@/components/PageHeader";
 import {
-  tiers,
-  type TierId,
   deliveries,
   levels,
   packages,
@@ -25,7 +23,7 @@ export const metadata: Metadata = {
 export default async function IntakePage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; tier?: string; package?: string; level?: string; delivery?: string }>;
+  searchParams: Promise<{ order?: string; package?: string; level?: string; delivery?: string }>;
 }) {
   const params = await searchParams;
 
@@ -57,22 +55,20 @@ export default async function IntakePage({
     );
   }
 
-  const tier: TierId = params.tier === "signature" ? "signature" : "essential";
-  const tierName = tiers.find((item) => item.id === tier)!.name;
   const pkg = packages.find((p) => p.id === params.package);
   const level = levels.find((l) => l.id === (params.level as LevelId));
   const delivery = deliveries.find((d) => d.id === (params.delivery as DeliveryId));
 
   const summary = pkg
-    ? [`${tierName} · ${pkg.name}`, level?.name, delivery?.window].filter(Boolean).join(" · ")
+    ? [pkg.name, level?.name, delivery?.window].filter(Boolean).join(" · ")
     : undefined;
 
-  const q = pkg && level && delivery ? quote(pkg, level.id, delivery.id, tier) : null;
+  const q = pkg && level && delivery ? quote(pkg, level.id, delivery.id) : null;
 
   const order: OrderInfo | undefined = pkg
     ? {
-        package_id: `${tier}:${pkg.id}`,
-        package_name: `${tierName} · ${pkg.name}`,
+        package_id: pkg.id,
+        package_name: pkg.name,
         level_id: level?.id,
         level_name: level?.name,
         delivery_id: delivery?.id,
@@ -86,7 +82,7 @@ export default async function IntakePage({
       <PageHeader
         eyebrow="Step 2 of 2 · Your brief"
         title="Tell me about you. Then I get to work."
-        lead="Complete your career brief and upload your CV here. Writing begins after payment is confirmed and your brief is complete. The more you share, the sharper your first draft can be."
+        lead="Payment is done. This is the only form you fill in. The delivery clock starts once this brief is complete, and the more you give me here, the sharper the first draft comes back."
         crumbs={[{ label: "Order", href: "/order" }, { label: "Your brief" }]}
         showProof={false}
       />

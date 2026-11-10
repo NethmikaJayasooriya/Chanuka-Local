@@ -1,22 +1,27 @@
 import Link from "next/link";
 import { Badge, EmptyState, PageTitle } from "@/components/admin/ui";
+import { SiteFilter, SiteBadge } from "@/components/admin/SiteFilter";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseConfigured } from "@/lib/supabase/guard";
+import { requireAdmin, resolveAdminSite, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const dynamic = "force-dynamic";
 
-export default async function SubmissionsPage() {
+export default async function SubmissionsPage({ searchParams }: { searchParams: Promise<{ site?: string }> }) {
   if (!supabaseConfigured()) return null;
+  const { site = "" } = await searchParams;
+  const access = await requireAdmin();
+  const scopedSite = resolveAdminSite(site, access);
   const db = createAdminClient();
-  const { data: rows } = await db
+  let q = db
     .from("intake_submissions")
-    .select("id,name,email,target_role,cv_path,handled,created_at")
-    .eq("site", "lk")
-    .order("created_at", { ascending: false });
+    .select("id,site,name,email,target_role,cv_path,handled,created_at");
+  if (scopedSite) q = q.eq("site", scopedSite); else q = q.in("site", access.sites);
+  const { data: rows } = await q.order("created_at", { ascending: false });
 
   return (
     <>
-      <PageTitle title="CV briefs" sub="Every brief a customer submits, with their uploaded CV." />
+      <PageTitle title="CV briefs" sub="Every brief a customer submits on either site, with their uploaded CV." />
+      <SiteFilter active={scopedSite ?? ""} base="/admin/submissions" allowed={access.sites} />
       {(rows ?? []).length === 0 ? (
         <EmptyState>No briefs yet. They arrive here when a customer completes the intake form.</EmptyState>
       ) : (
@@ -25,6 +30,7 @@ export default async function SubmissionsPage() {
             <thead className="border-b border-line bg-[#f7f9fc] text-[12px] uppercase tracking-wide text-muted">
               <tr>
                 <th className="px-4 py-3 font-semibold">Name</th>
+                <th className="px-4 py-3 font-semibold">Site</th>
                 <th className="px-4 py-3 font-semibold">Target role</th>
                 <th className="px-4 py-3 font-semibold">CV</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
@@ -38,6 +44,7 @@ export default async function SubmissionsPage() {
                     <Link href={`/admin/submissions/${s.id}`} className="font-semibold text-brand">{s.name ?? "-"}</Link>
                     <p className="text-[12px] text-muted">{s.email ?? ""}</p>
                   </td>
+                  <td data-label="Site" className="px-4 py-3"><SiteBadge site={s.site} /></td>
                   <td data-label="Target role" className="px-4 py-3 text-ink-soft">{s.target_role ?? "-"}</td>
                   <td data-label="CV" className="px-4 py-3 text-[12.5px]">{s.cv_path ? "📎 attached" : <span className="text-muted">none</span>}</td>
                   <td data-label="Status" className="px-4 py-3">{s.handled ? <Badge status="completed" label="handled" /> : <Badge status="new" label="new" />}</td>

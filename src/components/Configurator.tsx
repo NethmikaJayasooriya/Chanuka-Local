@@ -1,34 +1,68 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { TierSelector } from "./TierSelector";
 import {
-  tiers,
-  type TierId,
   deliveries,
   levels,
   packages,
   quote,
-  formatLKR,
-  getPackageDisplayName,
+  services,
+  usd,
   type DeliveryId,
   type LevelId,
 } from "@/lib/pricing";
-import { whatsappUrl } from "@/lib/site";
+
+function GoldSaveBadge({
+  saving,
+  discountPercent,
+  className = "",
+}: {
+  saving: number;
+  discountPercent: number;
+  className?: string;
+}) {
+  if (saving <= 0) return null;
+  return (
+    <div className={`flex items-center justify-center animate-in fade-in zoom-in duration-300 ${className}`}>
+      <div className="relative flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-accent via-accent-deep to-amber-800 text-paper shadow-md shadow-accent/25 border-2 border-paper rotate-6 hover:rotate-0 transition-transform cursor-default select-none">
+        {/* Scalloped decorative ring */}
+        <svg
+          className="absolute inset-0 w-full h-full text-accent-soft/35 pointer-events-none"
+          viewBox="0 0 100 100"
+          aria-hidden="true"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r="44"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeDasharray="4, 3"
+          />
+        </svg>
+        <span className="text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider leading-none opacity-90">
+          SAVE
+        </span>
+        <span className="text-[12px] sm:text-[13.5px] font-extrabold leading-tight tracking-tight">
+          {usd(saving)}
+        </span>
+        <span className="text-[7.5px] sm:text-[8px] font-bold opacity-90">
+          {discountPercent}% OFF
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function Configurator() {
   // Step expansion state: 1 = Career Level, 2 = Package Options, 3 = Turnaround Speed
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | null>(1);
-  // Which steps the visitor has actually chosen (so the green ticks only
-  // appear as they progress, not all filled in from the start).
-  const [done, setDone] = useState<{ 1: boolean; 2: boolean; 3: boolean }>({ 1: false, 2: false, 3: false });
 
   // Configuration state
-  const [tier, setTier] = useState<TierId>("essential");
-  const [level, setLevel] = useState<LevelId>("3-to-9");
-  const [packageId, setPackageId] = useState("complete");
-  const [delivery, setDelivery] = useState<DeliveryId>("normal");
+  const [level, setLevel] = useState<LevelId | null>(null);
+  const [packageId, setPackageId] = useState<string | null>(null);
+  const [delivery, setDelivery] = useState<DeliveryId | null>(null);
   const [tab, setTab] = useState<"bundles" | "singles">("bundles");
   const [mounted, setMounted] = useState(false);
 
@@ -39,47 +73,39 @@ export function Configurator() {
   const bundles = useMemo(() => packages.filter((p) => p.includes.length > 1), []);
   const singles = useMemo(() => packages.filter((p) => p.includes.length === 1), []);
 
-  const availableSingles = useMemo(() => {
-    return singles.filter((p) => {
-      const s = p.includes[0];
-      if (s === "consultation" && level !== "over-10") return false;
-      return true;
-    });
-  }, [singles, level]);
-
   const pkg = useMemo(
-    () => packages.find((p) => p.id === packageId) ?? packages[0],
+    () => packages.find((p) => p.id === packageId) ?? null,
     [packageId]
   );
-  const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
+  const q = useMemo(
+    () => (pkg && level && delivery ? quote(pkg, level, delivery) : null),
+    [pkg, level, delivery]
+  );
 
   const levelObj = levels.find((l) => l.id === level);
   const deliveryOption = deliveries.find((d) => d.id === delivery);
-  const pkgDisplayName = getPackageDisplayName(pkg, level);
 
   const completionDate = useMemo(() => {
+    if (!delivery) return "";
     if (!mounted) {
-      return delivery === "ultra" ? "Within 24 Hours" : delivery === "fast" ? "24 to 48 Hours" : "48 to 72 Hours";
+      return delivery === "ultra" ? "Within 24 Hours" : delivery === "fast" ? "2 to 3 Days" : "5 to 7 Days";
     }
     const d = new Date();
-    const addDays = delivery === "ultra" ? 1 : delivery === "fast" ? 2 : 3;
+    const addDays = delivery === "ultra" ? 1 : delivery === "fast" ? 3 : 7;
     d.setDate(d.getDate() + addDays);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" });
   }, [delivery, mounted]);
 
-  const orderHref = `/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`;
-  
-  const whatsappDiscussUrl = whatsappUrl(
-    `Hi Chanuka, I would like to discuss the ${tier} ${pkgDisplayName} (${formatLKR(q.total)}) for ${levelObj?.name} (${levelObj?.hint}).`
-  );
-
+  const isComplete = Boolean(level && pkg && delivery);
+  const orderHref = isComplete
+    ? `/order?package=${pkg!.id}&level=${level!}&delivery=${delivery!}`
+    : "";
   const toggleStep = (step: 1 | 2 | 3) => {
     setActiveStep((curr) => (curr === step ? null : step));
   };
 
   const handleSelectLevel = (newLevel: LevelId) => {
     setLevel(newLevel);
-    setDone((d) => ({ ...d, 1: true }));
     // Smoothly progress to step 2 if step 1 was open
     if (activeStep === 1) {
       setActiveStep(2);
@@ -88,7 +114,6 @@ export function Configurator() {
 
   const handleSelectPackage = (newPkgId: string) => {
     setPackageId(newPkgId);
-    setDone((d) => ({ ...d, 2: true }));
     // Smoothly progress to step 3 if step 2 was open
     if (activeStep === 2) {
       setActiveStep(3);
@@ -97,15 +122,15 @@ export function Configurator() {
 
   const handleSelectDelivery = (newDelivery: DeliveryId) => {
     setDelivery(newDelivery);
-    setDone((d) => ({ ...d, 3: true }));
+    setActiveStep(null);
   };
 
   const handleTabChange = (newTab: "bundles" | "singles") => {
     setTab(newTab);
     if (newTab === "bundles" && singles.some((p) => p.id === packageId)) {
-      setPackageId("complete");
+      setPackageId(null);
     } else if (newTab === "singles" && bundles.some((p) => p.id === packageId)) {
-      setPackageId("ats-cv");
+      setPackageId(null);
     }
   };
 
@@ -113,29 +138,30 @@ export function Configurator() {
     <section className="relative isolate overflow-hidden border-y border-line/60 bg-[linear-gradient(180deg,#e8eff9_0%,#f7f9fc_42%,#f9fafc_100%)] pb-16 pt-14 sm:pt-16 lg:pb-24 lg:pt-20">
       <div aria-hidden className="pointer-events-none absolute -left-40 top-24 -z-10 h-96 w-96 rounded-full bg-white/75 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute -right-32 bottom-12 -z-10 h-80 w-80 rounded-full bg-accent-soft/80 blur-3xl" />
-      
       <div className="container-page relative mx-auto max-w-5xl px-4 sm:px-6">
-        {/* Section Header: Sri Lanka Focus */}
+        {/* Section Header: Minimal, Clean, Engaging */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <p className="reveal eyebrow inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-accent/10 border border-accent/25 text-accent-deep text-[11px] font-bold uppercase tracking-wider">
-            Sri Lanka Pricing Calculator
+            Instant Package Calculator
           </p>
           <h2 className="reveal d1 display mt-2 text-[clamp(1.5rem,3vw,2.4rem)] font-bold text-ink">
-            Transparent Pricing in Sri Lankan Rupees (LKR)
+            Transparent Pricing. Exact Quotes.
           </h2>
           <p className="reveal d2 mt-1.5 text-[13.5px] text-muted max-w-md mx-auto">
-            Select your career stage and services to see guaranteed fixed rates with no hidden costs.
+            Select your career stage and services to see guaranteed fixed pricing and delivery.
           </p>
         </div>
 
         {/* Master Unified Card: 2 Columns on Desktop, Vertical Stack on Mobile */}
-        <div id="build" className="reveal d3 scroll-mt-24 grid overflow-hidden rounded-3xl border border-white/80 bg-surface shadow-[0_34px_80px_-42px_rgb(15_36_64/0.48)] ring-1 ring-brand/5 lg:grid-cols-[1.3fr_1.1fr]">
+        {/* id="build" lives on the card (not the section) so the hero CTA scrolls
+            straight to the picker instead of stopping at the section heading. */}
+        <div id="build" className="reveal d3 scroll-mt-24 grid overflow-hidden rounded-3xl border border-white/80 bg-surface shadow-[0_34px_80px_-42px_rgb(15_36_64/0.48)] ring-1 ring-brand/5 lg:grid-cols-[1.35fr_1fr]">
           {/* ============================================================= */}
           {/* LEFT COLUMN: THE 3 SEQUENTIAL SELECTION STEPS */}
           {/* ============================================================= */}
           <div className="min-w-0 p-5 sm:p-7 flex flex-col justify-between">
             <div className="min-w-0">
-              {/* Card Title */}
+              {/* Card Title with Reference Accent Underline */}
               <div className="mb-5">
                 <div className="flex min-w-0 items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -144,11 +170,15 @@ export function Configurator() {
                     </h3>
                     <div className="h-1 w-14 bg-accent rounded-full mt-1.5" />
                   </div>
+                  <GoldSaveBadge
+                    saving={q?.bundleSaving ?? 0}
+                    discountPercent={q?.discountPercent ?? 0}
+                    className="lg:hidden shrink-0"
+                  />
                 </div>
               </div>
 
-              <TierSelector value={tier} onChange={setTier} />
-              {/* Inset Steps Container */}
+              {/* Inset Steps Container (Inspired by client reference screenshots) */}
               <div className="rounded-2xl border border-line/80 bg-sand/20 p-2.5 sm:p-3.5 space-y-2.5">
                 {/* ------------------------------------------------------- */}
                 {/* STEP 1: CAREER LEVEL */}
@@ -161,24 +191,19 @@ export function Configurator() {
                     aria-expanded={activeStep === 1}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[1] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
-                        {done[1] ? "✓" : "1"}
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${level ? "bg-emerald-600 text-white" : "border border-line-strong bg-paper text-muted"}`}>
+                        {level ? "✓" : "1"}
                       </span>
-                      <div className="truncate">
+                      <div>
                         <span className="text-[13px] font-bold text-ink block leading-tight">
-                          Career stage
+                          Career level
                         </span>
-                        {levelObj && (
-                          <span className="text-[11.5px] font-medium text-accent-deep truncate block">
-                            {levelObj.name} · {levelObj.hint}
-                          </span>
-                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-1 text-muted shrink-0 pl-2">
                       <span className="text-[11px] hidden sm:inline font-medium">
-                        {activeStep === 1 ? "Close" : "Change"}
+                        {activeStep === 1 ? "Close" : level ? "Change" : "Select"}
                       </span>
                       <svg
                         viewBox="0 0 20 20"
@@ -197,7 +222,7 @@ export function Configurator() {
                   </button>
 
                   {activeStep === 1 && (
-                    <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-2">
+                    <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-1.5">
                       {levels.map((l) => {
                         const isSelected = l.id === level;
                         return (
@@ -205,13 +230,13 @@ export function Configurator() {
                             key={l.id}
                             type="button"
                             onClick={() => handleSelectLevel(l.id)}
-                            className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                            className={`w-full flex items-center justify-between p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
                               isSelected
-                                ? "border-brand bg-brand-soft/80 ring-1 ring-brand text-ink shadow-xs"
+                                ? "border-brand bg-brand-soft/70 ring-1 ring-brand text-ink"
                                 : "border-line bg-surface hover:border-line-strong hover:bg-sand/40 text-ink"
                             }`}
                           >
-                            <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="flex items-center gap-2.5">
                               <span
                                 className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
                                   isSelected
@@ -225,20 +250,13 @@ export function Configurator() {
                                   </svg>
                                 )}
                               </span>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#b9862f]">
-                                    {l.eyebrow}
-                                  </span>
-                                </div>
-                                <span className="text-[13px] font-bold text-ink block leading-snug">
-                                  {l.name}
-                                </span>
-                                <span className="text-[11px] text-muted block">
-                                  {l.hint}
-                                </span>
-                              </div>
+                              <span className="text-[12.5px] font-bold text-ink">
+                                {l.name}
+                              </span>
                             </div>
+                            <span className="text-[11px] text-muted text-right">
+                              {l.hint}
+                            </span>
                           </button>
                         );
                       })}
@@ -253,28 +271,24 @@ export function Configurator() {
                   <button
                     type="button"
                     onClick={() => toggleStep(2)}
-                    className="w-full flex items-center justify-between p-3 sm:p-3.5 text-left cursor-pointer hover:bg-sand/30 transition-colors"
+                    disabled={!level}
+                    className="w-full flex items-center justify-between p-3 sm:p-3.5 text-left transition-colors enabled:cursor-pointer enabled:hover:bg-sand/30 disabled:cursor-not-allowed disabled:opacity-55"
                     aria-expanded={activeStep === 2}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[2] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
-                        {done[2] ? "✓" : "2"}
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${pkg ? "bg-emerald-600 text-white" : "border border-line-strong bg-paper text-muted"}`}>
+                        {pkg ? "✓" : "2"}
                       </span>
-                      <div className="truncate">
+                      <div>
                         <span className="text-[13px] font-bold text-ink block leading-tight">
                           Package options
                         </span>
-                        {pkg && (
-                          <span className="text-[11.5px] font-medium text-accent-deep truncate block">
-                            {pkgDisplayName} · {formatLKR(q.total)}
-                          </span>
-                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-1 text-muted shrink-0 pl-2">
                       <span className="text-[11px] hidden sm:inline font-medium">
-                        {activeStep === 2 ? "Close" : "Change"}
+                        {activeStep === 2 ? "Close" : pkg ? "Change" : "Select"}
                       </span>
                       <svg
                         viewBox="0 0 20 20"
@@ -294,7 +308,7 @@ export function Configurator() {
 
                   {activeStep === 2 && (
                     <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-2.5">
-                      {/* Bundle / Single selector tabs */}
+                      {/* Bundle / Single selector: two clear, tappable cards */}
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -308,11 +322,14 @@ export function Configurator() {
                         >
                           <span className="block text-[12.5px] font-extrabold leading-tight">Complete Bundles</span>
                           <span
-                            className={`mt-0.5 block text-[10.5px] font-semibold ${
-                              tab === "bundles" ? "text-amber-300" : "text-muted"
+                            className={`mt-0.5 inline-flex items-center gap-1 text-[10.5px] font-bold ${
+                              tab === "bundles" ? "text-amber-300" : "text-accent-deep"
                             }`}
                           >
-                            All-in-one suite
+                            <svg viewBox="0 0 16 16" aria-hidden className="h-3 w-3 fill-current">
+                              <path d="M8 1l1.9 4 4.4.5-3.3 3 1 4.4L8 10.8l-3.9 2.1 1-4.4L1.7 5.5 6.1 5z" />
+                            </svg>
+                            Save up to 30%
                           </span>
                         </button>
                         <button
@@ -336,12 +353,20 @@ export function Configurator() {
                         </button>
                       </div>
 
+                      {/* Helper line: tells the user exactly what this tab is */}
+                      <p className="px-1 text-[11px] text-muted">
+                        {tab === "bundles"
+                          ? "Two or three services together, at a discount."
+                          : "Pick one service on its own."}
+                      </p>
+
                       {/* Package Item Rows */}
                       <div className="space-y-1.5">
-                        {(tab === "bundles" ? bundles : availableSingles).map((p) => {
+                        {(tab === "bundles" ? bundles : singles).map((p) => {
                           const isSelected = p.id === packageId;
-                          const name = getPackageDisplayName(p, level);
-                          const rowQuote = quote(p, level, delivery, tier);
+                          const discountBadge =
+                            p.includes.length === 3 ? "Save 30%" : p.includes.length === 2 ? "Save 20%" : null;
+                          const rowPrice = quote(p, level ?? "3-to-9", delivery ?? "normal").total;
 
                           return (
                             <button
@@ -370,22 +395,25 @@ export function Configurator() {
                                 </span>
                                 <div className="min-w-0">
                                   <span className="text-[12.5px] font-bold text-ink block leading-tight">
-                                    {name}
+                                    {p.name}
                                   </span>
                                   <span className="text-[10.5px] text-muted block leading-tight mt-0.5">
-                                    {p.id === "complete"
-                                      ? `Full ${levelObj?.name}`
-                                      : p.includes.length > 1
-                                      ? `${p.includes.length} services`
-                                      : "Single service"}
+                                    {p.includes.length > 1 ? `${p.includes.length} services` : "Single service"}
                                   </span>
                                 </div>
                               </div>
 
                               <div className="flex shrink-0 items-center gap-2 ml-2">
-                                <span className="stat-number text-[13px] font-extrabold text-ink">
-                                  {formatLKR(rowQuote.total)}
-                                </span>
+                                {discountBadge && (
+                                  <span className="rounded bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-accent-deep">
+                                    {discountBadge}
+                                  </span>
+                                )}
+                                {tab === "singles" && (
+                                  <span className="stat-number text-[13px] font-extrabold text-ink">
+                                    {usd(rowPrice)}
+                                  </span>
+                                )}
                               </div>
                             </button>
                           );
@@ -402,28 +430,24 @@ export function Configurator() {
                   <button
                     type="button"
                     onClick={() => toggleStep(3)}
-                    className="w-full flex items-center justify-between p-3 sm:p-3.5 text-left cursor-pointer hover:bg-sand/30 transition-colors"
+                    disabled={!pkg}
+                    className="w-full flex items-center justify-between p-3 sm:p-3.5 text-left transition-colors enabled:cursor-pointer enabled:hover:bg-sand/30 disabled:cursor-not-allowed disabled:opacity-55"
                     aria-expanded={activeStep === 3}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${done[3] ? "bg-emerald-600 text-white" : "bg-sand text-muted"}`}>
-                        {done[3] ? "✓" : "3"}
+                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${delivery ? "bg-emerald-600 text-white" : "border border-line-strong bg-paper text-muted"}`}>
+                        {delivery ? "✓" : "3"}
                       </span>
-                      <div className="truncate">
+                      <div>
                         <span className="text-[13px] font-bold text-ink block leading-tight">
                           Turnaround speed
                         </span>
-                        {deliveryOption && (
-                          <span className="text-[11.5px] font-medium text-accent-deep truncate block">
-                            {deliveryOption.name} ({deliveryOption.window}) · Draft by {completionDate}
-                          </span>
-                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-1 text-muted shrink-0 pl-2">
                       <span className="text-[11px] hidden sm:inline font-medium">
-                        {activeStep === 3 ? "Close" : "Change"}
+                        {activeStep === 3 ? "Close" : delivery ? "Change" : "Select"}
                       </span>
                       <svg
                         viewBox="0 0 20 20"
@@ -493,85 +517,107 @@ export function Configurator() {
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* ============================================================= */}
-          {/* RIGHT COLUMN: PRECISE PACKAGE CARD MATCHING SRI LANKA SPEC */}
+          {/* RIGHT COLUMN: SLEEK PRICE & CHECKOUT SUMMARY */}
           {/* ============================================================= */}
           <aside className="min-w-0 bg-sand/35 p-5 sm:p-7 border-t lg:border-t-0 lg:border-l border-line flex flex-col justify-between">
             {/* Top Details */}
             <div>
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#b9862f] block">
-                    {tiers.find((item) => item.id === tier)?.name}
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-muted block">
+                    Price Summary
                   </span>
-                  <h4 className="display mt-1 text-2xl sm:text-3xl font-bold text-ink">
-                    {pkgDisplayName}
+                  <h4 className="display mt-0.5 text-2xl font-bold text-ink">
+                    {pkg?.name ?? "Select your package"}
                   </h4>
-                  <p className="text-[12.5px] text-muted mt-1 leading-snug">
-                    {levelObj?.hint}
+                  <p className="text-[12px] text-muted mt-0.5">
+                    {levelObj && deliveryOption
+                      ? `${levelObj.name} · ${deliveryOption.name} delivery`
+                      : "Complete the three steps to see your quote"}
                   </p>
                 </div>
+
+                <GoldSaveBadge
+                  saving={q?.bundleSaving ?? 0}
+                  discountPercent={q?.discountPercent ?? 0}
+                  className="shrink-0"
+                />
               </div>
 
-              {/* Price Display */}
-              <div className="mt-5 pb-4 border-b border-line">
-                <div className="display text-3xl sm:text-4xl font-black text-ink leading-tight">
-                  {formatLKR(q.total)}
-                </div>
-                <p className="text-[11.5px] text-muted mt-1">
-                  Combined service total · No automatic discount
-                </p>
-              </div>
-
-              {/* Service Items Breakdown with Exact Prices */}
-              <div className="mt-4 pt-1">
-                <span className="text-[10.5px] font-bold uppercase tracking-wider text-muted block mb-3">
-                  Service Breakdown:
+              {/* Package Inclusions Pills */}
+              <div className="mt-4 pt-3.5 border-t border-line/70">
+                <span className="text-[10.5px] font-bold uppercase tracking-wider text-muted block mb-2">
+                  What&apos;s Included:
                 </span>
-                <div className="space-y-2.5 text-[13px]">
-                  {q.serviceBreakdown.map((item) => (
-                    <div
-                      key={item.serviceId}
-                      className="flex items-center justify-between py-1 border-b border-line/40 text-ink"
-                    >
-                      <span className="font-normal text-ink-soft">{item.name}</span>
-                      <span className="font-bold text-ink">{formatLKR(item.price)}</span>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between py-1 text-[11.5px] text-muted">
-                    <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
-                    <span className="font-semibold text-emerald-600">{tier === "signature" ? "30 days" : "Included"}</span>
-                  </div>
+                <div className="space-y-1.5 text-[12px] text-ink-soft">
+                  {pkg ? (
+                    <>
+                      {pkg.includes.map((s) => (
+                        <div key={s} className="flex items-center gap-2">
+                          <span className="text-emerald-600 font-bold">✓</span>
+                          <span className="font-semibold text-ink">{services[s].name}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span>1 full revision round included</span>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-muted">Your selected services will appear here.</p>
+                  )}
                 </div>
               </div>
 
-              {/* Estimated Turnaround Callout */}
-              <div className="mt-5 rounded-xl bg-surface border border-line/80 px-3.5 py-2.5 flex items-center justify-between text-[11.5px] shadow-xs">
+              {/* Estimated Delivery Date Callout */}
+              <div className="mt-4 rounded-xl bg-surface border border-line/80 px-3.5 py-2.5 flex items-center justify-between text-[11.5px] shadow-xs">
                 <span className="text-muted">Estimated first draft:</span>
-                <span className="font-bold text-ink">{completionDate}</span>
+                <span className="font-bold text-ink">{completionDate || "—"}</span>
               </div>
             </div>
 
-            {/* Bottom: order/payment flow is primary, WhatsApp is the backup */}
+            {/* Bottom: Price, Primary CTA, and Sub-action */}
             <div className="mt-6 pt-4 border-t border-line">
-              <Link
-                href={orderHref}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand hover:bg-brand-deep text-paper font-bold py-3.5 px-6 shadow-md hover:shadow-lg transition-all text-[15px] cursor-pointer"
-              >
-                <span>Continue to order</span>
-                <span>→</span>
-              </Link>
+              <div className="flex items-baseline justify-between mb-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted">
+                  Total Due (USD)
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="stat-number text-3xl sm:text-4xl font-extrabold text-ink leading-none">
+                    {q ? usd(q.total) : "—"}
+                  </span>
+                  {q && q.bundleSaving > 0 && (
+                    <span className="text-sm text-muted/60 line-through">
+                      {usd(q.listPrice + q.deliveryFee)}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-              <a
-                href={whatsappDiscussUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2.5 w-full flex items-center justify-center gap-2 rounded-2xl border border-line-strong bg-surface hover:border-brand text-ink font-semibold py-3 px-6 transition-colors text-[14px] cursor-pointer"
-              >
-                <span>Or discuss on WhatsApp</span>
-              </a>
+              {/* High-Converting Primary CTA */}
+              {isComplete ? (
+                <a
+                  href={orderHref}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand hover:bg-brand-deep text-paper font-bold py-3.5 px-6 shadow-md hover:shadow-lg transition-all text-[15px] cursor-pointer"
+                >
+                  <span>Continue to order</span>
+                  <span>→</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand/45 text-paper/80 font-bold py-3.5 px-6 shadow-none text-[15px] cursor-not-allowed"
+                >
+                  <span>Continue to order</span>
+                  <span>→</span>
+                </button>
+              )}
+
             </div>
           </aside>
         </div>

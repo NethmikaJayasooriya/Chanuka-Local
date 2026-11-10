@@ -12,11 +12,11 @@ type GatewayResponse = {
 const inputClass = "mt-1.5 w-full rounded-xl border border-line bg-white px-4 py-3 text-[16px] sm:text-[14px] text-ink outline-none focus:border-brand";
 const labelClass = "block text-[12.5px] font-semibold text-ink-soft";
 
-export function PayHerePaymentForm({ orderId, defaultPhone = "", sandbox = false }: { orderId: string; defaultPhone?: string; sandbox?: boolean }) {
+export function PayHerePaymentForm({ orderId, defaultPhone = "" }: { orderId: string; defaultPhone?: string }) {
   const [phone, setPhone] = useState(defaultPhone);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState("Sri Lanka");
+  const [country, setCountry] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,14 +35,7 @@ export function PayHerePaymentForm({ orderId, defaultPhone = "", sandbox = false
       });
       const data = (await result.json().catch(() => ({}))) as GatewayResponse;
       if (!result.ok || !data.action || !data.fields) {
-        const messages: Record<string, string> = {
-          already_paid: "This order is already paid. Refresh to see the verified status.",
-          price_mismatch: "This order needs an invoice review. Please contact us with your order reference; no payment has been taken.",
-          not_configured: "Online payment is temporarily unavailable. Please request an invoice.",
-          not_signed_in: "Your session has expired. Please sign in again before paying.",
-          payment_blocked: "Please contact us about payment for this order.",
-        };
-        setError(messages[data.reason ?? ""] ?? "Payment could not be started. Please check your billing details and try again.");
+        setError(data.reason === "already_paid" ? "This order is already paid." : "Payment could not be started. Please check your details and try again.");
         setBusy(false);
         return;
       }
@@ -74,8 +67,7 @@ export function PayHerePaymentForm({ orderId, defaultPhone = "", sandbox = false
 
   return (
     <form onSubmit={startPayment} className="mt-6 rounded-[14px] border border-brand/15 bg-brand-soft/25 p-4 sm:p-6">
-      <h3 className="text-[14px] font-bold text-ink">Billing details · LKR</h3>
-      {sandbox && <p role="status" className="mt-2 text-sm font-semibold text-amber-800">Sandbox test checkout — no real payment is collected.</p>}
+      <h3 className="text-[14px] font-bold text-ink">Billing details</h3>
       <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
         Your card details are entered only on PayHere&apos;s secure checkout and are never stored on this website.
       </p>
@@ -103,7 +95,8 @@ export function PayHerePaymentForm({ orderId, defaultPhone = "", sandbox = false
       <button type="submit" disabled={busy} className="mt-5 w-full rounded-full bg-brand px-7 py-3.5 text-[15px] font-semibold text-white shadow-md transition-colors hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60">
         {busy ? "Opening secure checkout..." : "Pay securely with PayHere"}
       </button>
-      <p className="mt-3 text-center text-[11.5px] text-muted">Your saved LKR order total is verified on the server. PayHere confirms payment securely before your order is marked paid.</p>
+      <p className="mt-3 text-center text-[11.5px] text-muted">Payment amount and order details are verified securely on the server.</p>
     </form>
   );
 }
+

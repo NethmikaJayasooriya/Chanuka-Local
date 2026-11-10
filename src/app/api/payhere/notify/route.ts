@@ -10,8 +10,7 @@ import {
   safePaymentText,
   signaturesMatch,
 } from "@/lib/payhere";
-import { SITE_KEY } from "@/lib/site";
-import { InputError, readLimitedBody } from "@/lib/request-validation";
+import { notifyPaymentConfirmed } from "@/lib/email/notifications";
 
 export const runtime = "nodejs";
 
@@ -33,10 +32,9 @@ export async function POST(request: Request) {
 
   let form: FormData;
   try {
-    const bytes = await readLimitedBody(request, 16_384);
-    form = await new Response(bytes.buffer as ArrayBuffer, { headers: { "Content-Type": contentType } }).formData();
-  } catch (error) {
-    return response(error instanceof InputError ? error.reason : "Bad request", error instanceof InputError ? error.status : 400);
+    form = await request.formData();
+  } catch {
+    return response("Bad request", 400);
   }
 
   const value = (key: string, max = 200) => {
@@ -76,23 +74,22 @@ export async function POST(request: Request) {
   if (![2, 0, -1, -2, -3].includes(status)) return response("Invalid status", 400);
 
   const amountMinor = amountToMinorUnits(amount);
-  if (amountMinor === null || currency !== "LKR") return response("Invalid amount", 400);
+  if (amountMinor === null || currency !== "USD") return response("Invalid amount", 400);
 
   const db = createAdminClient();
   const { data: order } = await db
     .from("orders")
-    .select("id,ref,total_usd")
+    .select("id,ref,total_usd,customer_name,customer_email,package_name,level_name,delivery_window,target_role,target_country")
     .eq("ref", orderRef)
-    .eq("site", SITE_KEY)
     .maybeSingle();
   if (!order || (customOrderId && customOrderId !== order.id)) return response("Order not found", 404);
-  if (amountMinor !== amountToMinorUnits(String(order.total_usd))) return response("Amount mismatch", 400);
+  if (amountMinor !== Number(order.total_usd) * 100) return response("Amount mismatch", 400);
 
   const notificationKey = createHash("sha256")
     .update(`${paymentId}|${statusCode}|${receivedSignature}`, "utf8")
     .digest("hex");
 
-  const { error } = await db.rpc("record_payhere_notification", {
+  const { data: recorded, error } = await db.rpc("record_payhere_notification", {
     p_order_id: order.id,
     p_notification_key: notificationKey,
     p_payment_id: paymentId,
@@ -103,6 +100,21 @@ export async function POST(request: Request) {
     p_status_message: statusMessage || null,
   });
   if (error) return response("Server error", 500);
+
+  if (recorded && status === 2) {
+    await notifyPaymentConfirmed({
+      id: order.id,
+      ref: order.ref,
+      customerName: order.customer_name ?? "",
+      customerEmail: order.customer_email ?? "",
+      packageName: order.package_name ?? "Career package",
+      levelName: order.level_name ?? "",
+      deliveryWindow: order.delivery_window ?? "",
+      totalUsd: Number(order.total_usd),
+      targetRole: order.target_role,
+      targetCountry: order.target_country,
+    });
+  }
 
   return response("OK", 200);
 }

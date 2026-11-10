@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
 
-const PRIVATE = ["/admin", "/api/", "/order/confirmation", "/checkout", "/intake", "/login", "/signup", "/dashboard"];
+const PRIVATE = ["/admin", "/api/", "/order/confirmation", "/checkout", "/intake", "/login", "/dashboard"];
 
 /**
- * Preserve public crawler access. Crawl permission is one technical
- * prerequisite, not a guarantee of indexing, citation or ranking.
+ * AI answer engines are explicitly welcomed (GEO): being crawlable by
+ * search and assistant bots is what makes the site citable in ChatGPT,
+ * Claude, Perplexity, Gemini and Google AI Overviews.
  */
 const AI_BOTS = [
   "OAI-SearchBot",
@@ -26,9 +27,6 @@ const AI_BOTS = [
 
 export default function robots(): MetadataRoute.Robots {
   const base = site.url.replace(/\/$/, "");
-  if (process.env.VERCEL_ENV === "preview") {
-    return { rules: { userAgent: "*", disallow: "/" } };
-  }
   return {
     rules: [
       { userAgent: "*", allow: "/", disallow: PRIVATE },

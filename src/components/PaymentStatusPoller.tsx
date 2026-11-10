@@ -17,3 +17,4 @@ export function PaymentStatusPoller({ active }: { active: boolean }) {
   }, [active, router]);
   return null;
 }
+

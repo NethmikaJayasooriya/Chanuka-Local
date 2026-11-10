@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { BriefControls } from "./BriefControls";
 import { Card } from "@/components/admin/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { supabaseConfigured } from "@/lib/supabase/guard";
+import { canManageSite, requireAdmin, supabaseConfigured } from "@/lib/supabase/guard";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +11,10 @@ export default async function BriefDetail({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!supabaseConfigured()) return null;
   const db = createAdminClient();
-  const { data: s } = await db.from("intake_submissions").select("*").eq("id", id).eq("site", "lk").maybeSingle();
+  const { data: s } = await db.from("intake_submissions").select("*").eq("id", id).maybeSingle();
   if (!s) notFound();
+  const access = await requireAdmin();
+  if (!canManageSite(access, s.site)) notFound();
 
   let cvUrl: string | null = null;
   if (s.cv_path) {

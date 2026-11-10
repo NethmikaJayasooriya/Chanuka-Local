@@ -1,10 +1,11 @@
 import { articles, ARTICLE_CATEGORIES } from "@/lib/articles";
 import { careerLevels, careerSituations } from "@/lib/career-stages";
+import { corridors } from "@/lib/corridors";
+import { COUNTRY_BUNDLES, countryPaths } from "@/lib/country-content";
 import { resources } from "@/lib/content/resources";
 import { cvSamples } from "@/lib/cv-samples";
 import { industries } from "@/lib/industries";
 import { jobRoles } from "@/lib/job-roles";
-import { lkGuides } from "@/lib/content/lk";
 
 /**
  * SITE INDEX
@@ -15,23 +16,14 @@ import { lkGuides } from "@/lib/content/lk";
  * (blog posts, SEO landing pages) are appended at request time.
  */
 
-export const SITE_UPDATED = "2026-10-04";
-const CONTENT_UPDATES: Record<string, string> = {
-  "/": "2026-10-14",
-  "/cv-writing": "2026-10-14",
-  "/linkedin-optimisation": "2026-10-14",
-  "/reviews": "2026-10-14",
-  "/contact": "2026-10-14",
-  "/about/chanuka-jeewantha": "2026-10-14",
-};
+export const SITE_UPDATED = "2026-09-27";
 
 export type IndexEntry = { path: string; lastmod: string; priority: number };
 
-const e = (path: string, lastmod = SITE_UPDATED, priority = 0.6): IndexEntry => ({ path, lastmod: CONTENT_UPDATES[path] ?? lastmod, priority });
+const e = (path: string, lastmod = SITE_UPDATED, priority = 0.6): IndexEntry => ({ path, lastmod, priority });
 
 export function sitemapGroups(): Record<string, IndexEntry[]> {
   const groups: Record<string, IndexEntry[]> = {
-    "sri-lanka-guides": lkGuides.map((g) => e(`/${g.slug}`, g.updated, 0.9)),
     "global-pages": [
       e("/", SITE_UPDATED, 1),
       ...["/cv-writing", "/linkedin-optimisation", "/cover-letter-writing", "/packages", "/services", "/cv-review", "/career-strategy"].map((p) => e(p, SITE_UPDATED, 0.9)),
@@ -42,10 +34,12 @@ export function sitemapGroups(): Record<string, IndexEntry[]> {
         "/about/chanuka-jeewantha",
         "/faq",
         "/contact",
+        "/countries",
         "/job-roles",
         "/industries",
         "/career-levels",
         "/career-situations",
+        "/international-job-seekers",
         "/cv-samples",
         "/career-advice",
         "/resources",
@@ -64,12 +58,16 @@ export function sitemapGroups(): Record<string, IndexEntry[]> {
       ...careerSituations.map((s) => e(`/career-situations/${s.slug}`, s.updated ?? SITE_UPDATED, 0.7)),
       ...cvSamples.map((s) => e(`/cv-samples/${s.slug}`, SITE_UPDATED, 0.6)),
     ],
+    international: corridors.map((c) => e(`/international-job-seekers/${c.slug}`, SITE_UPDATED, 0.6)),
     articles: [
       ...ARTICLE_CATEGORIES.map((c) => e(`/career-advice/${c.slug}`, SITE_UPDATED, 0.5)),
       ...articles.map((a) => e(`/career-advice/${a.slug}`, a.updated, 0.6)),
     ],
     resources: resources.map((r) => e(`/resources/${r.slug}`, r.updated, 0.6)),
   };
+  for (const b of COUNTRY_BUNDLES) {
+    groups[`country-${b.country}`] = countryPaths(b.country).map((p, i) => e(p, SITE_UPDATED, i === 0 ? 0.9 : 0.7));
+  }
   return groups;
 }
 

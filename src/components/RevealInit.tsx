@@ -4,26 +4,31 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
- * One IntersectionObserver for the whole site.
+ * Global Scroll Reveal & Motion Controller.
  *
- * Any element, in a server component or not, can opt into the scroll
- * reveal by adding `className="reveal"` (plus an optional d1..d5 for
- * stagger). This mounts once in the layout and re-scans on navigation.
- *
- * The hidden state lives behind html[data-js="1"], set before paint in
- * the layout, so nothing is ever hidden without JS.
+ * Runs once in RootLayout and re-scans on page navigation.
+ * Applies data-js="1" on client mount to activate progressive enhancement
+ * animations without ever breaking non-JS or crawler visits.
  */
 export function RevealInit() {
   const pathname = usePathname();
 
+  // Suppress React 19 dev false-positive warning for script tags during client reconciliation
   useEffect(() => {
-    // Hydration happened, so the layout's "never hydrated" fallback is not needed.
-    const w = window as Window & { __revealFallback?: ReturnType<typeof setTimeout> };
-    if (w.__revealFallback) {
-      clearTimeout(w.__revealFallback);
-      w.__revealFallback = undefined;
-      document.documentElement.setAttribute("data-js", "1");
+    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+      const originalError = console.error;
+      console.error = (...args: unknown[]) => {
+        if (typeof args[0] === "string" && args[0].includes("Encountered a script tag")) {
+          return;
+        }
+        originalError.apply(console, args);
+      };
     }
+  }, []);
+
+  useEffect(() => {
+    // Activate JS animations
+    document.documentElement.setAttribute("data-js", "1");
 
     const show = (el: Element) => el.classList.add("is-visible");
     const collect = () =>

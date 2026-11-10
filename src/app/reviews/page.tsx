@@ -6,19 +6,19 @@ import { Reviews } from "@/components/Reviews";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: `Reviews: ${site.rating.score} from ${site.rating.count} Google Reviews`,
+  title: "Reviews",
   description: `Rated ${site.rating.score} across ${site.rating.count} Google reviews. Read what professionals say after working with Chanuka Jeewantha.`,
   path: "/reviews",
 });
 
 const outcomes = [
   {
-    stat: "Public proof",
-    label: "Read dated reviews on the independent Google profile, not only quotations on this site",
+    stat: "2 to 6 weeks",
+    label: "Typical time to first interview callback after the rewrite",
   },
   {
-    stat: "Relevant detail",
-    label: "Look for comments about the brief, communication, document quality and delivery",
+    stat: "40+",
+    label: "Countries clients have applied into",
   },
   {
     stat: "1 round",
@@ -32,7 +32,7 @@ export default function ReviewsPage() {
       <PageHeader
         eyebrow="Reviews"
         title="What people say after the rewrite."
-        lead="Read client feedback and check the original Google profile before choosing your CV or LinkedIn writing service."
+        lead="Every review is a real, verified review left on Google by a client who paid for the service and went on to apply with the documents."
         crumbs={[{ label: "Reviews" }]}
         primary={{ href: "/#build", label: "Build your package" }}
       />
@@ -43,7 +43,7 @@ export default function ReviewsPage() {
         <div className="container-page">
           <p className="eyebrow">In practice</p>
           <h2 className="display mt-3 text-[clamp(1.6rem,3.2vw,2.2rem)] text-ink">
-            How to assess the feedback.
+            What tends to change.
           </h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {outcomes.map((o) => (
@@ -54,9 +54,9 @@ export default function ReviewsPage() {
             ))}
           </div>
           <p className="mt-6 max-w-2xl text-[13.5px] leading-relaxed text-muted">
-            The displayed rating was checked on 14 October 2026. Reviews and counts change;
-            the linked Google profile has the latest information. Individual experiences do
-            not guarantee an interview, a job offer or a similar result for another client.
+            These are observed ranges across past clients, not a promise. A better document
+            raises your response rate. It does not replace applying, and it cannot control
+            whether a role was already filled internally.
           </p>
         </div>
       </section>

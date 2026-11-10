@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/account/AuthForm";
 import { site } from "@/lib/site";
 import { getSessionUser, supabaseConfigured } from "@/lib/supabase/guard";
-import { safeReturnPath } from "@/lib/auth-redirect";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -14,9 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/login" },
 };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const params = await searchParams;
-  if (supabaseConfigured() && (await getSessionUser())) redirect(safeReturnPath(params.next));
+export default async function LoginPage() {
+  if (supabaseConfigured() && (await getSessionUser())) redirect("/dashboard");
 
   return (
     <section className="relative overflow-hidden">

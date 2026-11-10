@@ -1,4 +1,3 @@
-import { pricingSummary } from "@/lib/pricing";
 import type { ServiceId } from "./pricing";
 
 export type ServicePage = {
@@ -17,10 +16,6 @@ export type ServicePage = {
   whoFor: string[];
   faq: Array<{ q: string; a: string }>;
   related: Array<{ href: string; label: string }>;
-  quickAnswer?: string;
-  sinhalaSummary?: string;
-  localNotes?: Array<{ heading: string; body: string }>;
-  examples?: Array<{ label: string; before: string; after: string; why: string }>;
 };
 
 export const servicePages: ServicePage[] = [
@@ -28,22 +23,11 @@ export const servicePages: ServicePage[] = [
     slug: "cv-writing",
     name: "ATS Friendly CV",
     packageService: "cv",
-    title: "Professional CV writing in Sri Lanka, for your next role.",
-    lead: "A targeted CV for Sri Lankan employers or overseas applications, available as supervised Essential or personally crafted Signature work. Clear achievements, readable formatting and a story that matches the role you actually want.",
-    metaTitle: "CV Writing Service in Sri Lanka | ATS CV from LKR 3,950",
+    title: "CV writing that gets past the filter and holds a recruiter's attention.",
+    lead: "Most CVs are rejected before a person reads them, and the ones that survive get about seven seconds of attention. Your CV is rewritten to clear the first gate and earn the second.",
+    metaTitle: "ATS CV Writing Service",
     metaDescription:
-      "CPRW certified ATS CV writing in Sri Lanka for private sector, banking, IT and foreign jobs. Essential or Signature Jeewantha, delivery from 24 hours.",
-    quickAnswer: "Chanuka Jeewantha provides professional CV writing in Sri Lanka for graduates, experienced professionals and executives. The service includes target-role research, achievement-led writing, an ATS-friendly layout, editable Word and PDF files, and one revision round. Prices start at LKR 3,950 for students and fresh graduates; standard delivery is 48 to 72 hours. Sinhala and English communication is available online, island-wide.",
-    sinhalaSummary: "ශ්‍රී ලංකාවේ හෝ විදේශ රැකියාවකට ගැළපෙන CV එකක් Essential team-crafted හෝ Chanuka විසින්ම ලියන Signature tier එකෙන් තෝරන්න. ඔබේ අත්දැකීම් සහ ඉලක්ක රැකියාව අනුව අන්තර්ගතය සකස් කරන අතර Word සහ PDF files සමඟ එක් revision round එකක් ඇතුළත්. සිසුන් සහ නව උපාධිධාරීන් සඳහා මිල රු. 3,950 සිට.",
-    localNotes: [
-      { heading: "Private-sector applications", body: "Start with the employer's vacancy notice, whether it is on TopJobs, LinkedIn or a company careers page. A Colombo banking role and a software engineering role need different evidence; your actual qualifications, tools and achievements determine the content." },
-      { heading: "Government and prescribed forms", body: "A government vacancy may require its own application form and supporting documents. A professional CV does not replace those instructions. Supply the notice so the document supports the stated requirements." },
-      { heading: "Applying overseas from Sri Lanka", body: "Name the destination and target role before writing starts. Personal details, length and terminology are adapted to that application. Foreign-job CV writing is also available as a separate service." },
-    ],
-    examples: [
-      { label: "Banking operations", before: "Responsible for preparing monthly reports.", after: "Prepared monthly branch performance reports by consolidating lending and deposit data, checking variances and highlighting exceptions for the branch manager.", why: "The rewrite makes the task, method and reader clear. Add a volume or measurable result only if your records support it." },
-      { label: "Graduate project", before: "Did a final-year software project.", after: "Built a stock-tracking web application for a university project using React and PostgreSQL; implemented item search, stock updates and role-based access.", why: "A graduate can show practical evidence through a project without inventing paid employment or business results." },
-    ],
+      "Professional ATS-optimised CV writing for international roles. Achievement-led content, clean parseable formatting, delivery from 24 hours.",
     deliverables: [
       "Your CV in Word and PDF, ready to send",
       "A version formatted for online applications and one for direct sending",
@@ -65,7 +49,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         heading: "Market conventions",
-        body: "A CV for a Colombo employer, a Gulf company and a UK recruiter differ on length, photo, personal details and tone. Yours is written for the employer and country you named, not a generic template.",
+        body: "A UK CV, an Australian resume and a Gulf CV differ on length, photos, personal details and tone. Yours is written for the market you named, not a generic international template.",
       },
     ],
     whoFor: [
@@ -77,50 +61,33 @@ export const servicePages: ServicePage[] = [
     faq: [
       {
         q: "Will this guarantee my CV passes ATS?",
-        a: "No. Different employers configure different systems and screening rules. The CV is built with readable text, standard headings and relevant language drawn from your target job descriptions, but neither an ATS score nor an interview can be guaranteed.",
+        a: "No one can promise a specific system's result, and anyone who does is selling you something. What is guaranteed is that nothing in the document will be the reason it fails: the structure, formatting and keyword strategy are all built for machine parsing first.",
       },
       {
         q: "How long does it take?",
-        a: "Standard delivery is 48 to 72 hours. Priority Express is 24 to 48 hours and the VIP option delivers within 24 hours. The 24-hour option has limited weekly capacity, so it is worth confirming availability on WhatsApp before ordering.",
+        a: "Standard delivery is 5 to 7 days. Fast delivery is 2 to 3 days and ultra fast delivery is within 24 hours. The 24-hour option has limited weekly capacity, so it is worth confirming availability before ordering.",
       },
       {
         q: "What do you need from me?",
         a: "Your current CV, the target role and market, and a link to one or two job adverts you would actually apply to. If you do not have a CV, a detailed work history is enough to start.",
       },
-      { q: "How much does CV writing cost in Sri Lanka with Chanuka?", a: `${pricingSummary("cv")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.` },
-      { q: "Can I order online from Kandy, Galle or outside Colombo?", a: "Yes. The service is online across Sri Lanka. Share your existing CV or work history and target vacancies, discuss the brief in Sinhala or English, and receive the files digitally. No visit to a Colombo office is needed." },
-      { q: "Who is the best CV writer in Sri Lanka for my application?", a: "Compare named writers using relevant samples, credentials, independent reviews, target-role research, clear prices and revision terms. Chanuka offers supervised Essential and personally written Signature services; use the buyer's guide and public Google reviews to decide whether that approach fits your needs." },
     ],
     related: [
       { href: "/linkedin-optimisation", label: "LinkedIn Optimization" },
       { href: "/cover-letter-writing", label: "Cover Letter Writing" },
       { href: "/packages", label: "Packages and pricing" },
       { href: "/how-it-works", label: "How it works" },
-      { href: "/how-to-choose-a-cv-writer-sri-lanka", label: "How to choose a CV writer in Sri Lanka" },
-      { href: "/cv-format-sri-lanka", label: "CV format for Sri Lanka" },
-      { href: "/foreign-job-cv-sri-lanka", label: "CV writing for foreign jobs" },
     ],
   },
   {
     slug: "linkedin-optimisation",
     name: "LinkedIn Optimization",
     packageService: "linkedin",
-    title: "LinkedIn profile optimization in Sri Lanka.",
+    title: "A LinkedIn profile recruiters can find, and want to keep reading.",
     lead: "Recruiters search LinkedIn with keywords and judge in seconds. Being on the platform is not the same as being findable, and being findable is not the same as being convincing.",
-    metaTitle: "LinkedIn Optimization Sri Lanka | Chanuka Jeewantha",
+    metaTitle: "LinkedIn Profile Optimization Service",
     metaDescription:
-      "LinkedIn profile optimization in Sri Lanka by Chanuka Jeewantha. Headline, About, experience and role-relevant skills guidance. From LKR 3,950; no login needed.",
-    quickAnswer: "LinkedIn profile optimization is a rewrite of your headline, About and experience sections around your target roles, supported by relevant skills and consistent career evidence. Chanuka Jeewantha offers this service online in Sri Lanka from LKR 3,950, with one revision round and instructions for updating your own profile. You keep control of your account: no password or login access is requested.",
-    sinhalaSummary: "LinkedIn profile එකේ headline, About සහ experience කොටස් ඔබ බලාපොරොත්තු වන රැකියාවට ගැළපෙන ලෙස සකස් කරනවා. ඔබටම profile එක update කරගන්න උපදෙස් ලැබෙන අතර password එක හෝ account access දෙන්න අවශ්‍ය නැහැ. මිල රු. 3,950 සිට.",
-    localNotes: [
-      { heading: "Sri Lankan and overseas recruiter searches", body: "Choose a realistic target role and keep location, industry and availability accurate. Use the skills and tools you actually have, expressed in the terms employers use. Repeating a keyword cannot make you qualified for a role." },
-      { heading: "One career story across CV and LinkedIn", body: "Dates, employers, qualifications and achievements should agree with your CV. LinkedIn adds context and a conversational About section rather than duplicating the CV line for line." },
-      { heading: "Measure relevant attention", body: "Record your available Search Appearances and profile-view data before updating, then compare later periods alongside recruiter messages and relevant conversations. Views alone are not evidence of a better job search." },
-    ],
-    examples: [
-      { label: "Finance professional headline", before: "Looking for a new opportunity", after: "Finance Executive | Management Reporting, Budgeting & Excel | Sri Lanka", why: "State a real professional identity and relevant skills. This is an illustrative structure, not a reason to claim a title or skill you do not hold." },
-      { label: "Software engineer headline", before: "Passionate IT professional", after: "Software Engineer | Java, Spring Boot & REST APIs | Backend Development", why: "Concrete role and tool names explain your field more clearly than a general adjective. Select terms that match your own work." },
-    ],
+      "LinkedIn profile optimisation for professionals targeting international roles. Headline, About and experience rewritten for recruiter search.",
     deliverables: [
       "Rewritten headline, About section and experience entries",
       "A keyword set matched to your target roles and market",
@@ -158,18 +125,14 @@ export const servicePages: ServicePage[] = [
       },
       {
         q: "How soon will I see results?",
-        a: "There is no fixed time or guaranteed increase. Visibility depends on your target market, experience, profile settings, network and hiring demand. Compare available Search Appearances, relevant profile views and recruiter conversations over time, rather than expecting an immediate ranking change.",
+        a: "Profile views usually move within the first two weeks. Recruiter approaches depend on your field and market, and are a matter of months rather than days.",
       },
-      { q: "How much does LinkedIn optimization cost in Sri Lanka?", a: `${pricingSummary("linkedin")}. Essential is team-crafted and checked by Chanuka; Signature is personally crafted by him. See the calculator for your total.` },
-      { q: "Can you guarantee the top result in LinkedIn recruiter searches?", a: "No. LinkedIn controls its search and personalizes results. The service improves the clarity, relevance and completeness of your profile; it cannot guarantee a position, number of views or job offer." },
-      { q: "Is LinkedIn optimization the same as managing my account?", a: "No. This service provides profile content and placement guidance. It does not include account operation, posting on your behalf, paid promotion or messaging recruiters from your account." },
     ],
     related: [
       { href: "/cv-writing", label: "ATS Friendly CV" },
       { href: "/cover-letter-writing", label: "Cover Letter Writing" },
       { href: "/packages", label: "Packages and pricing" },
       { href: "/reviews", label: "Reviews" },
-      { href: "/linkedin-profile-guide-sri-lanka", label: "LinkedIn headline and profile examples for Sri Lanka" },
     ],
   },
   {
@@ -178,9 +141,9 @@ export const servicePages: ServicePage[] = [
     packageService: "cover-letter",
     title: "A letter written for one role, not a template with the name swapped in.",
     lead: "A cover letter is either the most wasted page in your application or the one that explains why you, specifically, for this role. The difference is whether it was written for the advert in front of you.",
-    metaTitle: "Cover Letter Writing Service in Sri Lanka",
+    metaTitle: "Professional Cover Letter Writing",
     metaDescription:
-      "Cover letter writing in Sri Lanka for a specific role and employer, written to the job description in the tone that employer expects. From LKR 2,950.",
+      "Tailored cover letter writing for a specific role and employer. Written to the job description, matched to your target market's tone.",
     deliverables: [
       "A cover letter tailored to one target role",
       "A reusable structure you can adapt for future applications",
@@ -224,11 +187,10 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "cv-review",
-    packageService: "cv-review",
     name: "CV Review",
     title: "An honest read of the CV you already have.",
     lead: "Sometimes the document is closer than you think and needs direction rather than a rewrite. A review tells you what is working, what is costing you interviews, and whether a rewrite is worth paying for.",
-    metaTitle: "CV Review in Sri Lanka: Professional CV Critique",
+    metaTitle: "Professional CV Review and Critique",
     metaDescription:
       "A detailed written critique of your existing CV: ATS readability, structure, achievements, positioning and market fit, with clear next steps.",
     deliverables: [

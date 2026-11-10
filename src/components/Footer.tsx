@@ -17,16 +17,28 @@ const columns = [
     ],
   },
   {
+    title: "Markets",
+    links: [
+      { label: "United Kingdom", href: "/uk" },
+      { label: "United States", href: "/usa" },
+      { label: "Australia", href: "/australia" },
+      { label: "Canada", href: "/canada" },
+      { label: "New Zealand", href: "/new-zealand" },
+      { label: "United Arab Emirates", href: "/uae" },
+      { label: "Singapore", href: "/singapore" },
+      { label: "All markets", href: "/countries" },
+    ],
+  },
+  {
     title: "Guidance",
     links: [
-      { label: "CV format Sri Lanka", href: "/cv-format-sri-lanka" },
-      { label: "CV format සිංහලෙන්", href: "/cv-format-sinhala" },
-      { label: "Foreign job CV", href: "/foreign-job-cv-sri-lanka" },
-      { label: "Choosing a CV writer", href: "/how-to-choose-a-cv-writer-sri-lanka" },
-      { label: "LinkedIn profile guide", href: "/linkedin-profile-guide-sri-lanka" },
       { label: "Job roles", href: "/job-roles" },
       { label: "Industries", href: "/industries" },
+      { label: "Career levels", href: "/career-levels" },
+      { label: "Career situations", href: "/career-situations" },
+      { label: "Applying abroad", href: "/international-job-seekers" },
       { label: "Career advice", href: "/career-advice" },
+      { label: "Free resources", href: "/resources" },
     ],
   },
   {
@@ -59,7 +71,7 @@ export function Footer() {
   return (
     <footer className="border-t border-line bg-paper pb-28 sm:pb-24 pt-14 lg:pb-14 pb-safe">
       <div className="container-page">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-[1.2fr_repeat(4,minmax(0,1fr))]">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))]">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1 lg:max-w-xs">
             <Link
               href="/"
@@ -105,9 +117,9 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[12.5px] text-muted">
-            © {new Date().getFullYear()} {site.name}. All rights reserved. Prices in LKR.
+            © {new Date().getFullYear()} {site.name}. All rights reserved. Prices in USD.
           </p>
-          <p className="text-[12.5px] text-muted">Personal Executive Brand · Sri Lanka</p>
+          <p className="text-[12.5px] text-muted">Personal Executive Brand · Clients in 40+ countries</p>
         </div>
       </div>
     </footer>
