@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 import { DirectoryHub } from "@/components/DirectoryHub";
 import { careerSituations } from "@/lib/career-stages";
-
+//....
 export const metadata: Metadata = pageMetadata({
   title: "Career situations",
   description: "CV guidance for a specific situation: changing career, returning after a break, first job, applying abroad, or after redundancy.",
