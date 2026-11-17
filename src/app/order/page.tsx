@@ -39,14 +39,16 @@ export default async function OrderPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Order"
-        title="Four steps and your order is placed."
-        lead="Nothing is added after this point. The total you see is the total you pay."
-        crumbs={[{ label: "Order" }]}
-      />
+      <div className={preconfigured ? "hidden lg:block" : ""}>
+        <PageHeader
+          eyebrow="Order"
+          title="Four steps and your order is placed."
+          lead="Nothing is added after this point. The total you see is the total you pay."
+          crumbs={[{ label: "Order" }]}
+        />
+      </div>
 
-      <section className="py-12 lg:py-16">
+      <section className={`py-6 sm:py-10 lg:py-16 ${preconfigured ? "pt-3 sm:pt-6" : ""}`}>
         <div className="container-page">
           <OrderWizard
             initialTier={params.tier === "signature" ? "signature" : "essential"}

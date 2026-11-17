@@ -27,16 +27,14 @@ export function Configurator() {
   // Configuration state
   const [tier, setTier] = useState<TierId>("essential");
   const [level, setLevel] = useState<LevelId>("3-to-9");
-  const [packageId, setPackageId] = useState("complete");
+  const [packageId, setPackageId] = useState("ats-cv");
   const [delivery, setDelivery] = useState<DeliveryId>("normal");
-  const [tab, setTab] = useState<"bundles" | "singles">("bundles");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const bundles = useMemo(() => packages.filter((p) => p.includes.length > 1), []);
   const singles = useMemo(() => packages.filter((p) => p.includes.length === 1), []);
 
   const availableSingles = useMemo(() => {
@@ -67,7 +65,7 @@ export function Configurator() {
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" });
   }, [delivery, mounted]);
 
-  const orderHref = `/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}`;
+  const orderHref = `/order?package=${pkg.id}&level=${level}&delivery=${delivery}&tier=${tier}#order-form`;
   
   const whatsappDiscussUrl = whatsappUrl(
     `Hi Chanuka, I would like to discuss the ${tier} ${pkgDisplayName} (${formatLKR(q.total)}) for ${levelObj?.name} (${levelObj?.hint}).`
@@ -98,15 +96,6 @@ export function Configurator() {
   const handleSelectDelivery = (newDelivery: DeliveryId) => {
     setDelivery(newDelivery);
     setDone((d) => ({ ...d, 3: true }));
-  };
-
-  const handleTabChange = (newTab: "bundles" | "singles") => {
-    setTab(newTab);
-    if (newTab === "bundles" && singles.some((p) => p.id === packageId)) {
-      setPackageId("complete");
-    } else if (newTab === "singles" && bundles.some((p) => p.id === packageId)) {
-      setPackageId("ats-cv");
-    }
   };
 
   return (
@@ -294,51 +283,14 @@ export function Configurator() {
 
                   {activeStep === 2 && (
                     <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-2.5">
-                      {/* Bundle / Single selector tabs */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleTabChange("bundles")}
-                          aria-pressed={tab === "bundles"}
-                          className={`rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer ${
-                            tab === "bundles"
-                              ? "border-brand bg-brand text-paper shadow-md"
-                              : "border-line bg-surface text-ink hover:border-brand/40 hover:bg-sand/30"
-                          }`}
-                        >
-                          <span className="block text-[12.5px] font-extrabold leading-tight">Complete Bundles</span>
-                          <span
-                            className={`mt-0.5 block text-[10.5px] font-semibold ${
-                              tab === "bundles" ? "text-amber-300" : "text-muted"
-                            }`}
-                          >
-                            All-in-one suite
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleTabChange("singles")}
-                          aria-pressed={tab === "singles"}
-                          className={`rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer ${
-                            tab === "singles"
-                              ? "border-brand bg-brand text-paper shadow-md"
-                              : "border-line bg-surface text-ink hover:border-brand/40 hover:bg-sand/30"
-                          }`}
-                        >
-                          <span className="block text-[12.5px] font-extrabold leading-tight">Single Services</span>
-                          <span
-                            className={`mt-0.5 block text-[10.5px] font-semibold ${
-                              tab === "singles" ? "text-paper/70" : "text-muted"
-                            }`}
-                          >
-                            Just one service
-                          </span>
-                        </button>
-                      </div>
+                      {/* Helper line */}
+                      <p className="px-1 text-[11px] text-muted">
+                        Pick one service on its own.
+                      </p>
 
-                      {/* Package Item Rows */}
+                      {/* Package Item Rows (Single Services Only) */}
                       <div className="space-y-1.5">
-                        {(tab === "bundles" ? bundles : availableSingles).map((p) => {
+                        {availableSingles.map((p) => {
                           const isSelected = p.id === packageId;
                           const name = getPackageDisplayName(p, level);
                           const rowQuote = quote(p, level, delivery, tier);
@@ -373,11 +325,7 @@ export function Configurator() {
                                     {name}
                                   </span>
                                   <span className="text-[10.5px] text-muted block leading-tight mt-0.5">
-                                    {p.id === "complete"
-                                      ? `Full ${levelObj?.name}`
-                                      : p.includes.length > 1
-                                      ? `${p.includes.length} services`
-                                      : "Single service"}
+                                    {p.blurb || "Single service"}
                                   </span>
                                 </div>
                               </div>
@@ -411,7 +359,7 @@ export function Configurator() {
                       </span>
                       <div className="truncate">
                         <span className="text-[13px] font-bold text-ink block leading-tight">
-                          Turnaround speed
+                          Delivery Time
                         </span>
                         {deliveryOption && (
                           <span className="text-[11.5px] font-medium text-accent-deep truncate block">

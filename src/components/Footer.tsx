@@ -12,7 +12,6 @@ const columns = [
       { label: "ATS Friendly CV", href: "/cv-writing" },
       { label: "LinkedIn Optimization", href: "/linkedin-optimisation" },
       { label: "Cover Letter Writing", href: "/cover-letter-writing" },
-      { label: "CV Review & Audit", href: "/cv-review" },
       { label: "CV Samples & Formats", href: "/cv-samples" },
     ],
   },

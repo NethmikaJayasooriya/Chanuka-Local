@@ -96,6 +96,18 @@ export function OrderWizard({
   // wizard on "Your details" so they are not asked to choose it all over
   // again. The package stays editable through the "Change" link below.
   const [step, setStep] = useState(preconfigured ? 1 : 0);
+
+  useEffect(() => {
+    if (preconfigured || (typeof window !== "undefined" && window.location.hash === "#order-form")) {
+      const el = document.getElementById("order-form");
+      if (el) {
+        const timer = setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 80);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [preconfigured]);
   const [packageId, setPackageId] = useState(initialPackage);
   const [tier, setTier] = useState<TierId>(initialTier);
   const [level, setLevel] = useState<LevelId>(initialLevel);
@@ -191,7 +203,7 @@ Notes: ${details.notes || "-"}`;
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
+    <div id="order-form" className="scroll-mt-16 sm:scroll-mt-20 grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
       <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
         {/* Mobile Quick Order Pill */}
         <div className="lg:hidden mb-5 rounded-xl border border-brand/20 bg-brand-soft/40 px-3.5 py-2.5 flex items-center justify-between">

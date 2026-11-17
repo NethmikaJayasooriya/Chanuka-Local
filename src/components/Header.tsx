@@ -10,8 +10,6 @@ const servicesList = [
   { label: "LinkedIn Optimization", href: "/linkedin-optimisation", desc: "Profile rewritten so recruiters find you" },
   { label: "Foreign Job CV", href: "/foreign-job-cv-sri-lanka", desc: "Gulf, UK, Europe, Australia and Canada formats" },
   { label: "Cover Letter Writing", href: "/cover-letter-writing", desc: "Targeted to specific roles and companies" },
-  { label: "CV Review & Audit", href: "/cv-review", desc: "1:1 review and ATS compliance audit" },
-  { label: "Career Strategy", href: "/career-strategy", desc: "Senior and executive positioning strategy" },
 ];
 
 export function Header() {

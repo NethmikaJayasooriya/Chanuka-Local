@@ -46,10 +46,10 @@ export function pricingSummary(service: ServiceId = "cv"): string {
 
 export const BUNDLE_DISCOUNT: Record<number, number> = {
   1: 0,
-  2: 0,
-  3: 0,
-  4: 0,
-  5: 0,
+  2: 0.2,
+  3: 0.3,
+  4: 0.3,
+  5: 0.3,
 };
 
 export type Package = {
