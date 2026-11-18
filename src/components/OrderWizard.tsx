@@ -17,7 +17,11 @@ import {
   getPackageDisplayName,
   quote,
   services,
+  formatLKR,
   usd,
+  TIER_PRICES,
+  type Package,
+  type ServiceId,
   type DeliveryId,
   type LevelId,
 } from "@/lib/pricing";
@@ -109,20 +113,120 @@ export function OrderWizard({
       }
     }
   }, [preconfigured]);
-  const [packageId, setPackageId] = useState(initialPackage);
+  const initialServices = useMemo<ServiceId[]>(() => {
+    const resolved = resolvePackage(initialPackage);
+    if (resolved && resolved.includes && resolved.includes.length > 0) {
+      return resolved.includes.filter((s) => s !== "cv-review");
+    }
+    return ["cv"];
+  }, [initialPackage]);
+
+  const [selectedServices, setSelectedServices] = useState<ServiceId[]>(initialServices);
   const [tier, setTier] = useState<TierId>(initialTier);
   const [level, setLevel] = useState<LevelId>(initialLevel);
   const [delivery, setDelivery] = useState<DeliveryId>(initialDelivery);
+  const [conflictAction, setConflictAction] = useState<{
+    target: ServiceId;
+    replace: ServiceId;
+    message: string;
+  } | null>(null);
   const [details, setDetails] = useState<Details>({
     ...emptyDetails,
     targetCountry: initialCountry,
     targetRole: initialRole,
   });
 
-  const pkg = useMemo(
-    () => resolvePackage(packageId) ?? packages[0],
-    [packageId]
-  );
+  // Ensure consultation (if not over-10) and cv-review are deselected
+  useEffect(() => {
+    if (selectedServices.includes("cv-review") || (level !== "over-10" && selectedServices.includes("consultation"))) {
+      setSelectedServices((prev) => {
+        const next = prev.filter((s) => s !== "cv-review" && (level === "over-10" || s !== "consultation"));
+        return next.length > 0 ? next : ["cv"];
+      });
+    }
+  }, [level, selectedServices]);
+
+  const singles = useMemo(() => packages.filter((p) => p.includes.length === 1), []);
+
+  const availableSingles = useMemo(() => {
+    return singles.filter((p) => {
+      const s = p.includes[0];
+      if (s === "cv-review") return false;
+      if (s === "consultation" && level !== "over-10") return false;
+      return true;
+    });
+  }, [singles, level]);
+
+  const activeServices = useMemo(() => {
+    const valid = selectedServices.filter((s) => {
+      if (s === "cv-review") return false;
+      if (s === "consultation" && level !== "over-10") return false;
+      return true;
+    });
+    return valid.length > 0 ? valid : (["cv"] as ServiceId[]);
+  }, [selectedServices, level]);
+
+  const pkg: Package = useMemo(() => {
+    if (activeServices.length === 1) {
+      const matched = packages.find(
+        (p) => p.includes.length === 1 && p.includes[0] === activeServices[0]
+      );
+      if (matched) return matched;
+    }
+    if (activeServices.length === 2) {
+      const matched = packages.find((p) => {
+        if (p.id === "complete") return false;
+        return (
+          p.includes.length === 2 &&
+          p.includes.every((s) => activeServices.includes(s))
+        );
+      });
+      if (matched) return matched;
+    }
+
+    const shortNames = activeServices.map((s) => services[s]?.short || s);
+    const fullName = shortNames.join(" + ");
+    return {
+      id: `custom_${activeServices.join("_")}`,
+      name: fullName,
+      includes: activeServices,
+      blurb: `Custom package: ${shortNames.join(", ")}`,
+    };
+  }, [activeServices]);
+
+  const handleToggleService = (serviceId: ServiceId) => {
+    if (selectedServices.includes(serviceId)) {
+      if (selectedServices.length <= 1) return;
+      setSelectedServices((prev) => prev.filter((s) => s !== serviceId));
+      if (conflictAction && (conflictAction.target === serviceId || conflictAction.replace === serviceId)) {
+        setConflictAction(null);
+      }
+      return;
+    }
+
+    if (serviceId === "foreign-cv" && selectedServices.includes("cv")) {
+      setConflictAction({
+        target: "foreign-cv",
+        replace: "cv",
+        message:
+          "ATS CV Writing and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS CV Writing or international Foreign Job CV.",
+      });
+      return;
+    }
+
+    if (serviceId === "cv" && selectedServices.includes("foreign-cv")) {
+      setConflictAction({
+        target: "cv",
+        replace: "foreign-cv",
+        message:
+          "ATS CV Writing and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS CV Writing or international Foreign Job CV.",
+      });
+      return;
+    }
+
+    setConflictAction(null);
+    setSelectedServices((prev) => [...prev, serviceId]);
+  };
   const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
   const packageName = `${tiers.find((item) => item.id === tier)!.name} · ${getPackageDisplayName(pkg, level)}`;
   const levelName = levels.find((l) => l.id === level)?.name ?? "";
@@ -203,13 +307,6 @@ Notes: ${details.notes || "-"}`;
     }
   };
 
-  const availablePackages = useMemo(() => {
-    if (pkg && !packages.some((p) => p.id === pkg.id)) {
-      return [pkg, ...packages];
-    }
-    return packages;
-  }, [pkg]);
-
   return (
     <div id="order-form" className="scroll-mt-16 sm:scroll-mt-20 grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
       <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
@@ -219,7 +316,7 @@ Notes: ${details.notes || "-"}`;
             <span className="text-[10px] font-bold uppercase tracking-wider text-accent-deep block">Selected Package</span>
             <span className="text-[13px] font-bold text-ink truncate block">{packageName}</span>
           </div>
-          <span className="stat-number text-[20px] font-extrabold text-ink shrink-0">{usd(q.total)}</span>
+          <span className="stat-number text-[20px] font-extrabold text-ink shrink-0">{formatLKR(q.total)}</span>
         </div>
 
         {/* Responsive Step Progress */}
@@ -287,21 +384,146 @@ Notes: ${details.notes || "-"}`;
           {step === 0 && (
             <div className="space-y-6 sm:space-y-8">
               <TierSelector value={tier} onChange={setTier} />
-              <div>
-                <h2 className="text-[14.5px] sm:text-[15px] font-semibold text-ink">Confirm your package</h2>
-                <div className="mt-3.5 sm:mt-4 grid gap-2.5 sm:grid-cols-2">
-                  {availablePackages.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      aria-pressed={p.id === packageId}
-                      onClick={() => setPackageId(p.id)}
-                      className={`${optionBase} ${p.id === packageId ? optionOn : optionOff}`}
-                    >
-                      <span className="text-[14px] font-semibold text-ink">{p.name}</span>
-                      <p className="mt-1 text-[12.5px] leading-snug text-muted">{p.blurb}</p>
-                    </button>
-                  ))}
+
+              {/* Multi-select Services */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-[14.5px] sm:text-[15px] font-semibold text-ink">Select your services</h2>
+                    <p className="mt-0.5 text-[12.5px] text-muted">Select one or more services to customize your package:</p>
+                  </div>
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-accent-deep bg-accent/10 border border-accent/25 px-2.5 py-1 rounded-full shrink-0">
+                    {activeServices.length} selected
+                  </span>
+                </div>
+
+                {/* Conflict Guidance Notice */}
+                {conflictAction && (
+                  <div className="rounded-2xl border border-brand/20 bg-brand-soft/50 p-3.5 sm:p-4 shadow-xs">
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand mt-0.5">
+                          <svg viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
+                            <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.5a1 1 0 110 2 1 1 0 010-2zM6.75 8a.75.75 0 01.75-.75h1a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-2.75h-.25A.75.75 0 016.75 8z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[13px] font-bold text-ink block">
+                            Cannot select both CV formats at once
+                          </span>
+                          <p className="mt-0.5 text-[12px] text-muted leading-relaxed">
+                            {conflictAction.message}
+                          </p>
+                          <div className="mt-2.5 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedServices((prev) =>
+                                  prev.map((s) => (s === conflictAction.replace ? conflictAction.target : s))
+                                );
+                                setConflictAction(null);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-deep text-paper font-semibold text-[12px] transition-colors cursor-pointer shadow-xs"
+                            >
+                              <span>Switch to {services[conflictAction.target]?.name || "selected CV"}</span>
+                              <span>→</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setConflictAction(null)}
+                              className="px-2.5 py-1.5 rounded-xl text-muted hover:text-ink text-[12px] font-medium transition-colors cursor-pointer"
+                            >
+                              Keep current
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setConflictAction(null)}
+                        className="text-muted hover:text-ink text-sm p-1 -mt-0.5 shrink-0 cursor-pointer transition-colors"
+                        aria-label="Close notice"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid gap-2.5 sm:grid-cols-2">
+                  {availableSingles.map((p) => {
+                    const sId = p.includes[0] as ServiceId;
+                    const isSelected = activeServices.includes(sId);
+                    const name = services[sId]?.name || p.name;
+                    const servicePrice = TIER_PRICES[tier][sId][level];
+                    const isConflicting =
+                      (!isSelected && sId === "foreign-cv" && activeServices.includes("cv")) ||
+                      (!isSelected && sId === "cv" && activeServices.includes("foreign-cv"));
+
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        onClick={() => handleToggleService(sId)}
+                        className={`w-full rounded-xl border p-3.5 sm:p-4 text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+                          isSelected
+                            ? "border-accent bg-accent-soft/60 shadow-[0_0_0_1px_var(--color-accent)] text-ink"
+                            : isConflicting
+                            ? "border-line bg-surface/80 hover:border-brand/40 text-ink"
+                            : "border-line bg-surface hover:border-line-strong text-ink"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span
+                                className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                                  isSelected
+                                    ? "border-brand bg-brand text-paper shadow-xs"
+                                    : isConflicting
+                                    ? "border-line-strong bg-sand/30"
+                                    : "border-line-strong bg-paper"
+                                }`}
+                              >
+                                {isSelected && (
+                                  <svg
+                                    viewBox="0 0 14 14"
+                                    fill="none"
+                                    className="h-3 w-3 stroke-current stroke-[2.5]"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <polyline points="2.5 7.5 5.5 10.5 11.5 3.5" />
+                                  </svg>
+                                )}
+                              </span>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[14px] font-semibold text-ink leading-snug">
+                                    {name}
+                                  </span>
+                                  {isConflicting && (
+                                    <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[9.5px] font-semibold bg-brand-soft/70 text-accent-deep border border-brand/15">
+                                      Pick 1 CV type
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <span className="stat-number text-[13.5px] font-extrabold text-ink shrink-0">
+                              {formatLKR(servicePrice)}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-[12px] leading-snug text-muted pl-7">
+                            {p.blurb}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -334,7 +556,20 @@ Notes: ${details.notes || "-"}`;
                       onClick={() => setDelivery(d.id)}
                       className={`${optionBase} ${d.id === delivery ? optionOn : optionOff}`}
                     >
-                      <span className="text-[14px] font-semibold text-ink">{d.name}</span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[14px] font-semibold text-ink">{d.name}</span>
+                        {d.note && (
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                              d.surcharge > 0
+                                ? "bg-accent/15 text-accent-deep border border-accent/25"
+                                : "bg-sand text-ink-soft"
+                            }`}
+                          >
+                            {d.note}
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-[12.5px] text-muted">{d.window}</p>
                     </button>
                   ))}
@@ -543,32 +778,44 @@ Notes: ${details.notes || "-"}`;
           <p className="eyebrow">Your order</p>
           <p className="display mt-2 text-[21px] leading-tight text-ink">{packageName}</p>
           <p className="mt-1.5 text-[13px] text-muted">
-            {levelName} · {deliveryOption?.window}
+            {levelName} · {deliveryOption?.name} ({deliveryOption?.window})
           </p>
         </div>
         <div className="px-6 py-5">
-          <ul className="space-y-2.5">
-            {q.includedServices.map((s) => (
-              <li key={s} className="flex items-start gap-2.5 text-[13.5px] text-ink-soft">
-                <svg viewBox="0 0 16 16" aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-accent">
-                  <path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M3 8.5l3.2 3.2L13 5" />
-                </svg>
-                {services[s].name}
-              </li>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted block mb-3">
+            Service Breakdown:
+          </span>
+          <div className="space-y-2.5 text-[13px]">
+            {q.serviceBreakdown.map((item) => (
+              <div
+                key={item.serviceId}
+                className="flex items-center justify-between py-1 border-b border-line/40 text-ink"
+              >
+                <span className="font-normal text-ink-soft">{item.name}</span>
+                <span className="font-bold text-ink">{formatLKR(item.price)}</span>
+              </div>
             ))}
-            <li className="flex items-start gap-2.5 text-[13.5px] text-ink-soft">
-              <svg viewBox="0 0 16 16" aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-accent">
-                <path fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" d="M3 8.5l3.2 3.2L13 5" />
-              </svg>
-              One revision round included
-            </li>
-          </ul>
+            {q.deliveryFee > 0 && (
+              <div className="flex items-center justify-between py-1 border-b border-line/40 text-ink">
+                <span className="font-normal text-ink-soft">
+                  {deliveryOption?.name} ({deliveryOption?.note})
+                </span>
+                <span className="font-bold text-ink">+{formatLKR(q.deliveryFee)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between py-1 text-[12px] text-muted">
+              <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
+              <span className="font-semibold text-emerald-600">
+                {tier === "signature" ? "30 days included" : "1 round included"}
+              </span>
+            </div>
+          </div>
 
           <div className="mt-6 flex items-end justify-between border-t border-line pt-5">
             <span className="text-[13px] font-medium text-muted">Total</span>
-            <span className="stat-number text-[32px] leading-none text-ink">{usd(q.total)}</span>
+            <span className="stat-number text-[30px] font-black leading-none text-ink">{formatLKR(q.total)}</span>
           </div>
-          <p className="mt-4 text-center text-[12px] leading-relaxed text-muted">
+          <p className="mt-3 text-center text-[12px] leading-relaxed text-muted">
             Prices in LKR. Nothing is added at checkout.
           </p>
         </div>
