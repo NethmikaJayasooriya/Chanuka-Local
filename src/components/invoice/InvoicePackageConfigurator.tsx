@@ -6,10 +6,11 @@ import {
   getCountryServicePrice,
   formatCountryAmount,
   getInvoicePackagePresets,
+  getCountryDeliveries,
+  getCountryBundleDiscount,
   type InvoicePackagePreset,
 } from "@/lib/invoicePackages";
 import {
-  deliveries,
   levels,
   packages,
   services,
@@ -71,6 +72,15 @@ export function InvoicePackageConfigurator({
     return INVOICE_COUNTRIES.find((c) => c.key === countryKey) || INVOICE_COUNTRIES[0];
   }, [countryKey]);
 
+  // Dynamic turnaround delivery options based on market
+  const countryDeliveries = useMemo(() => {
+    return getCountryDeliveries(countryKey);
+  }, [countryKey]);
+
+  const deliveryOption = useMemo(() => {
+    return countryDeliveries.find((d) => d.id === delivery) || countryDeliveries[0];
+  }, [countryDeliveries, delivery]);
+
   // Clean up consultation if level switches away from Executive
   useEffect(() => {
     if (selectedServices.includes("cv-review") || (level !== "over-10" && selectedServices.includes("consultation"))) {
@@ -116,7 +126,7 @@ export function InvoicePackageConfigurator({
         target: "foreign-cv",
         replace: "cv",
         message:
-          "ATS CV Writing and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS CV Writing or international Foreign Job CV.",
+          "ATS Friendly CV and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS Friendly CV or international Foreign Job CV.",
       });
       return;
     }
@@ -126,7 +136,7 @@ export function InvoicePackageConfigurator({
         target: "cv",
         replace: "foreign-cv",
         message:
-          "ATS CV Writing and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS CV Writing or international Foreign Job CV.",
+          "ATS Friendly CV and Foreign Job CV cannot be selected together in one package. Please choose either domestic ATS Friendly CV or international Foreign Job CV.",
       });
       return;
     }
@@ -136,17 +146,26 @@ export function InvoicePackageConfigurator({
   };
 
   const levelObj = levels.find((l) => l.id === level);
-  const deliveryOption = deliveries.find((d) => d.id === delivery);
   const tierObj = tiers.find((t) => t.id === tier);
 
-  // Computed Pricing for active country
+  const getLevelDisplay = (lvlId: LevelId) => {
+    if (countryKey === "com") {
+      if (lvlId === "under-2") return { name: "Under 2 years (Graduates)", hint: "Students & Recent Graduates", eyebrow: "Entry Level" };
+      if (lvlId === "3-to-9") return { name: "3 to 9 years (Professionals)", hint: "Mid-to-Senior Level Professionals", eyebrow: "Professional" };
+      if (lvlId === "over-10") return { name: "10+ years (Senior / Leadership)", hint: "Senior Leaders, Directors & Executives", eyebrow: "Executive" };
+    }
+    const l = levels.find((item) => item.id === lvlId);
+    return { name: l?.name || "", hint: l?.hint || "", eyebrow: l?.eyebrow || "" };
+  };
+
+  // Computed Base Pricing for active country
   const serviceBreakdown = useMemo(() => {
     return activeServices.map((sId) => {
       const price = getCountryServicePrice(countryKey, tier, sId, level);
-      const name = services[sId]?.name || sId;
+      const name = countryKey === "com" && sId === "cv" ? "ATS Friendly CV" : services[sId]?.name || sId;
       const tierLabel = tier === "signature" ? "Signature Tier" : "Essential Tier";
-      const levelLabel = levelObj?.name || "";
-      const description = `${name} (${levelLabel}) · ${tierLabel}`;
+      const lvlDisplay = getLevelDisplay(level);
+      const description = `${name} (${lvlDisplay.name}) · ${tierLabel}`;
       return {
         serviceId: sId,
         name,
@@ -154,35 +173,55 @@ export function InvoicePackageConfigurator({
         description,
       };
     });
-  }, [activeServices, countryKey, tier, level, levelObj]);
+  }, [activeServices, countryKey, tier, level]);
 
-  const subtotal = useMemo(() => {
+  // Level 2: Combined List Price
+  const listPrice = useMemo(() => {
     return serviceBreakdown.reduce((sum, item) => sum + item.price, 0);
   }, [serviceBreakdown]);
 
+  // Level 2: Bundle Discount
+  const { rate: bundleDiscountRate, percent: bundleDiscountPercent } = useMemo(() => {
+    return getCountryBundleDiscount(countryKey, activeServices.length);
+  }, [countryKey, activeServices.length]);
+
+  const bundleSaving = useMemo(() => {
+    if (bundleDiscountRate <= 0) return 0;
+    return Math.round(listPrice * bundleDiscountRate);
+  }, [listPrice, bundleDiscountRate]);
+
+  // Subtotal After Discount
+  const subtotal = listPrice - bundleSaving;
+
+  // Level 3: Delivery Surcharge applied to Subtotal
   const deliveryFee = useMemo(() => {
     if (!deliveryOption || deliveryOption.surcharge <= 0) return 0;
     return Math.round(subtotal * deliveryOption.surcharge);
   }, [subtotal, deliveryOption]);
 
+  // Final Total Due
   const total = subtotal + deliveryFee;
 
   const packageTitle = useMemo(() => {
     if (activeServices.length === 1) {
+      if (countryKey === "com" && activeServices[0] === "cv") return "ATS Friendly CV";
       return services[activeServices[0]]?.name || "Single Service";
     }
-    if (activeServices.length === 2) {
-      return activeServices.map((s) => services[s]?.short || s).join(" + ");
-    }
     if (
+      activeServices.length === 3 &&
       activeServices.includes("cv") &&
       activeServices.includes("linkedin") &&
       activeServices.includes("cover-letter")
     ) {
       return "Full Career Pack";
     }
+    if (activeServices.length === 2) {
+      return activeServices
+        .map((s) => (countryKey === "com" && s === "cv" ? "ATS CV" : services[s]?.short || s))
+        .join(" + ");
+    }
     return `${activeServices.length} Selected Services`;
-  }, [activeServices]);
+  }, [activeServices, countryKey]);
 
   const buildItemsPayload = () => {
     const payloadItems = serviceBreakdown.map((item) => ({
@@ -191,6 +230,15 @@ export function InvoicePackageConfigurator({
       unit_price: item.price,
       total: item.price,
     }));
+
+    if (bundleSaving > 0) {
+      payloadItems.push({
+        description: `Multi-Service Bundle Savings (${bundleDiscountPercent}% OFF bundle rate)`,
+        quantity: 1,
+        unit_price: -bundleSaving,
+        total: -bundleSaving,
+      });
+    }
 
     if (deliveryFee > 0 && deliveryOption) {
       payloadItems.push({
@@ -271,6 +319,8 @@ export function InvoicePackageConfigurator({
     if (onClose) onClose();
   };
 
+  const activeLevelDisplay = getLevelDisplay(level);
+
   return (
     <div
       role="dialog"
@@ -302,7 +352,7 @@ export function InvoicePackageConfigurator({
                 </span>
               </div>
               <p className="text-[11.5px] text-slate-500 mt-0.5 truncate">
-                Official website packages, experience levels & turnaround times with dynamic international rates
+                3-Tier Hierarchy: Career Stage Base Prices · Multi-Service Bundle Discounts · Turnaround Surcharges
               </p>
             </div>
           </div>
@@ -347,12 +397,12 @@ export function InvoicePackageConfigurator({
           </div>
         </div>
 
-        {/* Country Selector Sub-Bar */}
+        {/* Country Selector Sub-Bar (LK, COM, UK only) */}
         <div className="px-5 sm:px-6 py-2.5 bg-slate-100/70 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
             Select Country / Market:
           </span>
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             {INVOICE_COUNTRIES.map((c) => {
               const isSelected = c.key === countryKey;
               return (
@@ -377,7 +427,7 @@ export function InvoicePackageConfigurator({
           </div>
         </div>
 
-        {/* Mobile Mode Switcher (Visible only on small screens) */}
+        {/* Mobile Mode Switcher */}
         <div className="sm:hidden px-5 py-2 border-b border-slate-200 bg-white flex items-center justify-center">
           <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 text-[11.5px] font-semibold w-full">
             <button
@@ -411,41 +461,43 @@ export function InvoicePackageConfigurator({
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
               {/* Left Column: 3 Steps */}
               <div className="space-y-4">
-                {/* Tier Selector */}
-                <div>
-                  <label className="text-[11.5px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
-                    Service Tier
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {tiers.map((t) => {
-                      const isSelected = t.id === tier;
-                      return (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => setTier(t.id)}
-                          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                            isSelected
-                              ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600 shadow-xs text-slate-900"
-                              : "border-slate-200 bg-white hover:border-slate-300 text-slate-700"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[13.5px] font-bold text-slate-900">{t.name}</span>
-                            {isSelected && (
-                              <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">
-                                ✓
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
-                            {t.description}
-                          </p>
-                        </button>
-                      );
-                    })}
+                {/* Service Tier (For LK / UK, or toggle on COM) */}
+                {countryKey !== "com" && (
+                  <div>
+                    <label className="text-[11.5px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
+                      Service Tier
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {tiers.map((t) => {
+                        const isSelected = t.id === tier;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setTier(t.id)}
+                            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600 shadow-xs text-slate-900"
+                                : "border-slate-200 bg-white hover:border-slate-300 text-slate-700"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13.5px] font-bold text-slate-900">{t.name}</span>
+                              {isSelected && (
+                                <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                                  ✓
+                                </span>
+                              )}
+                            </div>
+                            <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
+                              {t.description}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* STEP 1: CAREER STAGE */}
                 <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
@@ -460,10 +512,10 @@ export function InvoicePackageConfigurator({
                       </span>
                       <div className="truncate">
                         <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
-                          Career Stage / Experience Level
+                          Hierarchy Level 1: Career Stage (Sets Base Price)
                         </span>
                         <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
-                          {levelObj?.name} · {levelObj?.hint}
+                          {activeLevelDisplay.name} · {activeLevelDisplay.hint}
                         </span>
                       </div>
                     </div>
@@ -476,6 +528,9 @@ export function InvoicePackageConfigurator({
                     <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2">
                       {levels.map((l) => {
                         const isSelected = l.id === level;
+                        const lvlInfo = getLevelDisplay(l.id);
+                        const cvPrice = getCountryServicePrice(countryKey, tier, "cv", l.id);
+
                         return (
                           <button
                             key={l.id}
@@ -492,20 +547,17 @@ export function InvoicePackageConfigurator({
                           >
                             <div>
                               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
-                                {l.eyebrow}
+                                {lvlInfo.eyebrow}
                               </span>
                               <span className="text-[13px] font-bold text-slate-900 block leading-snug">
-                                {l.name}
+                                {lvlInfo.name}
                               </span>
                               <span className="text-[11.5px] text-slate-500 block">
-                                {l.hint}
+                                {lvlInfo.hint}
                               </span>
                             </div>
                             <span className="text-[13px] font-extrabold text-slate-900 font-mono shrink-0 ml-3">
-                              {formatCountryAmount(
-                                getCountryServicePrice(countryKey, tier, "cv", l.id),
-                                countryKey
-                              )}{" "}
+                              {formatCountryAmount(cvPrice, countryKey)}{" "}
                               <span className="text-[10.5px] font-normal text-slate-400 font-sans">(CV)</span>
                             </span>
                           </button>
@@ -515,7 +567,7 @@ export function InvoicePackageConfigurator({
                   )}
                 </div>
 
-                {/* STEP 2: PACKAGE OPTIONS (MULTI-SELECT) */}
+                {/* STEP 2: PACKAGE OPTIONS (MULTI-SELECT & BUNDLE DISCOUNT) */}
                 <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
                   <button
                     type="button"
@@ -528,11 +580,18 @@ export function InvoicePackageConfigurator({
                       </span>
                       <div className="truncate">
                         <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
-                          Package Services (Multi-select)
+                          Hierarchy Level 2: Services & Bundle Discount
                         </span>
-                        <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
-                          {activeServices.length} service{activeServices.length > 1 ? "s" : ""} selected · {formatCountryAmount(subtotal, countryKey)}
-                        </span>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[12px] font-medium text-blue-700">
+                            {activeServices.length} service{activeServices.length > 1 ? "s" : ""} selected · Subtotal: {formatCountryAmount(subtotal, countryKey)}
+                          </span>
+                          {bundleSaving > 0 && (
+                            <span className="inline-flex items-center rounded px-1.5 py-0.2 text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              {bundleDiscountPercent}% OFF applied (-{formatCountryAmount(bundleSaving, countryKey)})
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span className="text-[11.5px] font-semibold text-slate-500 shrink-0 ml-2">
@@ -542,9 +601,11 @@ export function InvoicePackageConfigurator({
 
                   {activeStep === 2 && (
                     <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2.5">
-                      <div className="flex items-center justify-between px-1">
+                      <div className="flex items-center justify-between px-1 flex-wrap gap-1">
                         <span className="text-[11.5px] text-slate-500">
-                          Select one or more services to bundle into this invoice:
+                          {countryKey === "com"
+                            ? "Bundle Discounts: 2 Services = 20% OFF · 3 Services = 30% OFF"
+                            : "Select services to include in this invoice package:"}
                         </span>
                         <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-full">
                           {activeServices.length} selected
@@ -604,7 +665,7 @@ export function InvoicePackageConfigurator({
                         {availableSingles.map((p) => {
                           const sId = p.includes[0] as ServiceId;
                           const isSelected = activeServices.includes(sId);
-                          const name = services[sId]?.name || p.name;
+                          const name = countryKey === "com" && sId === "cv" ? "ATS Friendly CV" : services[sId]?.name || p.name;
                           const servicePrice = getCountryServicePrice(countryKey, tier, sId, level);
                           const isConflicting =
                             (!isSelected && sId === "foreign-cv" && activeServices.includes("cv")) ||
@@ -669,7 +730,7 @@ export function InvoicePackageConfigurator({
                   )}
                 </div>
 
-                {/* STEP 3: TURNAROUND SPEED */}
+                {/* STEP 3: TURNAROUND SPEED & SURCHARGE */}
                 <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
                   <button
                     type="button"
@@ -682,7 +743,7 @@ export function InvoicePackageConfigurator({
                       </span>
                       <div className="truncate">
                         <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
-                          Delivery Speed & Turnaround
+                          Hierarchy Level 3: Delivery Speed Surcharge
                         </span>
                         <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
                           {deliveryOption?.name} ({deliveryOption?.window}) · {deliveryOption?.note}
@@ -696,7 +757,10 @@ export function InvoicePackageConfigurator({
 
                   {activeStep === 3 && (
                     <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2">
-                      {deliveries.map((d) => {
+                      <p className="text-[11.5px] text-slate-500 px-1 pb-1">
+                        Surcharge percentage applies to the discounted Subtotal:
+                      </p>
+                      {countryDeliveries.map((d) => {
                         const isSelected = d.id === delivery;
                         return (
                           <button
@@ -753,7 +817,7 @@ export function InvoicePackageConfigurator({
                 <div className="pb-3 border-b border-slate-100">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 block">
-                      {tierObj?.name} Tier · {country.name}
+                      {countryKey === "com" ? "Official US / Global Rates" : `${tierObj?.name} Tier`} · {country.name}
                     </span>
                     <span className="text-base">{country.flag}</span>
                   </div>
@@ -761,17 +825,29 @@ export function InvoicePackageConfigurator({
                     {packageTitle}
                   </h4>
                   <p className="text-[12px] text-slate-500 mt-0.5">
-                    {levelObj?.name} · {levelObj?.hint}
+                    {activeLevelDisplay.name}
                   </p>
                 </div>
 
-                {/* Price display */}
+                {/* Price display with Strikethrough & Savings Badge */}
                 <div className="py-4 border-b border-slate-100">
-                  <div className="text-3xl font-black text-slate-950 font-mono tracking-tight leading-tight">
-                    {formatCountryAmount(total, countryKey)}
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <div className="text-3xl font-black text-slate-950 font-mono tracking-tight leading-tight">
+                      {formatCountryAmount(total, countryKey)}
+                    </div>
+                    {bundleSaving > 0 && (
+                      <div className="text-base font-semibold text-slate-400 line-through font-mono">
+                        {formatCountryAmount(listPrice + deliveryFee, countryKey)}
+                      </div>
+                    )}
                   </div>
+                  {bundleSaving > 0 && (
+                    <div className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <span>🎉 You save {formatCountryAmount(bundleSaving, countryKey)} ({bundleDiscountPercent}% OFF bundle)</span>
+                    </div>
+                  )}
                   <p className="text-[11.5px] text-slate-500 mt-1">
-                    Combined price in {country.currency} ({country.label})
+                    Combined total in {country.currency} ({country.label})
                   </p>
                 </div>
 
@@ -791,20 +867,39 @@ export function InvoicePackageConfigurator({
                       </span>
                     </div>
                   ))}
+
+                  {/* Bundle Savings Row */}
+                  {bundleSaving > 0 && (
+                    <div className="flex items-center justify-between py-1 text-emerald-700 bg-emerald-50/70 px-2 rounded-lg border border-emerald-200/60 font-semibold text-[12px]">
+                      <span>Bundle Savings ({bundleDiscountPercent}% OFF)</span>
+                      <span className="font-mono">-{formatCountryAmount(bundleSaving, countryKey)}</span>
+                    </div>
+                  )}
+
+                  {/* Subtotal after discount */}
+                  {bundleSaving > 0 && (
+                    <div className="flex items-center justify-between py-1 text-slate-900 font-semibold border-t border-slate-100 pt-1.5">
+                      <span>Subtotal After Discount</span>
+                      <span className="font-mono">{formatCountryAmount(subtotal, countryKey)}</span>
+                    </div>
+                  )}
+
+                  {/* Delivery Surcharge Row */}
                   {deliveryFee > 0 && deliveryOption && (
                     <div className="flex items-center justify-between py-1 text-slate-700">
                       <span className="text-slate-600">
-                        {deliveryOption.name} ({deliveryOption.note})
+                        {deliveryOption.name} Delivery ({deliveryOption.note} on Subtotal)
                       </span>
                       <span className="font-bold text-amber-700 font-mono">
                         +{formatCountryAmount(deliveryFee, countryKey)}
                       </span>
                     </div>
                   )}
+
                   <div className="flex items-center justify-between pt-1 text-[11.5px] text-slate-500">
-                    <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
-                    <span className="font-semibold text-emerald-600">
-                      {tier === "signature" ? "30 days included" : "1 round included"}
+                    <span>Turnaround speed</span>
+                    <span className="font-semibold text-slate-800">
+                      {deliveryOption?.window}
                     </span>
                   </div>
                 </div>
@@ -907,7 +1002,7 @@ export function InvoicePackageConfigurator({
           <div className="flex items-center gap-2 text-[12px] text-slate-600">
             <span className="font-semibold text-slate-900">Current Selection:</span>
             <span>
-              {packageTitle} ({levelObj?.name}) · {tierObj?.name} Tier · {country.name}
+              {packageTitle} ({activeLevelDisplay.name}) · {deliveryOption?.name}
             </span>
             <span className="text-slate-400">|</span>
             <span className="font-bold text-slate-900 font-mono">

@@ -6,6 +6,7 @@ import {
   type LevelId,
   type ServiceId,
   type TierId,
+  type DeliveryId,
 } from "./pricing";
 
 export interface InvoiceCountry {
@@ -24,6 +25,58 @@ export const INVOICE_COUNTRIES: InvoiceCountry[] = [
   { key: "uk", name: "United Kingdom", label: "UK", currency: "GBP", symbol: "£", flag: "🇬🇧", site: "uk" },
 ];
 
+export interface InvoiceDeliveryOption {
+  id: DeliveryId;
+  name: string;
+  window: string;
+  surcharge: number;
+  note: string;
+}
+
+/**
+ * Returns country-specific delivery turnaround speeds.
+ * For .com (USD / Global):
+ *   Standard: 5 to 7 days (0% / Included)
+ *   Fast: 2 to 3 days (+20%)
+ *   Ultra fast: Within 24 hours (+50%)
+ * For .lk and .uk:
+ *   Standard: 5 to 7 days (Included)
+ *   Priority Express: 1 to 3 days (+20%)
+ *   VIP 24-Hour Express: Within 24 hours (+30%)
+ */
+export function getCountryDeliveries(countryKey: string): InvoiceDeliveryOption[] {
+  if (countryKey === "com") {
+    return [
+      { id: "normal", name: "Standard", window: "5 to 7 days", surcharge: 0, note: "Included" },
+      { id: "fast", name: "Fast", window: "2 to 3 days", surcharge: 0.20, note: "+20%" },
+      { id: "ultra", name: "Ultra fast", window: "Within 24 hours", surcharge: 0.50, note: "+50%" },
+    ];
+  }
+  return [
+    { id: "normal", name: "Standard", window: "5 to 7 days", surcharge: 0, note: "Included" },
+    { id: "fast", name: "Priority Express", window: "1 to 3 days", surcharge: 0.20, note: "+20%" },
+    { id: "ultra", name: "VIP 24-Hour Express", window: "Within 24 hours", surcharge: 0.30, note: "+30%" },
+  ];
+}
+
+/**
+ * Multi-service bundle discount hierarchy:
+ * For .com:
+ *   1 service: 0% discount
+ *   2 services: 20% OFF the combined list price
+ *   3+ services: 30% OFF the combined list price
+ */
+export function getCountryBundleDiscount(
+  countryKey: string,
+  serviceCount: number
+): { rate: number; percent: number } {
+  if (countryKey === "com") {
+    if (serviceCount === 2) return { rate: 0.20, percent: 20 };
+    if (serviceCount >= 3) return { rate: 0.30, percent: 30 };
+  }
+  return { rate: 0, percent: 0 };
+}
+
 export interface InvoicePackagePreset {
   id: string;
   name: string;
@@ -37,12 +90,8 @@ export interface InvoicePackagePreset {
 
 /**
  * Returns the full list of package presets for a given country code.
- * If country is Sri Lanka ('lk'), rates are strictly bound to official pricing.ts matrices.
  */
 export function getInvoicePackagePresets(countryKey: string): InvoicePackagePreset[] {
-  const country = INVOICE_COUNTRIES.find((c) => c.key === countryKey) || INVOICE_COUNTRIES[0];
-  const curr = country.currency;
-
   if (countryKey === "lk") {
     return getSriLankaPresets();
   }
@@ -71,9 +120,11 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
   levels.forEach((lvl) => {
     // Essential Full Career Pack (CV + LinkedIn + Cover Letter)
     const essPrice =
-      BASE_PRICES.cv[lvl.id] + BASE_PRICES.linkedin[lvl.id] + BASE_PRICES["cover-letter"][lvl.id];
+      BASE_PRICES.cv[lvl.id] +
+      BASE_PRICES.linkedin[lvl.id] +
+      BASE_PRICES["cover-letter"][lvl.id];
     presets.push({
-      id: `lk-ess-complete-${lvl.id}`,
+      id: `lk-full-ess-${lvl.id}`,
       name: `Full Career Pack (${lvl.label}) · Essential`,
       category: "Full Packages",
       tier: "Essential",
@@ -85,9 +136,11 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
 
     // Signature Full Career Pack
     const sigPrice =
-      SIGNATURE_PRICES.cv[lvl.id] + SIGNATURE_PRICES.linkedin[lvl.id] + SIGNATURE_PRICES["cover-letter"][lvl.id];
+      SIGNATURE_PRICES.cv[lvl.id] +
+      SIGNATURE_PRICES.linkedin[lvl.id] +
+      SIGNATURE_PRICES["cover-letter"][lvl.id];
     presets.push({
-      id: `lk-sig-complete-${lvl.id}`,
+      id: `lk-full-sig-${lvl.id}`,
       name: `Full Career Pack (${lvl.label}) · Signature`,
       category: "Full Packages",
       tier: "Signature",
@@ -96,90 +149,74 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
       unitPrice: sigPrice,
       currency: "LKR",
     });
-  });
 
-  // 2. Bundles: CV + LinkedIn
-  levels.forEach((lvl) => {
-    const essPrice = BASE_PRICES.cv[lvl.id] + BASE_PRICES.linkedin[lvl.id];
+    // CV + LinkedIn Combo
+    const cvLiPrice = BASE_PRICES.cv[lvl.id] + BASE_PRICES.linkedin[lvl.id];
     presets.push({
-      id: `lk-ess-cv-li-${lvl.id}`,
+      id: `lk-cv-li-${lvl.id}`,
       name: `CV + LinkedIn (${lvl.label}) · Essential`,
       category: "Full Packages",
       tier: "Essential",
       level: lvl.label as any,
-      description: `CV + LinkedIn Bundle (${lvl.label}): Achievement-led ATS CV Writing + Complete LinkedIn Profile Optimization · Essential Tier`,
-      unitPrice: essPrice,
+      description: `ATS CV Writing + LinkedIn Optimization Combo (${lvl.label})`,
+      unitPrice: cvLiPrice,
       currency: "LKR",
     });
 
-    const sigPrice = SIGNATURE_PRICES.cv[lvl.id] + SIGNATURE_PRICES.linkedin[lvl.id];
+    // CV + Cover Letter Combo
+    const cvClPrice = BASE_PRICES.cv[lvl.id] + BASE_PRICES["cover-letter"][lvl.id];
     presets.push({
-      id: `lk-sig-cv-li-${lvl.id}`,
-      name: `CV + LinkedIn (${lvl.label}) · Signature`,
-      category: "Full Packages",
-      tier: "Signature",
-      level: lvl.label as any,
-      description: `CV + LinkedIn Bundle (${lvl.label}): Personally Crafted by Chanuka Jeewantha with Industry Positioning and 30-Day Support`,
-      unitPrice: sigPrice,
-      currency: "LKR",
-    });
-  });
-
-  // 3. Bundles: CV + Cover Letter
-  levels.forEach((lvl) => {
-    const essPrice = BASE_PRICES.cv[lvl.id] + BASE_PRICES["cover-letter"][lvl.id];
-    presets.push({
-      id: `lk-ess-cv-cl-${lvl.id}`,
+      id: `lk-cv-cl-${lvl.id}`,
       name: `CV + Cover Letter (${lvl.label}) · Essential`,
       category: "Full Packages",
       tier: "Essential",
       level: lvl.label as any,
-      description: `CV + Cover Letter (${lvl.label}): Role-specific ATS CV Writing + Tailored Value-Pitch Cover Letter · Essential Tier`,
-      unitPrice: essPrice,
+      description: `ATS CV Writing + Role Cover Letter Combo (${lvl.label})`,
+      unitPrice: cvClPrice,
       currency: "LKR",
     });
   });
 
-  // 4. Individual Services
-  const singleServices: Array<{ id: ServiceId; name: string; blurb: string }> = [
-    { id: "cv", name: "ATS CV Writing", blurb: "Achievement-led ATS CV with modern recruiter layout" },
-    { id: "linkedin", name: "LinkedIn Optimization", blurb: "Full profile makeover (headline, about, skills, search visibility)" },
-    { id: "cover-letter", name: "Cover Letter Writing", blurb: "Role-specific persuasive pitch letter" },
+  // 2. Individual Services
+  const singleServicesList: Array<{ id: ServiceId; name: string; blurb: string }> = [
+    { id: "cv", name: "ATS CV Writing", blurb: "Achievement-led ATS CV writing with readable formatting" },
+    { id: "linkedin", name: "LinkedIn Optimization", blurb: "Complete profile makeover (headline, about, skills, keywords)" },
+    { id: "cover-letter", name: "Cover Letter Writing", blurb: "Role-specific, persuasive pitch letter" },
     { id: "foreign-cv", name: "Foreign Job CV", blurb: "Country-targeted CV for Gulf, UK, Europe, Australia, Canada and remote roles" },
   ];
 
-  levels.forEach((lvl) => {
-    singleServices.forEach((svc) => {
+  singleServicesList.forEach((s) => {
+    levels.forEach((lvl) => {
       // Essential
       presets.push({
-        id: `lk-ess-${svc.id}-${lvl.id}`,
-        name: `${svc.name} (${lvl.label}) · Essential`,
+        id: `lk-sing-ess-${s.id}-${lvl.id}`,
+        name: `${s.name} (${lvl.label}) · Essential`,
         category: "Individual Services",
         tier: "Essential",
         level: lvl.label as any,
-        description: `${svc.name} (${lvl.label} · ${lvl.exp}) - ${svc.blurb} · Essential Tier`,
-        unitPrice: BASE_PRICES[svc.id][lvl.id],
+        description: `${s.name} (${lvl.label}): ${s.blurb} · Essential Tier`,
+        unitPrice: BASE_PRICES[s.id][lvl.id],
         currency: "LKR",
       });
 
       // Signature
       presets.push({
-        id: `lk-sig-${svc.id}-${lvl.id}`,
-        name: `${svc.name} (${lvl.label}) · Signature`,
+        id: `lk-sing-sig-${s.id}-${lvl.id}`,
+        name: `${s.name} (${lvl.label}) · Signature`,
         category: "Individual Services",
         tier: "Signature",
         level: lvl.label as any,
-        description: `${svc.name} (${lvl.label} · ${lvl.exp}) - Personally crafted by Chanuka Jeewantha · Signature Tier`,
-        unitPrice: SIGNATURE_PRICES[svc.id][lvl.id],
+        description: `${s.name} (${lvl.label}): ${s.blurb} · Personally Crafted by Chanuka Jeewantha with 30-Day Support`,
+        unitPrice: SIGNATURE_PRICES[s.id][lvl.id],
         currency: "LKR",
       });
     });
   });
 
-  // 5. Strategy Consultation & Add-ons
+  // 3. Consultation & Add-ons
   levels.forEach((lvl) => {
     presets.push({
-      id: `lk-consultation-${lvl.id}`,
+      id: `lk-consult-${lvl.id}`,
       name: `1-Hour Strategy Consultation (${lvl.label})`,
       category: "Consultation & Add-ons",
       level: lvl.label as any,
@@ -190,8 +227,8 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
   });
 
   presets.push({
-    id: "lk-vip-24h",
-    name: "VIP 24-Hour Express Turnaround",
+    id: "lk-vip-express",
+    name: "VIP 24-Hour Express Delivery Add-on",
     category: "Consultation & Add-ons",
     description: "VIP Priority Queueing: Final first draft delivery within 24 hours (+30% express turnaround)",
     unitPrice: 4755,
@@ -200,7 +237,7 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
 
   presets.push({
     id: "lk-priority-express",
-    name: "Priority Express Turnaround (1–3 Days)",
+    name: "Priority Express Delivery Add-on (1–3 Days)",
     category: "Consultation & Add-ons",
     description: "Priority Queueing: Expedited draft delivery within 1 to 3 business days (+20%)",
     unitPrice: 3170,
@@ -211,140 +248,246 @@ function getSriLankaPresets(): InvoicePackagePreset[] {
 }
 
 /**
- * Global (USD) Presets
+ * Global / US (.com) Presets
+ * Exactly matching the 3-Tier Pricing Calculation Hierarchy:
+ * Hierarchy Level 1 Base Prices:
+ *   ATS Friendly CV: Under 2 yrs ($129), 3 to 9 yrs ($189), 10+ yrs ($279)
+ *   Cover Letter: Under 2 yrs ($79), 3 to 9 yrs ($119), 10+ yrs ($159)
+ *   LinkedIn: Under 2 yrs ($129), 3 to 9 yrs ($189), 10+ yrs ($279)
+ * Hierarchy Level 2 Bundle Discounts:
+ *   1 item: 0%
+ *   2 items: 20% OFF
+ *   3 items: 30% OFF
  */
 function getGlobalPresets(): InvoicePackagePreset[] {
   return [
-    // Packages
+    // ==========================================
+    // 10+ Years (Senior / Leadership / Executive)
+    // ==========================================
     {
       id: "com-full-exec",
-      name: "Full Career Suite (Executive Level) · Signature",
+      name: "Full Career Pack (10+ years · Senior / Leadership)",
       category: "Full Packages",
-      tier: "Signature",
       level: "Executive",
-      description: "Executive Career Branding Suite: C-Level/Director ATS CV + Executive LinkedIn Profile Rewrite + Strategic Cover Letter · Personally Crafted with 30-Day Support",
-      unitPrice: 495,
+      description: "Full Career Pack (10+ years): ATS Friendly CV ($279) + Cover Letter ($159) + LinkedIn Optimization ($279) · 30% bundle discount applied (List $717)",
+      unitPrice: 502,
       currency: "USD",
     },
+    {
+      id: "com-cv-linkedin-exec",
+      name: "CV + LinkedIn (10+ years · Senior / Leadership)",
+      category: "Full Packages",
+      level: "Executive",
+      description: "Package: ATS Friendly CV ($279) + LinkedIn Optimization ($279) · 20% bundle discount applied (List $558)",
+      unitPrice: 446,
+      currency: "USD",
+    },
+    {
+      id: "com-cv-cl-exec",
+      name: "CV + Cover Letter (10+ years · Senior / Leadership)",
+      category: "Full Packages",
+      level: "Executive",
+      description: "Package: ATS Friendly CV ($279) + Cover Letter Writing ($159) · 20% bundle discount applied (List $438)",
+      unitPrice: 350,
+      currency: "USD",
+    },
+    {
+      id: "com-cl-linkedin-exec",
+      name: "Cover Letter + LinkedIn (10+ years · Senior / Leadership)",
+      category: "Full Packages",
+      level: "Executive",
+      description: "Package: Cover Letter Writing ($159) + LinkedIn Optimization ($279) · 20% bundle discount applied (List $438)",
+      unitPrice: 350,
+      currency: "USD",
+    },
+
+    // ==========================================
+    // 3 to 9 Years (Professionals)
+    // ==========================================
     {
       id: "com-full-pro",
-      name: "Full Career Pack (Professional) · Signature",
+      name: "Full Career Pack (3 to 9 years · Professionals)",
       category: "Full Packages",
-      tier: "Signature",
       level: "Professional",
-      description: "Full Career Pack (Mid-Senior Professional): Targeted ATS CV + LinkedIn Profile Optimization + Custom Cover Letter",
-      unitPrice: 320,
-      currency: "USD",
-    },
-    {
-      id: "com-full-ess-pro",
-      name: "Full Career Pack (Professional) · Essential",
-      category: "Full Packages",
-      tier: "Essential",
-      level: "Professional",
-      description: "Full Career Pack (1–9 years experience): ATS Friendly CV + LinkedIn Makeover + Role-Specific Cover Letter",
-      unitPrice: 175,
-      currency: "USD",
-    },
-    {
-      id: "com-full-grad",
-      name: "Starter Career Pack (Student / Graduate) · Essential",
-      category: "Full Packages",
-      tier: "Essential",
-      level: "Student / Graduate",
-      description: "Graduate Entry Pack: Graduate ATS CV + LinkedIn Profile Starter + Entry Cover Letter",
-      unitPrice: 110,
+      description: "Full Career Pack (3 to 9 years): ATS Friendly CV ($189) + Cover Letter ($119) + LinkedIn Optimization ($189) · 30% bundle discount applied (List $497)",
+      unitPrice: 348,
       currency: "USD",
     },
     {
       id: "com-cv-linkedin-pro",
-      name: "CV + LinkedIn Optimization (Professional)",
+      name: "CV + LinkedIn (3 to 9 years · Professionals)",
       category: "Full Packages",
       level: "Professional",
-      description: "Professional CV + LinkedIn Makeover: Dual applicant-ready documents for international recruiters",
-      unitPrice: 145,
+      description: "Package: ATS Friendly CV ($189) + LinkedIn Optimization ($189) · 20% bundle discount applied (List $378)",
+      unitPrice: 302,
+      currency: "USD",
+    },
+    {
+      id: "com-cv-cl-pro",
+      name: "CV + Cover Letter (3 to 9 years · Professionals)",
+      category: "Full Packages",
+      level: "Professional",
+      description: "Package: ATS Friendly CV ($189) + Cover Letter Writing ($119) · 20% bundle discount applied (List $308)",
+      unitPrice: 246,
+      currency: "USD",
+    },
+    {
+      id: "com-cl-linkedin-pro",
+      name: "Cover Letter + LinkedIn (3 to 9 years · Professionals)",
+      category: "Full Packages",
+      level: "Professional",
+      description: "Package: Cover Letter Writing ($119) + LinkedIn Optimization ($189) · 20% bundle discount applied (List $308)",
+      unitPrice: 246,
       currency: "USD",
     },
 
+    // ==========================================
+    // Under 2 Years (Graduates)
+    // ==========================================
+    {
+      id: "com-full-grad",
+      name: "Full Career Pack (Under 2 years · Graduates)",
+      category: "Full Packages",
+      level: "Student / Graduate",
+      description: "Full Career Pack (Under 2 years): ATS Friendly CV ($129) + Cover Letter ($79) + LinkedIn Optimization ($129) · 30% bundle discount applied (List $337)",
+      unitPrice: 236,
+      currency: "USD",
+    },
+    {
+      id: "com-cv-linkedin-grad",
+      name: "CV + LinkedIn (Under 2 years · Graduates)",
+      category: "Full Packages",
+      level: "Student / Graduate",
+      description: "Package: ATS Friendly CV ($129) + LinkedIn Optimization ($129) · 20% bundle discount applied (List $258)",
+      unitPrice: 206,
+      currency: "USD",
+    },
+    {
+      id: "com-cv-cl-grad",
+      name: "CV + Cover Letter (Under 2 years · Graduates)",
+      category: "Full Packages",
+      level: "Student / Graduate",
+      description: "Package: ATS Friendly CV ($129) + Cover Letter Writing ($79) · 20% bundle discount applied (List $208)",
+      unitPrice: 166,
+      currency: "USD",
+    },
+    {
+      id: "com-cl-linkedin-grad",
+      name: "Cover Letter + LinkedIn (Under 2 years · Graduates)",
+      category: "Full Packages",
+      level: "Student / Graduate",
+      description: "Package: Cover Letter Writing ($79) + LinkedIn Optimization ($129) · 20% bundle discount applied (List $208)",
+      unitPrice: 166,
+      currency: "USD",
+    },
+
+    // ==========================================
     // Individual Services
+    // ==========================================
+    // 10+ years
     {
       id: "com-cv-exec",
-      name: "Executive CV Writing · Signature",
+      name: "ATS Friendly CV (10+ years · Senior / Leadership)",
       category: "Individual Services",
-      tier: "Signature",
       level: "Executive",
-      description: "Executive Leadership CV Writing: Board/Director/VP Narrative crafted to international search standards",
-      unitPrice: 245,
+      description: "Executive Leadership ATS CV: Board, Director, VP, and C-Suite Strategic Career Narrative (10+ years experience)",
+      unitPrice: 279,
       currency: "USD",
     },
     {
-      id: "com-cv-pro",
-      name: "Professional ATS CV Writing",
+      id: "com-cl-exec",
+      name: "Cover Letter Writing (10+ years · Senior / Leadership)",
       category: "Individual Services",
-      level: "Professional",
-      description: "International ATS CV Writing: Achievement-led structure targeted to US, Remote, and Multinational roles",
-      unitPrice: 75,
-      currency: "USD",
-    },
-    {
-      id: "com-cv-grad",
-      name: "Graduate Entry CV Writing",
-      category: "Individual Services",
-      level: "Student / Graduate",
-      description: "Early Career ATS CV Writing: Education, technical projects, internships and value proposition",
-      unitPrice: 45,
+      level: "Executive",
+      description: "Executive Pitch Letter / Letter of Interest for C-Level & Leadership roles (10+ years experience)",
+      unitPrice: 159,
       currency: "USD",
     },
     {
       id: "com-linkedin-exec",
-      name: "Executive LinkedIn Profile Optimization",
+      name: "LinkedIn Optimization (10+ years · Senior / Leadership)",
       category: "Individual Services",
       level: "Executive",
-      description: "Full Executive LinkedIn Profile Overhaul: Headline, About story, Experience highlights & recruiter SEO indexing",
-      unitPrice: 135,
+      description: "Executive Authority LinkedIn Profile Overhaul for Senior Executives & Directors (10+ years experience)",
+      unitPrice: 279,
+      currency: "USD",
+    },
+
+    // 3 to 9 years
+    {
+      id: "com-cv-pro",
+      name: "ATS Friendly CV (3 to 9 years · Professionals)",
+      category: "Individual Services",
+      level: "Professional",
+      description: "Achievement-Led ATS CV Writing for Mid-Senior Professionals (3 to 9 years experience)",
+      unitPrice: 189,
+      currency: "USD",
+    },
+    {
+      id: "com-cl-pro",
+      name: "Cover Letter Writing (3 to 9 years · Professionals)",
+      category: "Individual Services",
+      level: "Professional",
+      description: "Strategic Role-Specific Cover Letter Writing for Professionals (3 to 9 years experience)",
+      unitPrice: 119,
       currency: "USD",
     },
     {
       id: "com-linkedin-pro",
-      name: "Professional LinkedIn Optimization",
+      name: "LinkedIn Optimization (3 to 9 years · Professionals)",
       category: "Individual Services",
       level: "Professional",
-      description: "Complete LinkedIn Profile Transformation for keyword discoverability and headhunter outreach",
-      unitPrice: 75,
-      currency: "USD",
-    },
-    {
-      id: "com-cover-letter",
-      name: "Targeted Strategic Cover Letter",
-      category: "Individual Services",
-      description: "Tailored executive pitch letter addressing key requirements of a specific target opportunity",
-      unitPrice: 55,
+      description: "Complete LinkedIn Profile Transformation & Recruiter Search Optimization (3 to 9 years experience)",
+      unitPrice: 189,
       currency: "USD",
     },
 
-    // Strategy & Add-ons
+    // Under 2 years
     {
-      id: "com-strategy-1h",
-      name: "1-Hour Executive Career Strategy Session",
-      category: "Consultation & Add-ons",
-      description: "1-on-1 Strategy & Interview Consultation: Positioning review, salary negotiation prep, and target role roadmap",
-      unitPrice: 120,
+      id: "com-cv-grad",
+      name: "ATS Friendly CV (Under 2 years · Graduates)",
+      category: "Individual Services",
+      level: "Student / Graduate",
+      description: "ATS Friendly CV Writing for Graduates and Early Career Professionals (< 2 years experience)",
+      unitPrice: 129,
       currency: "USD",
     },
     {
-      id: "com-express-24h",
-      name: "VIP 24-Hour Express Turnaround",
-      category: "Consultation & Add-ons",
-      description: "Guaranteed initial deliverable draft within 24 hours of onboarding confirmation",
-      unitPrice: 75,
+      id: "com-cl-grad",
+      name: "Cover Letter Writing (Under 2 years · Graduates)",
+      category: "Individual Services",
+      level: "Student / Graduate",
+      description: "Tailored Cover Letter Writing for Early Career Vacancies (< 2 years experience)",
+      unitPrice: 79,
       currency: "USD",
     },
     {
-      id: "com-extra-revision",
-      name: "Additional Polish & Revision Round",
+      id: "com-linkedin-grad",
+      name: "LinkedIn Optimization (Under 2 years · Graduates)",
+      category: "Individual Services",
+      level: "Student / Graduate",
+      description: "Graduate Entry LinkedIn Makeover & Keyword Optimization (< 2 years experience)",
+      unitPrice: 129,
+      currency: "USD",
+    },
+
+    // ==========================================
+    // Turnaround Speed Add-ons (Fast & Ultra)
+    // ==========================================
+    {
+      id: "com-turnaround-fast",
+      name: "Fast Turnaround Surcharge (2 to 3 days)",
       category: "Consultation & Add-ons",
-      description: "Dedicated extra round of document refinements and targeted vacancy adjustments",
-      unitPrice: 35,
+      description: "Expedited turnaround: Draft delivered within 2 to 3 days (+20% surcharge on package subtotal)",
+      unitPrice: 49,
+      currency: "USD",
+    },
+    {
+      id: "com-turnaround-ultra",
+      name: "Ultra Fast Turnaround Surcharge (Within 24 hours)",
+      category: "Consultation & Add-ons",
+      description: "VIP queue: Priority delivery within 24 hours (+50% surcharge on package subtotal)",
+      unitPrice: 125,
       currency: "USD",
     },
   ];
@@ -439,271 +582,6 @@ function getUnitedKingdomPresets(): InvoicePackagePreset[] {
   ];
 }
 
-/**
- * Australia (AUD) Presets
- */
-function getAustraliaPresets(): InvoicePackagePreset[] {
-  return [
-    {
-      id: "au-full-exec",
-      name: "Executive Career Suite (Australia) · Signature",
-      category: "Full Packages",
-      tier: "Signature",
-      level: "Executive",
-      description: "Executive Australian Resume (3-Page Standard) + LinkedIn Optimization + Targeted Cover Letter",
-      unitPrice: 720,
-      currency: "AUD",
-    },
-    {
-      id: "au-full-pro",
-      name: "Full Career Pack (Professional) · Australia",
-      category: "Full Packages",
-      level: "Professional",
-      description: "Australian Format Resume + LinkedIn Profile Transformation + Key Selection Criteria Cover Letter",
-      unitPrice: 380,
-      currency: "AUD",
-    },
-    {
-      id: "au-cv-pro",
-      name: "Professional Australian Resume Writing",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Australian Format Resume: Aligned with local recruiter norms, competency models and ATS tools",
-      unitPrice: 125,
-      currency: "AUD",
-    },
-    {
-      id: "au-linkedin-pro",
-      name: "LinkedIn Profile Optimization (ANZ Market)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Australia & New Zealand targeted LinkedIn profile overhaul for headhunters and SEEK recruiters",
-      unitPrice: 115,
-      currency: "AUD",
-    },
-    {
-      id: "au-cover-letter",
-      name: "Targeted Australian Cover Letter / Selection Criteria",
-      category: "Individual Services",
-      description: "Australian employer pitch letter highlighting core competencies and proven value delivery",
-      unitPrice: 75,
-      currency: "AUD",
-    },
-  ];
-}
-
-/**
- * Europe (EUR) Presets
- */
-function getEuropePresets(): InvoicePackagePreset[] {
-  return [
-    {
-      id: "eu-full-exec",
-      name: "Executive European Career Suite · Signature",
-      category: "Full Packages",
-      tier: "Signature",
-      level: "Executive",
-      description: "Executive International CV (Europass / Multinational format) + LinkedIn Profile + Executive Pitch Letter",
-      unitPrice: 450,
-      currency: "EUR",
-    },
-    {
-      id: "eu-full-pro",
-      name: "Full Career Pack (Professional) · Europe",
-      category: "Full Packages",
-      level: "Professional",
-      description: "European Format English CV + LinkedIn Profile Optimization + Tailored Motivation Letter",
-      unitPrice: 245,
-      currency: "EUR",
-    },
-    {
-      id: "eu-cv-pro",
-      name: "Professional European Format CV Writing",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Multinational EU English CV written for corporate and international agencies across Europe",
-      unitPrice: 69,
-      currency: "EUR",
-    },
-    {
-      id: "eu-linkedin-pro",
-      name: "LinkedIn Profile Optimization (European Market)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Optimized for corporate European recruiters, German/Dutch tech hubs and remote EU roles",
-      unitPrice: 69,
-      currency: "EUR",
-    },
-    {
-      id: "eu-cover-letter",
-      name: "Motivation Letter / Application Statement",
-      category: "Individual Services",
-      description: "European corporate motivation letter tailored to specific position specifications",
-      unitPrice: 45,
-      currency: "EUR",
-    },
-  ];
-}
-
-/**
- * UAE / Gulf (AED) Presets
- */
-function getGulfPresets(): InvoicePackagePreset[] {
-  return [
-    {
-      id: "ae-full-exec",
-      name: "Gulf Executive Career Package · Signature",
-      category: "Full Packages",
-      tier: "Signature",
-      level: "Executive",
-      description: "Dubai & Gulf Executive CV (UAE/Saudi/Qatar format) + LinkedIn Optimization + Executive Cover Letter",
-      unitPrice: 1820,
-      currency: "AED",
-    },
-    {
-      id: "ae-full-pro",
-      name: "Gulf Professional Career Pack",
-      category: "Full Packages",
-      level: "Professional",
-      description: "Gulf Format ATS CV (UAE / Saudi / Qatar) + LinkedIn Profile Makeover + Regional Cover Letter",
-      unitPrice: 975,
-      currency: "AED",
-    },
-    {
-      id: "ae-cv-pro",
-      name: "Gulf Targeted Professional CV (UAE / KSA / Qatar)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Gulf Region ATS CV: Tailored with regional positioning, visa status clarity, and industry metrics",
-      unitPrice: 325,
-      currency: "AED",
-    },
-    {
-      id: "ae-linkedin-pro",
-      name: "LinkedIn Optimization (Gulf & Middle East)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Targeted to Dubai and Gulf recruitment agencies, executive search partners, and HR directors",
-      unitPrice: 295,
-      currency: "AED",
-    },
-    {
-      id: "ae-cover-letter",
-      name: "Gulf Market Strategic Cover Letter",
-      category: "Individual Services",
-      description: "Gulf employer application letter highlighting relocation readiness, leadership, and regional impact",
-      unitPrice: 185,
-      currency: "AED",
-    },
-  ];
-}
-
-/**
- * Canada (CAD) Presets
- */
-function getCanadaPresets(): InvoicePackagePreset[] {
-  return [
-    {
-      id: "ca-full-exec",
-      name: "Executive Canadian Career Suite · Signature",
-      category: "Full Packages",
-      tier: "Signature",
-      level: "Executive",
-      description: "Executive Canadian Resume (2-Page ATS Standard) + LinkedIn Optimization + Strategic Cover Letter",
-      unitPrice: 670,
-      currency: "CAD",
-    },
-    {
-      id: "ca-full-pro",
-      name: "Full Career Pack (Professional) · Canada",
-      category: "Full Packages",
-      level: "Professional",
-      description: "Canadian Format Resume + LinkedIn Profile Transformation + Role-Specific Cover Letter",
-      unitPrice: 365,
-      currency: "CAD",
-    },
-    {
-      id: "ca-cv-pro",
-      name: "Canadian Format Professional Resume",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Canadian Standard Resume: Formatted strictly to Canadian anti-discrimination and ATS standards",
-      unitPrice: 110,
-      currency: "CAD",
-    },
-    {
-      id: "ca-linkedin-pro",
-      name: "LinkedIn Profile Optimization (Canadian Market)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Canadian recruiter keyword optimization, skills endorsement structure, and personal branding",
-      unitPrice: 99,
-      currency: "CAD",
-    },
-    {
-      id: "ca-cover-letter",
-      name: "Canadian Format Cover Letter",
-      category: "Individual Services",
-      description: "Role-specific Canadian business pitch letter emphasizing local Canadian equivalence and value",
-      unitPrice: 65,
-      currency: "CAD",
-    },
-  ];
-}
-
-/**
- * Singapore (SGD) Presets
- */
-function getSingaporePresets(): InvoicePackagePreset[] {
-  return [
-    {
-      id: "sg-full-exec",
-      name: "Executive Career Suite (Singapore / APAC) · Signature",
-      category: "Full Packages",
-      tier: "Signature",
-      level: "Executive",
-      description: "Singapore & APAC Regional Director CV + Executive LinkedIn Rewrite + Executive Cover Letter",
-      unitPrice: 650,
-      currency: "SGD",
-    },
-    {
-      id: "sg-full-pro",
-      name: "Full Career Pack (Singapore / APAC)",
-      category: "Full Packages",
-      level: "Professional",
-      description: "Singapore Standard ATS CV + LinkedIn Profile Optimization + Corporate Cover Letter",
-      unitPrice: 355,
-      currency: "SGD",
-    },
-    {
-      id: "sg-cv-pro",
-      name: "Professional Singapore ATS CV Writing",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Singapore / Asia-Pacific corporate CV structured for multinational hubs and regional headquarters",
-      unitPrice: 105,
-      currency: "SGD",
-    },
-    {
-      id: "sg-linkedin-pro",
-      name: "LinkedIn Profile Optimization (APAC Hub)",
-      category: "Individual Services",
-      level: "Professional",
-      description: "Complete LinkedIn optimization targeted to Singapore, Hong Kong and regional APAC talent hunters",
-      unitPrice: 95,
-      currency: "SGD",
-    },
-    {
-      id: "sg-cover-letter",
-      name: "Targeted Singapore Corporate Cover Letter",
-      category: "Individual Services",
-      description: "Concise executive pitch letter tailored to Singapore hiring practices and business norms",
-      unitPrice: 65,
-      currency: "SGD",
-    },
-  ];
-}
-
 export const MULTI_COUNTRY_PRICES: Record<
   string,
   Record<TierId, Record<ServiceId, Record<LevelId, number>>>
@@ -714,20 +592,20 @@ export const MULTI_COUNTRY_PRICES: Record<
   },
   com: {
     essential: {
-      cv: { "under-2": 45, "3-to-9": 75, "over-10": 125 },
-      linkedin: { "under-2": 45, "3-to-9": 75, "over-10": 110 },
-      "cover-letter": { "under-2": 35, "3-to-9": 45, "over-10": 65 },
-      "foreign-cv": { "under-2": 55, "3-to-9": 85, "over-10": 135 },
-      "cv-review": { "under-2": 25, "3-to-9": 35, "over-10": 45 },
-      consultation: { "under-2": 60, "3-to-9": 90, "over-10": 120 },
+      cv: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "cover-letter": { "under-2": 79, "3-to-9": 119, "over-10": 159 },
+      linkedin: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "foreign-cv": { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "cv-review": { "under-2": 49, "3-to-9": 79, "over-10": 99 },
+      consultation: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
     },
     signature: {
-      cv: { "under-2": 75, "3-to-9": 145, "over-10": 245 },
-      linkedin: { "under-2": 75, "3-to-9": 135, "over-10": 195 },
-      "cover-letter": { "under-2": 55, "3-to-9": 75, "over-10": 110 },
-      "foreign-cv": { "under-2": 95, "3-to-9": 165, "over-10": 265 },
-      "cv-review": { "under-2": 35, "3-to-9": 55, "over-10": 75 },
-      consultation: { "under-2": 75, "3-to-9": 120, "over-10": 150 },
+      cv: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "cover-letter": { "under-2": 79, "3-to-9": 119, "over-10": 159 },
+      linkedin: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "foreign-cv": { "under-2": 129, "3-to-9": 189, "over-10": 279 },
+      "cv-review": { "under-2": 49, "3-to-9": 79, "over-10": 99 },
+      consultation: { "under-2": 129, "3-to-9": 189, "over-10": 279 },
     },
   },
   uk: {
@@ -748,96 +626,6 @@ export const MULTI_COUNTRY_PRICES: Record<
       consultation: { "under-2": 60, "3-to-9": 95, "over-10": 120 },
     },
   },
-  au: {
-    essential: {
-      cv: { "under-2": 65, "3-to-9": 115, "over-10": 185 },
-      linkedin: { "under-2": 65, "3-to-9": 115, "over-10": 165 },
-      "cover-letter": { "under-2": 45, "3-to-9": 65, "over-10": 95 },
-      "foreign-cv": { "under-2": 75, "3-to-9": 135, "over-10": 195 },
-      "cv-review": { "under-2": 35, "3-to-9": 55, "over-10": 75 },
-      consultation: { "under-2": 85, "3-to-9": 140, "over-10": 180 },
-    },
-    signature: {
-      cv: { "under-2": 110, "3-to-9": 220, "over-10": 360 },
-      linkedin: { "under-2": 110, "3-to-9": 195, "over-10": 295 },
-      "cover-letter": { "under-2": 85, "3-to-9": 115, "over-10": 165 },
-      "foreign-cv": { "under-2": 145, "3-to-9": 245, "over-10": 395 },
-      "cv-review": { "under-2": 50, "3-to-9": 75, "over-10": 110 },
-      consultation: { "under-2": 110, "3-to-9": 180, "over-10": 225 },
-    },
-  },
-  eu: {
-    essential: {
-      cv: { "under-2": 40, "3-to-9": 69, "over-10": 115 },
-      linkedin: { "under-2": 40, "3-to-9": 69, "over-10": 99 },
-      "cover-letter": { "under-2": 30, "3-to-9": 39, "over-10": 59 },
-      "foreign-cv": { "under-2": 50, "3-to-9": 79, "over-10": 125 },
-      "cv-review": { "under-2": 25, "3-to-9": 35, "over-10": 45 },
-      consultation: { "under-2": 55, "3-to-9": 80, "over-10": 110 },
-    },
-    signature: {
-      cv: { "under-2": 70, "3-to-9": 135, "over-10": 225 },
-      linkedin: { "under-2": 70, "3-to-9": 125, "over-10": 180 },
-      "cover-letter": { "under-2": 50, "3-to-9": 70, "over-10": 99 },
-      "foreign-cv": { "under-2": 85, "3-to-9": 155, "over-10": 245 },
-      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 70 },
-      consultation: { "under-2": 70, "3-to-9": 110, "over-10": 140 },
-    },
-  },
-  ae: {
-    essential: {
-      cv: { "under-2": 165, "3-to-9": 275, "over-10": 460 },
-      linkedin: { "under-2": 165, "3-to-9": 275, "over-10": 400 },
-      "cover-letter": { "under-2": 125, "3-to-9": 165, "over-10": 240 },
-      "foreign-cv": { "under-2": 195, "3-to-9": 310, "over-10": 495 },
-      "cv-review": { "under-2": 95, "3-to-9": 135, "over-10": 185 },
-      consultation: { "under-2": 220, "3-to-9": 330, "over-10": 440 },
-    },
-    signature: {
-      cv: { "under-2": 275, "3-to-9": 535, "over-10": 895 },
-      linkedin: { "under-2": 275, "3-to-9": 495, "over-10": 715 },
-      "cover-letter": { "under-2": 200, "3-to-9": 275, "over-10": 405 },
-      "foreign-cv": { "under-2": 350, "3-to-9": 605, "over-10": 975 },
-      "cv-review": { "under-2": 135, "3-to-9": 195, "over-10": 265 },
-      consultation: { "under-2": 275, "3-to-9": 440, "over-10": 550 },
-    },
-  },
-  ca: {
-    essential: {
-      cv: { "under-2": 60, "3-to-9": 105, "over-10": 170 },
-      linkedin: { "under-2": 60, "3-to-9": 105, "over-10": 150 },
-      "cover-letter": { "under-2": 45, "3-to-9": 60, "over-10": 90 },
-      "foreign-cv": { "under-2": 70, "3-to-9": 115, "over-10": 180 },
-      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 65 },
-      consultation: { "under-2": 80, "3-to-9": 125, "over-10": 160 },
-    },
-    signature: {
-      cv: { "under-2": 100, "3-to-9": 195, "over-10": 330 },
-      linkedin: { "under-2": 100, "3-to-9": 180, "over-10": 260 },
-      "cover-letter": { "under-2": 75, "3-to-9": 100, "over-10": 150 },
-      "foreign-cv": { "under-2": 130, "3-to-9": 220, "over-10": 355 },
-      "cv-review": { "under-2": 45, "3-to-9": 70, "over-10": 95 },
-      consultation: { "under-2": 100, "3-to-9": 160, "over-10": 200 },
-    },
-  },
-  sg: {
-    essential: {
-      cv: { "under-2": 60, "3-to-9": 100, "over-10": 165 },
-      linkedin: { "under-2": 60, "3-to-9": 100, "over-10": 145 },
-      "cover-letter": { "under-2": 45, "3-to-9": 60, "over-10": 85 },
-      "foreign-cv": { "under-2": 70, "3-to-9": 115, "over-10": 175 },
-      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 65 },
-      consultation: { "under-2": 80, "3-to-9": 120, "over-10": 160 },
-    },
-    signature: {
-      cv: { "under-2": 100, "3-to-9": 190, "over-10": 320 },
-      linkedin: { "under-2": 100, "3-to-9": 175, "over-10": 255 },
-      "cover-letter": { "under-2": 75, "3-to-9": 100, "over-10": 145 },
-      "foreign-cv": { "under-2": 130, "3-to-9": 215, "over-10": 345 },
-      "cv-review": { "under-2": 45, "3-to-9": 70, "over-10": 95 },
-      consultation: { "under-2": 100, "3-to-9": 160, "over-10": 200 },
-    },
-  },
 };
 
 export function getCountryServicePrice(
@@ -855,10 +643,5 @@ export function formatCountryAmount(amount: number, countryKey: string): string 
   if (c.currency === "LKR") return `LKR ${amount.toLocaleString("en-US")}`;
   if (c.currency === "USD") return `$${amount.toLocaleString("en-US")}`;
   if (c.currency === "GBP") return `£${amount.toLocaleString("en-US")}`;
-  if (c.currency === "EUR") return `€${amount.toLocaleString("en-US")}`;
-  if (c.currency === "AUD") return `A$${amount.toLocaleString("en-US")}`;
-  if (c.currency === "CAD") return `C$${amount.toLocaleString("en-US")}`;
-  if (c.currency === "AED") return `AED ${amount.toLocaleString("en-US")}`;
-  if (c.currency === "SGD") return `S$${amount.toLocaleString("en-US")}`;
   return `${c.currency} ${amount.toLocaleString("en-US")}`;
 }

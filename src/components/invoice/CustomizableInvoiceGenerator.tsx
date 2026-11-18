@@ -322,6 +322,8 @@ export function CustomizableInvoiceGenerator({
       setCurrency(country.currency);
       setSite(country.site);
     }
+    setDiscountType("none");
+    setDiscountValue(0);
 
     setItems([
       {
@@ -367,6 +369,8 @@ export function CustomizableInvoiceGenerator({
     setCurrency(configured.currency);
     setSite(configured.site);
     setSelectedCountry(configured.countryKey);
+    setDiscountType("none");
+    setDiscountValue(0);
     setItems(
       configured.items.map((it, idx) => ({
         ...it,
