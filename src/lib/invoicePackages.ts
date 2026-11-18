@@ -20,13 +20,8 @@ export interface InvoiceCountry {
 
 export const INVOICE_COUNTRIES: InvoiceCountry[] = [
   { key: "lk", name: "Sri Lanka", label: "Sri Lanka", currency: "LKR", symbol: "Rs ", flag: "🇱🇰", site: "lk" },
-  { key: "com", name: "Global / International", label: "Global / US", currency: "USD", symbol: "$", flag: "🌐", site: "com" },
+  { key: "com", name: "Global / US", label: "Global / US", currency: "USD", symbol: "$", flag: "🌐", site: "com" },
   { key: "uk", name: "United Kingdom", label: "UK", currency: "GBP", symbol: "£", flag: "🇬🇧", site: "uk" },
-  { key: "au", name: "Australia", label: "Australia", currency: "AUD", symbol: "A$", flag: "🇦🇺", site: "com" },
-  { key: "eu", name: "Europe", label: "Europe", currency: "EUR", symbol: "€", flag: "🇪🇺", site: "com" },
-  { key: "ae", name: "United Arab Emirates / Gulf", label: "UAE / Gulf", currency: "AED", symbol: "AED ", flag: "🇦🇪", site: "com" },
-  { key: "ca", name: "Canada", label: "Canada", currency: "CAD", symbol: "C$", flag: "🇨🇦", site: "com" },
-  { key: "sg", name: "Singapore", label: "Singapore", currency: "SGD", symbol: "S$", flag: "🇸🇬", site: "com" },
 ];
 
 export interface InvoicePackagePreset {
@@ -56,27 +51,7 @@ export function getInvoicePackagePresets(countryKey: string): InvoicePackagePres
     return getUnitedKingdomPresets();
   }
 
-  if (countryKey === "au") {
-    return getAustraliaPresets();
-  }
-
-  if (countryKey === "eu") {
-    return getEuropePresets();
-  }
-
-  if (countryKey === "ae") {
-    return getGulfPresets();
-  }
-
-  if (countryKey === "ca") {
-    return getCanadaPresets();
-  }
-
-  if (countryKey === "sg") {
-    return getSingaporePresets();
-  }
-
-  // Default: Global (USD)
+  // Default: Global / US (USD)
   return getGlobalPresets();
 }
 

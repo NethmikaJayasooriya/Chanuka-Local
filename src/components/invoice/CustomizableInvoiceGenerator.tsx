@@ -262,12 +262,7 @@ export function CustomizableInvoiceGenerator({
   const initialCountryKey = useMemo(() => {
     if (initialInvoice?.site === "lk" || initialInvoice?.currency === "LKR") return "lk";
     if (initialInvoice?.site === "uk" || initialInvoice?.currency === "GBP") return "uk";
-    if (initialInvoice?.currency === "AUD") return "au";
-    if (initialInvoice?.currency === "EUR") return "eu";
-    if (initialInvoice?.currency === "AED") return "ae";
-    if (initialInvoice?.currency === "CAD") return "ca";
-    if (initialInvoice?.currency === "SGD") return "sg";
-    if (initialInvoice?.currency === "USD") return "com";
+    if (initialInvoice?.site === "com" || initialInvoice?.currency === "USD") return "com";
     return "lk"; // Default to Sri Lanka
   }, [initialInvoice?.site, initialInvoice?.currency]);
 
