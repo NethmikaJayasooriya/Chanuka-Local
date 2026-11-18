@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
 import {
   type Invoice,
@@ -17,6 +17,11 @@ import {
 } from "@/lib/invoices";
 import { saveInvoice } from "@/app/admin/(panel)/invoices/actions";
 import { downloadInvoiceAsPdf } from "@/lib/generateInvoicePdf";
+import {
+  INVOICE_COUNTRIES,
+  getInvoicePackagePresets,
+  type InvoicePackagePreset,
+} from "@/lib/invoicePackages";
 
 interface OrderImportOption {
   id: string;
@@ -27,7 +32,7 @@ interface OrderImportOption {
   level_name: string;
   total_usd: number;
   currency: string;
-  site: "com" | "lk";
+  site: "com" | "lk" | "uk";
 }
 
 interface Props {
@@ -248,9 +253,112 @@ export function CustomizableInvoiceGenerator({
 
   const [id, setId] = useState(initialInvoice?.id || "");
   const [orderId, setOrderId] = useState(initialInvoice?.order_id || "");
-  const [site, setSite] = useState<"com" | "lk">(initialInvoice?.site || "com");
+  const [site, setSite] = useState<"com" | "lk" | "uk">(initialInvoice?.site || "lk");
   const [status, setStatus] = useState<InvoiceStatus>(initialInvoice?.status || "sent");
-  const [currency, setCurrency] = useState(initialInvoice?.currency || "USD");
+  const [currency, setCurrency] = useState(initialInvoice?.currency || "LKR");
+
+  // Package Catalog & Country-specific Presets
+  const initialCountryKey = useMemo(() => {
+    if (initialInvoice?.site === "lk" || initialInvoice?.currency === "LKR") return "lk";
+    if (initialInvoice?.site === "uk" || initialInvoice?.currency === "GBP") return "uk";
+    if (initialInvoice?.currency === "AUD") return "au";
+    if (initialInvoice?.currency === "EUR") return "eu";
+    if (initialInvoice?.currency === "AED") return "ae";
+    if (initialInvoice?.currency === "CAD") return "ca";
+    if (initialInvoice?.currency === "SGD") return "sg";
+    if (initialInvoice?.currency === "USD") return "com";
+    return "lk"; // Default to Sri Lanka
+  }, [initialInvoice?.site, initialInvoice?.currency]);
+
+  const [selectedCountry, setSelectedCountry] = useState<string>(initialCountryKey);
+  const [selectedPackageId, setSelectedPackageId] = useState<string>("");
+
+  const countryPresets = useMemo(() => {
+    return getInvoicePackagePresets(selectedCountry);
+  }, [selectedCountry]);
+
+  const activePreset = useMemo(() => {
+    return countryPresets.find((p) => p.id === selectedPackageId) || null;
+  }, [countryPresets, selectedPackageId]);
+
+  const presetCategories = useMemo(() => {
+    const cats: Array<"Full Packages" | "Individual Services" | "Consultation & Add-ons"> = [];
+    countryPresets.forEach((p) => {
+      if (!cats.includes(p.category)) cats.push(p.category);
+    });
+    return cats;
+  }, [countryPresets]);
+
+  const handleCountryChange = (countryKey: string) => {
+    setSelectedCountry(countryKey);
+    const c = INVOICE_COUNTRIES.find((item) => item.key === countryKey);
+    if (c) {
+      setCurrency(c.currency);
+      setSite(c.site);
+    }
+    setSelectedPackageId("");
+  };
+
+  const handleAddSelectedPackage = () => {
+    if (!activePreset) return;
+    const country = INVOICE_COUNTRIES.find((c) => c.key === selectedCountry);
+    if (country && currency !== country.currency) {
+      setCurrency(country.currency);
+      setSite(country.site);
+    }
+
+    setItems((prev) => [
+      ...prev,
+      {
+        id: `pkg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        description: activePreset.description,
+        quantity: 1,
+        unit_price: activePreset.unitPrice,
+        total: activePreset.unitPrice,
+      },
+    ]);
+  };
+
+  const handleReplaceWithPackage = () => {
+    if (!activePreset) return;
+    const country = INVOICE_COUNTRIES.find((c) => c.key === selectedCountry);
+    if (country) {
+      setCurrency(country.currency);
+      setSite(country.site);
+    }
+
+    setItems([
+      {
+        id: `pkg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        description: activePreset.description,
+        quantity: 1,
+        unit_price: activePreset.unitPrice,
+        total: activePreset.unitPrice,
+      },
+    ]);
+  };
+
+  const applyPresetToItem = (itemIdx: number, presetId: string) => {
+    const found = countryPresets.find((p) => p.id === presetId);
+    if (!found) return;
+    const country = INVOICE_COUNTRIES.find((c) => c.key === selectedCountry);
+    if (country && currency !== country.currency) {
+      setCurrency(country.currency);
+      setSite(country.site);
+    }
+
+    setItems((prev) => {
+      const next = [...prev];
+      const qty = next[itemIdx]?.quantity || 1;
+      next[itemIdx] = {
+        ...next[itemIdx],
+        description: found.description,
+        unit_price: found.unitPrice,
+        total: qty * found.unitPrice,
+      };
+      return next;
+    });
+  };
 
   const [issueDate, setIssueDate] = useState(
     initialInvoice?.issue_date || "2026-10-19"
@@ -813,6 +921,88 @@ export function CustomizableInvoiceGenerator({
   // 3. Line Items Table (Simple & Clean)
   const renderItems = () => (
     <div className="my-6">
+      {/* 📦 Package & Pricing Preset Selector for Admins */}
+      <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/40 p-3 sm:p-4 print:hidden shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-blue-600 text-white text-[11px] font-bold shadow-2xs">
+              📦
+            </span>
+            <span className="text-[13px] font-bold text-slate-800">
+              Select from Existing Packages & Services
+            </span>
+            <span className="text-[11px] text-slate-500 hidden md:inline">
+              (Prices & package descriptions change dynamically by country)
+            </span>
+          </div>
+
+          {/* Country / Market Selector */}
+          <div className="flex items-center gap-1.5">
+            <label className="text-[11.5px] font-semibold text-slate-600">Country / Market:</label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => handleCountryChange(e.target.value)}
+              className="text-[11.5px] font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1 shadow-2xs focus:border-blue-500 focus:outline-none cursor-pointer"
+            >
+              {INVOICE_COUNTRIES.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.flag} {c.name} ({c.currency})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Package Dropdown and Action Buttons */}
+        <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] items-center">
+          <select
+            value={selectedPackageId}
+            onChange={(e) => setSelectedPackageId(e.target.value)}
+            className="w-full text-[12.5px] font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 shadow-2xs focus:border-blue-500 focus:outline-none cursor-pointer"
+          >
+            <option value="">-- Choose package from {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name} --</option>
+            {presetCategories.map((cat) => (
+              <optgroup key={cat} label={`── ${cat} ──`}>
+                {countryPresets
+                  .filter((p) => p.category === cat)
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} · {p.currency} {p.unitPrice.toLocaleString()}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            onClick={handleAddSelectedPackage}
+            disabled={!selectedPackageId}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+          >
+            <span>+ Add Line Item</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReplaceWithPackage}
+            disabled={!selectedPackageId}
+            className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 disabled:opacity-40 text-slate-700 text-[12px] font-medium shadow-2xs transition-colors cursor-pointer"
+            title="Replace all current invoice items with this package"
+          >
+            <span>⚡ Replace All Items</span>
+          </button>
+        </div>
+
+        {/* Selected Package Preview Note */}
+        {activePreset && (
+          <div className="mt-2.5 text-[11.5px] text-slate-600 flex items-start gap-1.5 pt-2 border-t border-blue-200/50">
+            <span className="font-semibold text-blue-900 shrink-0">Auto-description:</span>
+            <span className="text-slate-700 italic">"{activePreset.description}"</span>
+          </div>
+        )}
+      </div>
+
       <table className="w-full text-left text-[13.5px]">
         <thead>
           <tr className="border-b-2 border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -849,13 +1039,44 @@ export function CustomizableInvoiceGenerator({
                 </div>
               </td>
               <td className="py-3 align-top">
-                <input
-                  type="text"
-                  value={item.description}
-                  onChange={(e) => handleItemChange(idx, "description", e.target.value)}
-                  placeholder="Service description"
-                  className="w-full font-medium text-slate-800 focus:outline-none focus:bg-slate-100 rounded px-1 -mx-1"
-                />
+                <div className="flex flex-col gap-1">
+                  <input
+                    type="text"
+                    value={item.description}
+                    onChange={(e) => handleItemChange(idx, "description", e.target.value)}
+                    placeholder="Service description"
+                    className="w-full font-medium text-slate-800 focus:outline-none focus:bg-slate-100 rounded px-1 -mx-1"
+                  />
+                  {/* Quick Preset Selector for this item */}
+                  <div className="flex items-center gap-1.5 print:hidden">
+                    <span className="text-[10px] uppercase font-bold text-slate-400">Autofill:</span>
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          applyPresetToItem(idx, e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                      className="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50/60 hover:bg-blue-100/80 border border-blue-200/70 rounded px-1.5 py-0.5 focus:outline-none cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        Pick from {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name} packages...
+                      </option>
+                      {presetCategories.map((cat) => (
+                        <optgroup key={cat} label={`── ${cat} ──`}>
+                          {countryPresets
+                            .filter((p) => p.category === cat)
+                            .map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name} · {p.currency} {p.unitPrice.toLocaleString()}
+                              </option>
+                            ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </td>
               <td className="py-3 px-3 align-top text-center">
                 <input
@@ -899,13 +1120,13 @@ export function CustomizableInvoiceGenerator({
       </table>
 
       {/* Add Line Item */}
-      <div className="pt-2 print:hidden">
+      <div className="pt-2 print:hidden flex items-center justify-between">
         <button
           type="button"
           onClick={handleAddItem}
           className="text-[12.5px] font-semibold text-slate-500 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
         >
-          <span>+ Add line item</span>
+          <span>+ Add custom line item</span>
         </button>
       </div>
     </div>
@@ -1863,7 +2084,15 @@ export function CustomizableInvoiceGenerator({
           <span className="text-slate-300">|</span>
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
+            onChange={(e) => {
+              const newCurr = e.target.value;
+              setCurrency(newCurr);
+              const matchedCountry = INVOICE_COUNTRIES.find((c) => c.currency === newCurr);
+              if (matchedCountry) {
+                setSelectedCountry(matchedCountry.key);
+                setSite(matchedCountry.site);
+              }
+            }}
             className="text-[12.5px] font-semibold text-slate-800 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:outline-none"
           >
             {CURRENCIES.map((c) => (
@@ -1902,6 +2131,9 @@ export function CustomizableInvoiceGenerator({
                     setToEmail(o.customer_email);
                     setSite(o.site);
                     setCurrency(o.currency);
+                    if (o.site === "lk" || o.currency === "LKR") setSelectedCountry("lk");
+                    else if (o.site === "uk" || o.currency === "GBP") setSelectedCountry("uk");
+                    else setSelectedCountry("com");
                     setItems([
                       {
                         id: `ord-${Date.now()}`,

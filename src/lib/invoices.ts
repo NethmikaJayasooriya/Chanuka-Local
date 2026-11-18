@@ -24,7 +24,7 @@ export interface Invoice {
   id: string;
   invoice_number: string;
   order_id?: string | null;
-  site: "com" | "lk";
+  site: "com" | "lk" | "uk";
   status: InvoiceStatus;
   issue_date: string;
   due_date?: string | null;

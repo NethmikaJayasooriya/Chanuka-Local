@@ -25,7 +25,7 @@ interface OrderImportOption {
   level_name: string;
   total_usd: number;
   currency: string;
-  site: "com" | "lk";
+  site: "com" | "lk" | "uk";
 }
 
 export function InvoiceBuilder({
@@ -46,7 +46,7 @@ export function InvoiceBuilder({
     initialInvoice?.invoice_number || generateInvoiceNumber()
   );
   const [orderId, setOrderId] = useState(initialInvoice?.order_id || "");
-  const [site, setSite] = useState<"com" | "lk">(initialInvoice?.site || "com");
+  const [site, setSite] = useState<"com" | "lk" | "uk">(initialInvoice?.site || "com");
   const [status, setStatus] = useState<InvoiceStatus>(initialInvoice?.status || "draft");
   const [issueDate, setIssueDate] = useState(
     initialInvoice?.issue_date || new Date().toISOString().split("T")[0]
