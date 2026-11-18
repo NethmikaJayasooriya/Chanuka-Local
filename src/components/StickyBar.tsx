@@ -6,7 +6,6 @@ import { BoltIcon } from "./CountryFlags";
 
 export function StickyBar() {
   const pathname = usePathname() ?? "/";
-  if (pathname.startsWith("/admin")) return null;
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -47,6 +46,8 @@ export function StickyBar() {
       window.removeEventListener("resize", checkPosition);
     };
   }, [isHome]);
+
+  if (pathname.startsWith("/admin")) return null;
 
   // Suppress sticky bar on order funnel pages or when the mobile navigation drawer is active
   if (

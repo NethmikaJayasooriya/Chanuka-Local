@@ -14,7 +14,6 @@ const servicesList = [
 
 export function Header() {
   const pathname = usePathname() ?? "/";
-  if (pathname.startsWith("/admin")) return null;
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -81,6 +80,8 @@ export function Header() {
       headerCls = "bg-paper/95 backdrop-blur-md border-b border-line shadow-2xs";
     }
   }
+
+  if (pathname.startsWith("/admin")) return null;
 
   return (
     <header
