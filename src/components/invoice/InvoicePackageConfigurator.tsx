@@ -5,6 +5,8 @@ import {
   INVOICE_COUNTRIES,
   getCountryServicePrice,
   formatCountryAmount,
+  getInvoicePackagePresets,
+  type InvoicePackagePreset,
 } from "@/lib/invoicePackages";
 import {
   deliveries,
@@ -20,6 +22,7 @@ import {
 
 interface Props {
   initialCountry?: string;
+  onClose?: () => void;
   onApplyPackage: (data: {
     countryKey: string;
     currency: string;
@@ -36,10 +39,12 @@ interface Props {
 
 export function InvoicePackageConfigurator({
   initialCountry = "lk",
+  onClose,
   onApplyPackage,
   onAddPackage,
 }: Props) {
   const [countryKey, setCountryKey] = useState<string>(initialCountry);
+  const [mode, setMode] = useState<"configurator" | "presets">("configurator");
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | null>(1);
   const [tier, setTier] = useState<TierId>("essential");
   const [level, setLevel] = useState<LevelId>("3-to-9");
@@ -50,6 +55,17 @@ export function InvoicePackageConfigurator({
     replace: ServiceId;
     message: string;
   } | null>(null);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const country = useMemo(() => {
     return INVOICE_COUNTRIES.find((c) => c.key === countryKey) || INVOICE_COUNTRIES[0];
@@ -195,6 +211,7 @@ export function InvoicePackageConfigurator({
       site: country.site,
       items: buildItemsPayload(),
     });
+    if (onClose) onClose();
   };
 
   const handleAdd = () => {
@@ -204,21 +221,137 @@ export function InvoicePackageConfigurator({
       site: country.site,
       items: buildItemsPayload(),
     });
+    if (onClose) onClose();
+  };
+
+  // Presets list for the second tab
+  const countryPresets = useMemo(() => {
+    return getInvoicePackagePresets(countryKey);
+  }, [countryKey]);
+
+  const presetCategories = useMemo(() => {
+    const cats: Array<"Full Packages" | "Individual Services" | "Consultation & Add-ons"> = [];
+    countryPresets.forEach((p) => {
+      if (!cats.includes(p.category)) cats.push(p.category);
+    });
+    return cats;
+  }, [countryPresets]);
+
+  const handleApplyPreset = (preset: InvoicePackagePreset) => {
+    onApplyPackage({
+      countryKey,
+      currency: country.currency,
+      site: country.site,
+      items: [
+        {
+          description: preset.description,
+          quantity: 1,
+          unit_price: preset.unitPrice,
+          total: preset.unitPrice,
+        },
+      ],
+    });
+    if (onClose) onClose();
+  };
+
+  const handleAddPreset = (preset: InvoicePackagePreset) => {
+    onAddPackage({
+      countryKey,
+      currency: country.currency,
+      site: country.site,
+      items: [
+        {
+          description: preset.description,
+          quantity: 1,
+          unit_price: preset.unitPrice,
+          total: preset.unitPrice,
+        },
+      ],
+    });
+    if (onClose) onClose();
   };
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4 sm:p-6 shadow-sm mb-6">
-      {/* Country Selection Pill Row */}
-      <div className="mb-6 pb-4 border-b border-line">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-accent-deep block">
-              Market & Currency
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-y-auto print:hidden"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) onClose();
+      }}
+    >
+      <div
+        className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] my-auto animate-in fade-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="px-5 sm:px-6 py-4 border-b border-slate-200 bg-slate-50/90 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white text-[15px] font-bold shadow-xs">
+              ✨
             </span>
-            <h3 className="text-[16px] font-bold text-ink">
-              Choose Country / Market Rates
-            </h3>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-tight">
+                  Official Package & Pricing Configurator
+                </h3>
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                  <span>{country.flag}</span>
+                  <span>{country.label}</span>
+                  <span className="text-slate-500 font-mono">({country.currency})</span>
+                </span>
+              </div>
+              <p className="text-[11.5px] text-slate-500 mt-0.5 truncate">
+                Official website packages, experience levels & turnaround times with dynamic international rates
+              </p>
+            </div>
           </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Mode Switcher */}
+            <div className="hidden sm:flex items-center rounded-xl bg-slate-200/70 p-1 border border-slate-200 text-[11.5px] font-semibold text-slate-700">
+              <button
+                type="button"
+                onClick={() => setMode("configurator")}
+                className={`rounded-lg px-2.5 py-1 transition-all cursor-pointer ${
+                  mode === "configurator"
+                    ? "bg-white text-blue-700 shadow-2xs font-bold"
+                    : "hover:text-slate-900"
+                }`}
+              >
+                ⚡ 3-Step Configurator
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("presets")}
+                className={`rounded-lg px-2.5 py-1 transition-all cursor-pointer ${
+                  mode === "presets"
+                    ? "bg-white text-blue-700 shadow-2xs font-bold"
+                    : "hover:text-slate-900"
+                }`}
+              >
+                📦 Quick Presets
+              </button>
+            </div>
+
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-8 w-8 flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer text-base font-bold"
+                title="Close modal (Esc)"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Country Selector Sub-Bar */}
+        <div className="px-5 sm:px-6 py-2.5 bg-slate-100/70 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Select Country / Market:
+          </span>
           <div className="flex flex-wrap items-center gap-1.5">
             {INVOICE_COUNTRIES.map((c) => {
               const isSelected = c.key === countryKey;
@@ -229,13 +362,13 @@ export function InvoicePackageConfigurator({
                   onClick={() => setCountryKey(c.key)}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? "bg-brand text-paper shadow-xs"
-                      : "bg-sand/40 hover:bg-sand/70 text-ink-soft border border-line"
+                      ? "bg-blue-600 text-white shadow-xs ring-2 ring-blue-600/30"
+                      : "bg-white hover:bg-slate-200/60 text-slate-700 border border-slate-200/90"
                   }`}
                 >
-                  <span>{c.flag}</span>
-                  <span>{c.name.split(" ")[0]}</span>
-                  <span className={isSelected ? "text-paper/80 text-[10.5px]" : "text-muted text-[10.5px]"}>
+                  <span className="text-[13px]">{c.flag}</span>
+                  <span>{c.label}</span>
+                  <span className={isSelected ? "text-blue-100 text-[10.5px] font-mono" : "text-slate-400 text-[10.5px] font-mono"}>
                     ({c.currency})
                   </span>
                 </button>
@@ -243,417 +376,561 @@ export function InvoicePackageConfigurator({
             })}
           </div>
         </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] items-start">
-        {/* Left Column: 3-Step Selection */}
-        <div className="space-y-4">
-          {/* Tier Selector */}
-          <div>
-            <label className="text-[12px] font-bold uppercase tracking-wider text-muted block mb-2">
-              Service Tier
-            </label>
-            <div className="grid grid-cols-2 gap-2.5">
-              {tiers.map((t) => {
-                const isSelected = t.id === tier;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTier(t.id)}
-                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? "border-accent bg-accent-soft/60 shadow-[0_0_0_1px_var(--color-accent)] text-ink"
-                        : "border-line bg-surface hover:border-line-strong text-ink"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[13.5px] font-bold text-ink">{t.name}</span>
-                      {isSelected && (
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand text-paper text-[10px]">
-                          ✓
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-[11.5px] leading-snug text-muted">
-                      {t.description}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* STEP 1: CAREER STAGE */}
-          <div className="rounded-xl border border-line bg-surface overflow-hidden shadow-xs">
+        {/* Mobile Mode Switcher (Visible only on small screens) */}
+        <div className="sm:hidden px-5 py-2 border-b border-slate-200 bg-white flex items-center justify-center">
+          <div className="flex items-center rounded-xl bg-slate-100 p-1 border border-slate-200 text-[11.5px] font-semibold w-full">
             <button
               type="button"
-              onClick={() => setActiveStep(activeStep === 1 ? null : 1)}
-              className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-sand/30 transition-colors"
+              onClick={() => setMode("configurator")}
+              className={`flex-1 text-center rounded-lg py-1 transition-all cursor-pointer ${
+                mode === "configurator"
+                  ? "bg-white text-blue-700 shadow-2xs font-bold"
+                  : "text-slate-600"
+              }`}
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-paper text-[11px] font-bold">
-                  1
-                </span>
-                <div className="truncate">
-                  <span className="text-[13.5px] font-bold text-ink block leading-tight">
-                    Career Stage / Experience Level
-                  </span>
-                  <span className="text-[12px] font-medium text-accent-deep truncate block">
-                    {levelObj?.name} · {levelObj?.hint}
-                  </span>
-                </div>
-              </div>
-              <span className="text-[11.5px] font-semibold text-muted">
-                {activeStep === 1 ? "Close ▲" : "Change ▼"}
-              </span>
+              ⚡ 3-Step Configurator
             </button>
-
-            {activeStep === 1 && (
-              <div className="border-t border-line/60 p-3 bg-sand/15 space-y-2">
-                {levels.map((l) => {
-                  const isSelected = l.id === level;
-                  return (
-                    <button
-                      key={l.id}
-                      type="button"
-                      onClick={() => {
-                        setLevel(l.id);
-                        setActiveStep(2);
-                      }}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? "border-brand bg-brand-soft/80 ring-1 ring-brand text-ink"
-                          : "border-line bg-surface hover:border-line-strong text-ink"
-                      }`}
-                    >
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#b9862f] block">
-                          {l.eyebrow}
-                        </span>
-                        <span className="text-[13px] font-bold text-ink block leading-snug">
-                          {l.name}
-                        </span>
-                        <span className="text-[11.5px] text-muted block">
-                          {l.hint}
-                        </span>
-                      </div>
-                      <span className="stat-number text-[12.5px] font-extrabold text-ink">
-                        {formatCountryAmount(
-                          getCountryServicePrice(countryKey, tier, "cv", l.id),
-                          countryKey
-                        )} (CV)
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* STEP 2: PACKAGE OPTIONS (MULTI-SELECT) */}
-          <div className="rounded-xl border border-line bg-surface overflow-hidden shadow-xs">
             <button
               type="button"
-              onClick={() => setActiveStep(activeStep === 2 ? null : 2)}
-              className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-sand/30 transition-colors"
+              onClick={() => setMode("presets")}
+              className={`flex-1 text-center rounded-lg py-1 transition-all cursor-pointer ${
+                mode === "presets"
+                  ? "bg-white text-blue-700 shadow-2xs font-bold"
+                  : "text-slate-600"
+              }`}
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-paper text-[11px] font-bold">
-                  2
-                </span>
-                <div className="truncate">
-                  <span className="text-[13.5px] font-bold text-ink block leading-tight">
-                    Package Options (Multi-select Services)
-                  </span>
-                  <span className="text-[12px] font-medium text-accent-deep truncate block">
-                    {activeServices.length} service{activeServices.length > 1 ? "s" : ""} selected · {formatCountryAmount(subtotal, countryKey)}
-                  </span>
-                </div>
-              </div>
-              <span className="text-[11.5px] font-semibold text-muted">
-                {activeStep === 2 ? "Close ▲" : "Change ▼"}
-              </span>
+              📦 Quick Presets
             </button>
-
-            {activeStep === 2 && (
-              <div className="border-t border-line/60 p-3 bg-sand/15 space-y-2.5">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-[11.5px] text-muted">
-                    Pick one or more services to bundle into this invoice:
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-accent-deep bg-accent/10 border border-accent/25 px-2 py-0.5 rounded-full">
-                    {activeServices.length} selected
-                  </span>
-                </div>
-
-                {/* Mutual Exclusivity Guidance Notice */}
-                {conflictAction && (
-                  <div className="rounded-xl border border-brand/20 bg-brand-soft/50 p-3 shadow-xs">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[12.5px] font-bold text-ink block">
-                          Cannot select both CV formats at once
-                        </span>
-                        <p className="mt-0.5 text-[11.5px] text-muted leading-relaxed">
-                          {conflictAction.message}
-                        </p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedServices((prev) =>
-                                prev.map((s) => (s === conflictAction.replace ? conflictAction.target : s))
-                              );
-                              setConflictAction(null);
-                            }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand hover:bg-brand-deep text-paper font-semibold text-[11.5px] cursor-pointer"
-                          >
-                            <span>Switch to {services[conflictAction.target]?.name}</span>
-                            <span>→</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setConflictAction(null)}
-                            className="px-2 py-1 rounded-lg text-muted hover:text-ink text-[11.5px] font-medium cursor-pointer"
-                          >
-                            Keep current
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setConflictAction(null)}
-                        className="text-muted hover:text-ink text-sm p-0.5 cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Services Checkboxes */}
-                <div className="space-y-1.5">
-                  {availableSingles.map((p) => {
-                    const sId = p.includes[0] as ServiceId;
-                    const isSelected = activeServices.includes(sId);
-                    const name = services[sId]?.name || p.name;
-                    const servicePrice = getCountryServicePrice(countryKey, tier, sId, level);
-                    const isConflicting =
-                      (!isSelected && sId === "foreign-cv" && activeServices.includes("cv")) ||
-                      (!isSelected && sId === "cv" && activeServices.includes("foreign-cv"));
-
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        role="checkbox"
-                        aria-checked={isSelected}
-                        onClick={() => handleToggleService(sId)}
-                        className={`w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                          isSelected
-                            ? "border-brand bg-brand-soft/70 ring-1 ring-brand text-ink"
-                            : isConflicting
-                            ? "border-line bg-surface/80 hover:border-brand/40 text-ink"
-                            : "border-line bg-surface hover:border-line-strong text-ink"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span
-                            className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${
-                              isSelected
-                                ? "border-brand bg-brand text-paper shadow-xs"
-                                : isConflicting
-                                ? "border-line-strong bg-sand/30"
-                                : "border-line-strong bg-paper"
-                            }`}
-                          >
-                            {isSelected && (
-                              <svg viewBox="0 0 14 14" fill="none" className="h-3 w-3 stroke-current stroke-[2.5]">
-                                <polyline points="2.5 7.5 5.5 10.5 11.5 3.5" />
-                              </svg>
-                            )}
-                          </span>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[13px] font-bold text-ink block leading-tight">
-                                {name}
-                              </span>
-                              {isConflicting && (
-                                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[9.5px] font-semibold bg-brand-soft/70 text-accent-deep border border-brand/15">
-                                  Pick 1 CV type
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-[11px] text-muted block leading-tight mt-0.5">
-                              {p.blurb}
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="stat-number text-[13px] font-extrabold text-ink shrink-0 ml-2">
-                          {formatCountryAmount(servicePrice, countryKey)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* STEP 3: TURNAROUND SPEED */}
-          <div className="rounded-xl border border-line bg-surface overflow-hidden shadow-xs">
-            <button
-              type="button"
-              onClick={() => setActiveStep(activeStep === 3 ? null : 3)}
-              className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-sand/30 transition-colors"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-paper text-[11px] font-bold">
-                  3
-                </span>
-                <div className="truncate">
-                  <span className="text-[13.5px] font-bold text-ink block leading-tight">
-                    Delivery Speed & Turnaround
-                  </span>
-                  <span className="text-[12px] font-medium text-accent-deep truncate block">
-                    {deliveryOption?.name} ({deliveryOption?.window}) · {deliveryOption?.note}
-                  </span>
-                </div>
-              </div>
-              <span className="text-[11.5px] font-semibold text-muted">
-                {activeStep === 3 ? "Close ▲" : "Change ▼"}
-              </span>
-            </button>
-
-            {activeStep === 3 && (
-              <div className="border-t border-line/60 p-3 bg-sand/15 space-y-1.5">
-                {deliveries.map((d) => {
-                  const isSelected = d.id === delivery;
-                  return (
-                    <button
-                      key={d.id}
-                      type="button"
-                      onClick={() => setDelivery(d.id)}
-                      className={`w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? "border-brand bg-brand-soft/70 ring-1 ring-brand text-ink"
-                          : "border-line bg-surface hover:border-line-strong text-ink"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                            isSelected ? "border-brand bg-brand text-paper" : "border-line-strong bg-paper"
-                          }`}
-                        >
-                          {isSelected && (
-                            <svg viewBox="0 0 12 12" className="h-1.5 w-1.5 fill-current">
-                              <circle cx="6" cy="6" r="3" />
-                            </svg>
-                          )}
-                        </span>
-                        <div>
-                          <span className="text-[13px] font-bold text-ink block leading-tight">
-                            {d.name}
-                          </span>
-                          <span className="text-[11px] text-muted block">
-                            {d.window}
-                          </span>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`rounded px-2 py-0.5 text-[10.5px] font-bold ${
-                          d.surcharge > 0
-                            ? "bg-accent/15 text-accent-deep border border-accent/25"
-                            : "bg-sand text-ink-soft"
-                        }`}
-                      >
-                        {d.note}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Right Column: Dynamic Quote & Actions */}
-        <div className="rounded-2xl border border-line bg-sand/35 p-5 shadow-xs">
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#b9862f] block">
-              {tierObj?.name} Tier · {country.name}
-            </span>
-            <h4 className="display mt-1 text-2xl font-bold text-ink">
-              {packageTitle}
-            </h4>
-            <p className="text-[12px] text-muted mt-0.5">
-              {levelObj?.hint}
-            </p>
-          </div>
+        {/* Modal Scrollable Body */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-slate-50/50">
+          {mode === "configurator" ? (
+            <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] items-start">
+              {/* Left Column: 3 Steps */}
+              <div className="space-y-4">
+                {/* Tier Selector */}
+                <div>
+                  <label className="text-[11.5px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
+                    Service Tier
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {tiers.map((t) => {
+                      const isSelected = t.id === tier;
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => setTier(t.id)}
+                          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                            isSelected
+                              ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600 shadow-xs text-slate-900"
+                              : "border-slate-200 bg-white hover:border-slate-300 text-slate-700"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[13.5px] font-bold text-slate-900">{t.name}</span>
+                            {isSelected && (
+                              <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-[11.5px] leading-snug text-slate-500">
+                            {t.description}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-          {/* Price display */}
-          <div className="mt-4 pb-3 border-b border-line">
-            <div className="display text-3xl font-black text-ink leading-tight">
-              {formatCountryAmount(total, countryKey)}
+                {/* STEP 1: CAREER STAGE */}
+                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveStep(activeStep === 1 ? null : 1)}
+                    className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white text-[11px] font-bold">
+                        1
+                      </span>
+                      <div className="truncate">
+                        <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
+                          Career Stage / Experience Level
+                        </span>
+                        <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
+                          {levelObj?.name} · {levelObj?.hint}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[11.5px] font-semibold text-slate-500 shrink-0 ml-2">
+                      {activeStep === 1 ? "Close ▲" : "Change ▼"}
+                    </span>
+                  </button>
+
+                  {activeStep === 1 && (
+                    <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2">
+                      {levels.map((l) => {
+                        const isSelected = l.id === level;
+                        return (
+                          <button
+                            key={l.id}
+                            type="button"
+                            onClick={() => {
+                              setLevel(l.id);
+                              setActiveStep(2);
+                            }}
+                            className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? "border-blue-600 bg-blue-50/80 ring-1 ring-blue-600 text-slate-900 shadow-2xs"
+                                : "border-slate-200 bg-white hover:border-slate-300 text-slate-800"
+                            }`}
+                          >
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
+                                {l.eyebrow}
+                              </span>
+                              <span className="text-[13px] font-bold text-slate-900 block leading-snug">
+                                {l.name}
+                              </span>
+                              <span className="text-[11.5px] text-slate-500 block">
+                                {l.hint}
+                              </span>
+                            </div>
+                            <span className="text-[13px] font-extrabold text-slate-900 font-mono shrink-0 ml-3">
+                              {formatCountryAmount(
+                                getCountryServicePrice(countryKey, tier, "cv", l.id),
+                                countryKey
+                              )}{" "}
+                              <span className="text-[10.5px] font-normal text-slate-400 font-sans">(CV)</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* STEP 2: PACKAGE OPTIONS (MULTI-SELECT) */}
+                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveStep(activeStep === 2 ? null : 2)}
+                    className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white text-[11px] font-bold">
+                        2
+                      </span>
+                      <div className="truncate">
+                        <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
+                          Package Services (Multi-select)
+                        </span>
+                        <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
+                          {activeServices.length} service{activeServices.length > 1 ? "s" : ""} selected · {formatCountryAmount(subtotal, countryKey)}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[11.5px] font-semibold text-slate-500 shrink-0 ml-2">
+                      {activeStep === 2 ? "Close ▲" : "Change ▼"}
+                    </span>
+                  </button>
+
+                  {activeStep === 2 && (
+                    <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2.5">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[11.5px] text-slate-500">
+                          Select one or more services to bundle into this invoice:
+                        </span>
+                        <span className="text-[10.5px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-full">
+                          {activeServices.length} selected
+                        </span>
+                      </div>
+
+                      {/* Mutual Exclusivity Guidance Notice */}
+                      {conflictAction && (
+                        <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 shadow-xs">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-amber-600 font-bold">⚠️</span>
+                                <span className="text-[12.5px] font-bold text-slate-900">
+                                  Cannot select both CV formats at once
+                                </span>
+                              </div>
+                              <p className="mt-1 text-[11.5px] text-slate-600 leading-relaxed">
+                                {conflictAction.message}
+                              </p>
+                              <div className="mt-2.5 flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedServices((prev) =>
+                                      prev.map((s) => (s === conflictAction.replace ? conflictAction.target : s))
+                                    );
+                                    setConflictAction(null);
+                                  }}
+                                  className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-[11.5px] cursor-pointer shadow-2xs"
+                                >
+                                  <span>Switch to {services[conflictAction.target]?.name}</span>
+                                  <span>→</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setConflictAction(null)}
+                                  className="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-[11.5px] font-medium cursor-pointer"
+                                >
+                                  Keep current selection
+                                </button>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setConflictAction(null)}
+                              className="text-slate-400 hover:text-slate-700 text-sm p-0.5 cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Services Checkboxes */}
+                      <div className="space-y-1.5">
+                        {availableSingles.map((p) => {
+                          const sId = p.includes[0] as ServiceId;
+                          const isSelected = activeServices.includes(sId);
+                          const name = services[sId]?.name || p.name;
+                          const servicePrice = getCountryServicePrice(countryKey, tier, sId, level);
+                          const isConflicting =
+                            (!isSelected && sId === "foreign-cv" && activeServices.includes("cv")) ||
+                            (!isSelected && sId === "cv" && activeServices.includes("foreign-cv"));
+
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              onClick={() => handleToggleService(sId)}
+                              className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                                isSelected
+                                  ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600 text-slate-900 shadow-2xs"
+                                  : isConflicting
+                                  ? "border-slate-200 bg-white/70 hover:border-blue-300 text-slate-800"
+                                  : "border-slate-200 bg-white hover:border-slate-300 text-slate-800"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <span
+                                  className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                                    isSelected
+                                      ? "border-blue-600 bg-blue-600 text-white shadow-xs"
+                                      : isConflicting
+                                      ? "border-slate-300 bg-slate-100"
+                                      : "border-slate-300 bg-white"
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <svg viewBox="0 0 14 14" fill="none" className="h-3 w-3 stroke-current stroke-[2.5]">
+                                      <polyline points="2.5 7.5 5.5 10.5 11.5 3.5" />
+                                    </svg>
+                                  )}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[13px] font-bold text-slate-900 block leading-tight">
+                                      {name}
+                                    </span>
+                                    {isConflicting && (
+                                      <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                                        Choose 1 CV type
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[11.5px] text-slate-500 block leading-tight mt-0.5">
+                                    {p.blurb}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <span className="text-[13px] font-extrabold text-slate-900 font-mono shrink-0 ml-3">
+                                {formatCountryAmount(servicePrice, countryKey)}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* STEP 3: TURNAROUND SPEED */}
+                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveStep(activeStep === 3 ? null : 3)}
+                    className="w-full flex items-center justify-between p-3.5 text-left cursor-pointer hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white text-[11px] font-bold">
+                        3
+                      </span>
+                      <div className="truncate">
+                        <span className="text-[13.5px] font-bold text-slate-900 block leading-tight">
+                          Delivery Speed & Turnaround
+                        </span>
+                        <span className="text-[12px] font-medium text-blue-700 truncate block mt-0.5">
+                          {deliveryOption?.name} ({deliveryOption?.window}) · {deliveryOption?.note}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[11.5px] font-semibold text-slate-500 shrink-0 ml-2">
+                      {activeStep === 3 ? "Close ▲" : "Change ▼"}
+                    </span>
+                  </button>
+
+                  {activeStep === 3 && (
+                    <div className="border-t border-slate-100 p-3 bg-slate-50/60 space-y-2">
+                      {deliveries.map((d) => {
+                        const isSelected = d.id === delivery;
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => setDelivery(d.id)}
+                            className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? "border-blue-600 bg-blue-50/70 ring-1 ring-blue-600 text-slate-900 shadow-2xs"
+                                : "border-slate-200 bg-white hover:border-slate-300 text-slate-800"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span
+                                className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border ${
+                                  isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 bg-white"
+                                }`}
+                              >
+                                {isSelected && (
+                                  <svg viewBox="0 0 12 12" className="h-1.5 w-1.5 fill-current">
+                                    <circle cx="6" cy="6" r="3" />
+                                  </svg>
+                                )}
+                              </span>
+                              <div>
+                                <span className="text-[13px] font-bold text-slate-900 block leading-tight">
+                                  {d.name}
+                                </span>
+                                <span className="text-[11.5px] text-slate-500 block">
+                                  {d.window}
+                                </span>
+                              </div>
+                            </div>
+
+                            <span
+                              className={`rounded-lg px-2.5 py-1 text-[11px] font-bold ${
+                                d.surcharge > 0
+                                  ? "bg-amber-100 text-amber-800 border border-amber-200"
+                                  : "bg-slate-100 text-slate-600"
+                              }`}
+                            >
+                              {d.note}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Live Quote Card (Sticky) */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-2">
+                <div className="pb-3 border-b border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 block">
+                      {tierObj?.name} Tier · {country.name}
+                    </span>
+                    <span className="text-base">{country.flag}</span>
+                  </div>
+                  <h4 className="text-[19px] sm:text-[21px] font-bold text-slate-950 mt-1 leading-snug">
+                    {packageTitle}
+                  </h4>
+                  <p className="text-[12px] text-slate-500 mt-0.5">
+                    {levelObj?.name} · {levelObj?.hint}
+                  </p>
+                </div>
+
+                {/* Price display */}
+                <div className="py-4 border-b border-slate-100">
+                  <div className="text-3xl font-black text-slate-950 font-mono tracking-tight leading-tight">
+                    {formatCountryAmount(total, countryKey)}
+                  </div>
+                  <p className="text-[11.5px] text-slate-500 mt-1">
+                    Combined price in {country.currency} ({country.label})
+                  </p>
+                </div>
+
+                {/* Itemized Service Breakdown */}
+                <div className="py-3.5 space-y-2 text-[12.5px] border-b border-slate-100">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    Invoice Items Breakdown:
+                  </span>
+                  {serviceBreakdown.map((item) => (
+                    <div
+                      key={item.serviceId}
+                      className="flex items-center justify-between py-1 text-slate-700"
+                    >
+                      <span className="text-slate-600">{item.name}</span>
+                      <span className="font-bold text-slate-950 font-mono">
+                        {formatCountryAmount(item.price, countryKey)}
+                      </span>
+                    </div>
+                  ))}
+                  {deliveryFee > 0 && deliveryOption && (
+                    <div className="flex items-center justify-between py-1 text-slate-700">
+                      <span className="text-slate-600">
+                        {deliveryOption.name} ({deliveryOption.note})
+                      </span>
+                      <span className="font-bold text-amber-700 font-mono">
+                        +{formatCountryAmount(deliveryFee, countryKey)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-1 text-[11.5px] text-slate-500">
+                    <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
+                    <span className="font-semibold text-emerald-600">
+                      {tier === "signature" ? "30 days included" : "1 round included"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons to populate Invoice */}
+                <div className="pt-4 space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleApply}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 shadow-sm transition-all text-[13.5px] cursor-pointer"
+                  >
+                    <span>⚡ Replace Invoice Items</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAdd}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-semibold py-2.5 px-4 transition-colors text-[13px] shadow-2xs cursor-pointer"
+                  >
+                    <span>+ Add to Existing Items</span>
+                  </button>
+                </div>
+              </div>
             </div>
-            <p className="text-[11.5px] text-muted mt-1">
-              Combined price in {country.currency} ({country.name})
-            </p>
+          ) : (
+            /* Presets Mode: Browse ready packages */
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-[15px] font-bold text-slate-900">
+                    Ready Package Presets for {country.name} ({country.currency})
+                  </h4>
+                  <p className="text-[12px] text-slate-500">
+                    Click any package to immediately insert it into the invoice
+                  </p>
+                </div>
+              </div>
+
+              {presetCategories.map((cat) => (
+                <div key={cat} className="space-y-3">
+                  <h5 className="text-[12px] font-bold uppercase tracking-wider text-blue-700 border-b border-blue-100 pb-1.5">
+                    {cat}
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {countryPresets
+                      .filter((p) => p.category === cat)
+                      .map((preset) => (
+                        <div
+                          key={preset.id}
+                          className="p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-400 hover:shadow-xs transition-all flex flex-col justify-between gap-3"
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[13.5px] font-bold text-slate-900 block leading-snug">
+                                  {preset.name}
+                                </span>
+                                {(preset.tier || preset.level) && (
+                                  <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+                                    {preset.tier && `${preset.tier} Tier · `}
+                                    {preset.level}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[14px] font-black font-mono text-slate-950 shrink-0">
+                                {preset.currency} {preset.unitPrice.toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-[11.5px] text-slate-600 leading-relaxed italic">
+                              "{preset.description}"
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                            <button
+                              type="button"
+                              onClick={() => handleApplyPreset(preset)}
+                              className="flex-1 py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold shadow-2xs transition-colors cursor-pointer text-center"
+                            >
+                              ⚡ Replace Invoice
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleAddPreset(preset)}
+                              className="flex-1 py-1.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[12px] font-semibold transition-colors cursor-pointer text-center"
+                            >
+                              + Add Item
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Modal Sticky Footer */}
+        <div className="px-5 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-[12px] text-slate-600">
+            <span className="font-semibold text-slate-900">Current Selection:</span>
+            <span>
+              {packageTitle} ({levelObj?.name}) · {tierObj?.name} Tier · {country.name}
+            </span>
+            <span className="text-slate-400">|</span>
+            <span className="font-bold text-slate-900 font-mono">
+              Total: {formatCountryAmount(total, countryKey)}
+            </span>
           </div>
 
-          {/* Itemized Service Breakdown */}
-          <div className="mt-4 space-y-2 text-[12.5px]">
-            <span className="text-[10.5px] font-bold uppercase tracking-wider text-muted block">
-              Invoice Items Breakdown:
-            </span>
-            {serviceBreakdown.map((item) => (
-              <div
-                key={item.serviceId}
-                className="flex items-center justify-between py-1 border-b border-line/40 text-ink"
+          <div className="flex items-center gap-2">
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 text-[12.5px] font-semibold transition-colors cursor-pointer"
               >
-                <span className="font-normal text-ink-soft">{item.name}</span>
-                <span className="font-bold text-ink">
-                  {formatCountryAmount(item.price, countryKey)}
-                </span>
-              </div>
-            ))}
-            {deliveryFee > 0 && deliveryOption && (
-              <div className="flex items-center justify-between py-1 border-b border-line/40 text-ink">
-                <span className="font-normal text-ink-soft">
-                  {deliveryOption.name} ({deliveryOption.note})
-                </span>
-                <span className="font-bold text-ink">
-                  +{formatCountryAmount(deliveryFee, countryKey)}
-                </span>
-              </div>
+                Cancel
+              </button>
             )}
-            <div className="flex items-center justify-between py-1 text-[11.5px] text-muted">
-              <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
-              <span className="font-semibold text-emerald-600">
-                {tier === "signature" ? "30 days included" : "1 round included"}
-              </span>
-            </div>
-          </div>
-
-          {/* Action Buttons to populate Invoice */}
-          <div className="mt-6 pt-4 border-t border-line space-y-2">
             <button
               type="button"
               onClick={handleApply}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand hover:bg-brand-deep text-paper font-bold py-3 px-4 shadow-sm transition-all text-[14px] cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[12.5px] font-bold shadow-xs transition-colors cursor-pointer"
             >
-              <span>⚡ Replace Invoice with This Package</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-surface hover:bg-sand/40 border border-line text-ink font-semibold py-2.5 px-4 transition-colors text-[13px] cursor-pointer"
-            >
-              <span>+ Add to Existing Line Items</span>
+              Apply to Invoice
             </button>
           </div>
         </div>

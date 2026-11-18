@@ -961,133 +961,53 @@ export function CustomizableInvoiceGenerator({
   // 3. Line Items Table (Simple & Clean)
   const renderItems = () => (
     <div className="my-6">
-      {/* Visual Package Configurator (Exact Same as Home Page) */}
-      <div className="mb-4 print:hidden">
-        <button
-          type="button"
-          onClick={() => setShowVisualConfigurator((v) => !v)}
-          className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer ${
-            showVisualConfigurator
-              ? "border-brand bg-brand-soft/70 text-ink ring-1 ring-brand shadow-xs"
-              : "border-line bg-surface hover:border-brand/40 hover:bg-sand/30 text-ink shadow-2xs"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-paper text-[15px] font-bold shadow-xs">
-              ✨
-            </span>
-            <div className="text-left">
-              <div className="flex items-center gap-2">
-                <span className="text-[14px] font-bold text-ink">
-                  {showVisualConfigurator
-                    ? "Hide Interactive Package Configurator"
-                    : "Select Package via Interactive Configurator (Same as Home Page)"}
-                </span>
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold bg-accent/15 text-accent-deep border border-accent/25">
-                  {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.flag} {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name}
-                </span>
-              </div>
-              <span className="text-[11.5px] text-muted block mt-0.5">
-                Full 3-step configurator: Tier, Career Level, Multi-select Services, Turnaround & Live Pricing
+      {/* 📦 Package & Country Rates Action Bar (Clean & Non-Intrusive) */}
+      <div className="mb-4 print:hidden flex flex-wrap items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-slate-50/90 border border-slate-200/90 shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white text-[14px] font-bold shadow-2xs">
+            📦
+          </span>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[13px] font-bold text-slate-900">
+                Official Packages & Dynamic Country Rates
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                <span>{INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.flag}</span>
+                <span>{INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.label}</span>
+                <span className="text-slate-500 font-mono">({currency})</span>
               </span>
             </div>
-          </div>
-          <span className="text-[12px] font-bold text-brand px-3.5 py-1.5 rounded-xl bg-paper border border-line shadow-2xs">
-            {showVisualConfigurator ? "Close Configurator ▲" : "Open Configurator ▼"}
-          </span>
-        </button>
-
-        {showVisualConfigurator && (
-          <div className="mt-4">
-            <InvoicePackageConfigurator
-              initialCountry={selectedCountry}
-              onApplyPackage={handleApplyConfiguredPackage}
-              onAddPackage={handleAddConfiguredPackage}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* 📦 Package & Pricing Preset Selector for Admins */}
-      <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/40 p-3 sm:p-4 print:hidden shadow-xs">
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-blue-600 text-white text-[11px] font-bold shadow-2xs">
-              📦
-            </span>
-            <span className="text-[13px] font-bold text-slate-800">
-              Select from Existing Packages & Services
-            </span>
-            <span className="text-[11px] text-slate-500 hidden md:inline">
-              (Prices & package descriptions change dynamically by country)
-            </span>
-          </div>
-
-          {/* Country / Market Selector */}
-          <div className="flex items-center gap-1.5">
-            <label className="text-[11.5px] font-semibold text-slate-600">Country / Market:</label>
-            <select
-              value={selectedCountry}
-              onChange={(e) => handleCountryChange(e.target.value)}
-              className="text-[11.5px] font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1 shadow-2xs focus:border-blue-500 focus:outline-none cursor-pointer"
-            >
-              {INVOICE_COUNTRIES.map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.flag} {c.name} ({c.currency})
-                </option>
-              ))}
-            </select>
+            <p className="text-[11.5px] text-slate-500">
+              Select or customize CV packages, experience levels & turnaround times with dynamic international rates
+            </p>
           </div>
         </div>
 
-        {/* Package Dropdown and Action Buttons */}
-        <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] items-center">
+        <div className="flex items-center gap-2">
+          {/* Quick country select */}
           <select
-            value={selectedPackageId}
-            onChange={(e) => setSelectedPackageId(e.target.value)}
-            className="w-full text-[12.5px] font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-1.5 shadow-2xs focus:border-blue-500 focus:outline-none cursor-pointer"
+            value={selectedCountry}
+            onChange={(e) => handleCountryChange(e.target.value)}
+            className="text-[11.5px] font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 shadow-2xs focus:border-blue-500 focus:outline-none cursor-pointer"
+            title="Change active country rates"
           >
-            <option value="">-- Choose package from {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name} --</option>
-            {presetCategories.map((cat) => (
-              <optgroup key={cat} label={`── ${cat} ──`}>
-                {countryPresets
-                  .filter((p) => p.category === cat)
-                  .map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} · {p.currency} {p.unitPrice.toLocaleString()}
-                    </option>
-                  ))}
-              </optgroup>
+            {INVOICE_COUNTRIES.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.flag} {c.label} ({c.currency})
+              </option>
             ))}
           </select>
 
+          {/* Button to Open Full Interactive Modal */}
           <button
             type="button"
-            onClick={handleAddSelectedPackage}
-            disabled={!selectedPackageId}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+            onClick={() => setShowVisualConfigurator(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-bold shadow-xs transition-colors cursor-pointer"
           >
-            <span>+ Add Line Item</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleReplaceWithPackage}
-            disabled={!selectedPackageId}
-            className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 disabled:opacity-40 text-slate-700 text-[12px] font-medium shadow-2xs transition-colors cursor-pointer"
-            title="Replace all current invoice items with this package"
-          >
-            <span>⚡ Replace All Items</span>
+            <span>✨ Select from Package Configurator</span>
           </button>
         </div>
-
-        {/* Selected Package Preview Note */}
-        {activePreset && (
-          <div className="mt-2.5 text-[11.5px] text-slate-600 flex items-start gap-1.5 pt-2 border-t border-blue-200/50">
-            <span className="font-semibold text-blue-900 shrink-0">Auto-description:</span>
-            <span className="text-slate-700 italic">"{activePreset.description}"</span>
-          </div>
-        )}
       </div>
 
       <table className="w-full text-left text-[13.5px]">
@@ -2486,6 +2406,16 @@ export function CustomizableInvoiceGenerator({
       >
         {renderExactOutputPaper(false, "exact-preview-paper-export", true)}
       </div>
+
+      {/* Interactive Package Configurator & Presets Modal */}
+      {showVisualConfigurator && (
+        <InvoicePackageConfigurator
+          initialCountry={selectedCountry}
+          onClose={() => setShowVisualConfigurator(false)}
+          onApplyPackage={handleApplyConfiguredPackage}
+          onAddPackage={handleAddConfiguredPackage}
+        />
+      )}
     </div>
   );
 }

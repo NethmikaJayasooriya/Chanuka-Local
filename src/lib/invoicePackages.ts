@@ -11,6 +11,7 @@ import {
 export interface InvoiceCountry {
   key: string;
   name: string;
+  label: string;
   currency: string;
   symbol: string;
   flag: string;
@@ -18,14 +19,14 @@ export interface InvoiceCountry {
 }
 
 export const INVOICE_COUNTRIES: InvoiceCountry[] = [
-  { key: "lk", name: "Sri Lanka", currency: "LKR", symbol: "Rs ", flag: "🇱🇰", site: "lk" },
-  { key: "com", name: "Global / International", currency: "USD", symbol: "$", flag: "🌐", site: "com" },
-  { key: "uk", name: "United Kingdom", currency: "GBP", symbol: "£", flag: "🇬🇧", site: "uk" },
-  { key: "au", name: "Australia", currency: "AUD", symbol: "A$", flag: "🇦🇺", site: "com" },
-  { key: "eu", name: "Europe", currency: "EUR", symbol: "€", flag: "🇪🇺", site: "com" },
-  { key: "ae", name: "United Arab Emirates / Gulf", currency: "AED", symbol: "AED ", flag: "🇦🇪", site: "com" },
-  { key: "ca", name: "Canada", currency: "CAD", symbol: "C$", flag: "🇨🇦", site: "com" },
-  { key: "sg", name: "Singapore", currency: "SGD", symbol: "S$", flag: "🇸🇬", site: "com" },
+  { key: "lk", name: "Sri Lanka", label: "Sri Lanka", currency: "LKR", symbol: "Rs ", flag: "🇱🇰", site: "lk" },
+  { key: "com", name: "Global / International", label: "Global / US", currency: "USD", symbol: "$", flag: "🌐", site: "com" },
+  { key: "uk", name: "United Kingdom", label: "UK", currency: "GBP", symbol: "£", flag: "🇬🇧", site: "uk" },
+  { key: "au", name: "Australia", label: "Australia", currency: "AUD", symbol: "A$", flag: "🇦🇺", site: "com" },
+  { key: "eu", name: "Europe", label: "Europe", currency: "EUR", symbol: "€", flag: "🇪🇺", site: "com" },
+  { key: "ae", name: "United Arab Emirates / Gulf", label: "UAE / Gulf", currency: "AED", symbol: "AED ", flag: "🇦🇪", site: "com" },
+  { key: "ca", name: "Canada", label: "Canada", currency: "CAD", symbol: "C$", flag: "🇨🇦", site: "com" },
+  { key: "sg", name: "Singapore", label: "Singapore", currency: "SGD", symbol: "S$", flag: "🇸🇬", site: "com" },
 ];
 
 export interface InvoicePackagePreset {
