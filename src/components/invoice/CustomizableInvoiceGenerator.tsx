@@ -22,6 +22,7 @@ import {
   getInvoicePackagePresets,
   type InvoicePackagePreset,
 } from "@/lib/invoicePackages";
+import { InvoicePackageConfigurator } from "@/components/invoice/InvoicePackageConfigurator";
 
 interface OrderImportOption {
   id: string;
@@ -358,6 +359,45 @@ export function CustomizableInvoiceGenerator({
       };
       return next;
     });
+  };
+
+  const [showVisualConfigurator, setShowVisualConfigurator] = useState(false);
+
+  const handleApplyConfiguredPackage = (configured: {
+    countryKey: string;
+    currency: string;
+    site: "com" | "lk" | "uk";
+    items: Array<{ description: string; quantity: number; unit_price: number; total: number }>;
+  }) => {
+    setCurrency(configured.currency);
+    setSite(configured.site);
+    setSelectedCountry(configured.countryKey);
+    setItems(
+      configured.items.map((it, idx) => ({
+        ...it,
+        id: `pkg-${Date.now()}-${idx}`,
+      }))
+    );
+    setShowVisualConfigurator(false);
+  };
+
+  const handleAddConfiguredPackage = (configured: {
+    countryKey: string;
+    currency: string;
+    site: "com" | "lk" | "uk";
+    items: Array<{ description: string; quantity: number; unit_price: number; total: number }>;
+  }) => {
+    setCurrency(configured.currency);
+    setSite(configured.site);
+    setSelectedCountry(configured.countryKey);
+    setItems((prev) => [
+      ...prev,
+      ...configured.items.map((it, idx) => ({
+        ...it,
+        id: `pkg-${Date.now()}-${idx}`,
+      })),
+    ]);
+    setShowVisualConfigurator(false);
   };
 
   const [issueDate, setIssueDate] = useState(
@@ -921,6 +961,53 @@ export function CustomizableInvoiceGenerator({
   // 3. Line Items Table (Simple & Clean)
   const renderItems = () => (
     <div className="my-6">
+      {/* Visual Package Configurator (Exact Same as Home Page) */}
+      <div className="mb-4 print:hidden">
+        <button
+          type="button"
+          onClick={() => setShowVisualConfigurator((v) => !v)}
+          className={`w-full flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer ${
+            showVisualConfigurator
+              ? "border-brand bg-brand-soft/70 text-ink ring-1 ring-brand shadow-xs"
+              : "border-line bg-surface hover:border-brand/40 hover:bg-sand/30 text-ink shadow-2xs"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-paper text-[15px] font-bold shadow-xs">
+              ✨
+            </span>
+            <div className="text-left">
+              <div className="flex items-center gap-2">
+                <span className="text-[14px] font-bold text-ink">
+                  {showVisualConfigurator
+                    ? "Hide Interactive Package Configurator"
+                    : "Select Package via Interactive Configurator (Same as Home Page)"}
+                </span>
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold bg-accent/15 text-accent-deep border border-accent/25">
+                  {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.flag} {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name}
+                </span>
+              </div>
+              <span className="text-[11.5px] text-muted block mt-0.5">
+                Full 3-step configurator: Tier, Career Level, Multi-select Services, Turnaround & Live Pricing
+              </span>
+            </div>
+          </div>
+          <span className="text-[12px] font-bold text-brand px-3.5 py-1.5 rounded-xl bg-paper border border-line shadow-2xs">
+            {showVisualConfigurator ? "Close Configurator ▲" : "Open Configurator ▼"}
+          </span>
+        </button>
+
+        {showVisualConfigurator && (
+          <div className="mt-4">
+            <InvoicePackageConfigurator
+              initialCountry={selectedCountry}
+              onApplyPackage={handleApplyConfiguredPackage}
+              onAddPackage={handleAddConfiguredPackage}
+            />
+          </div>
+        )}
+      </div>
+
       {/* 📦 Package & Pricing Preset Selector for Admins */}
       <div className="mb-4 rounded-xl border border-blue-200/80 bg-blue-50/40 p-3 sm:p-4 print:hidden shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">

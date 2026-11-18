@@ -727,3 +727,162 @@ function getSingaporePresets(): InvoicePackagePreset[] {
     },
   ];
 }
+
+export const MULTI_COUNTRY_PRICES: Record<
+  string,
+  Record<TierId, Record<ServiceId, Record<LevelId, number>>>
+> = {
+  lk: {
+    essential: BASE_PRICES,
+    signature: SIGNATURE_PRICES,
+  },
+  com: {
+    essential: {
+      cv: { "under-2": 45, "3-to-9": 75, "over-10": 125 },
+      linkedin: { "under-2": 45, "3-to-9": 75, "over-10": 110 },
+      "cover-letter": { "under-2": 35, "3-to-9": 45, "over-10": 65 },
+      "foreign-cv": { "under-2": 55, "3-to-9": 85, "over-10": 135 },
+      "cv-review": { "under-2": 25, "3-to-9": 35, "over-10": 45 },
+      consultation: { "under-2": 60, "3-to-9": 90, "over-10": 120 },
+    },
+    signature: {
+      cv: { "under-2": 75, "3-to-9": 145, "over-10": 245 },
+      linkedin: { "under-2": 75, "3-to-9": 135, "over-10": 195 },
+      "cover-letter": { "under-2": 55, "3-to-9": 75, "over-10": 110 },
+      "foreign-cv": { "under-2": 95, "3-to-9": 165, "over-10": 265 },
+      "cv-review": { "under-2": 35, "3-to-9": 55, "over-10": 75 },
+      consultation: { "under-2": 75, "3-to-9": 120, "over-10": 150 },
+    },
+  },
+  uk: {
+    essential: {
+      cv: { "under-2": 35, "3-to-9": 59, "over-10": 95 },
+      linkedin: { "under-2": 35, "3-to-9": 59, "over-10": 85 },
+      "cover-letter": { "under-2": 25, "3-to-9": 35, "over-10": 55 },
+      "foreign-cv": { "under-2": 45, "3-to-9": 69, "over-10": 105 },
+      "cv-review": { "under-2": 20, "3-to-9": 30, "over-10": 40 },
+      consultation: { "under-2": 50, "3-to-9": 70, "over-10": 95 },
+    },
+    signature: {
+      cv: { "under-2": 60, "3-to-9": 115, "over-10": 195 },
+      linkedin: { "under-2": 60, "3-to-9": 105, "over-10": 155 },
+      "cover-letter": { "under-2": 45, "3-to-9": 60, "over-10": 85 },
+      "foreign-cv": { "under-2": 75, "3-to-9": 135, "over-10": 215 },
+      "cv-review": { "under-2": 30, "3-to-9": 45, "over-10": 60 },
+      consultation: { "under-2": 60, "3-to-9": 95, "over-10": 120 },
+    },
+  },
+  au: {
+    essential: {
+      cv: { "under-2": 65, "3-to-9": 115, "over-10": 185 },
+      linkedin: { "under-2": 65, "3-to-9": 115, "over-10": 165 },
+      "cover-letter": { "under-2": 45, "3-to-9": 65, "over-10": 95 },
+      "foreign-cv": { "under-2": 75, "3-to-9": 135, "over-10": 195 },
+      "cv-review": { "under-2": 35, "3-to-9": 55, "over-10": 75 },
+      consultation: { "under-2": 85, "3-to-9": 140, "over-10": 180 },
+    },
+    signature: {
+      cv: { "under-2": 110, "3-to-9": 220, "over-10": 360 },
+      linkedin: { "under-2": 110, "3-to-9": 195, "over-10": 295 },
+      "cover-letter": { "under-2": 85, "3-to-9": 115, "over-10": 165 },
+      "foreign-cv": { "under-2": 145, "3-to-9": 245, "over-10": 395 },
+      "cv-review": { "under-2": 50, "3-to-9": 75, "over-10": 110 },
+      consultation: { "under-2": 110, "3-to-9": 180, "over-10": 225 },
+    },
+  },
+  eu: {
+    essential: {
+      cv: { "under-2": 40, "3-to-9": 69, "over-10": 115 },
+      linkedin: { "under-2": 40, "3-to-9": 69, "over-10": 99 },
+      "cover-letter": { "under-2": 30, "3-to-9": 39, "over-10": 59 },
+      "foreign-cv": { "under-2": 50, "3-to-9": 79, "over-10": 125 },
+      "cv-review": { "under-2": 25, "3-to-9": 35, "over-10": 45 },
+      consultation: { "under-2": 55, "3-to-9": 80, "over-10": 110 },
+    },
+    signature: {
+      cv: { "under-2": 70, "3-to-9": 135, "over-10": 225 },
+      linkedin: { "under-2": 70, "3-to-9": 125, "over-10": 180 },
+      "cover-letter": { "under-2": 50, "3-to-9": 70, "over-10": 99 },
+      "foreign-cv": { "under-2": 85, "3-to-9": 155, "over-10": 245 },
+      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 70 },
+      consultation: { "under-2": 70, "3-to-9": 110, "over-10": 140 },
+    },
+  },
+  ae: {
+    essential: {
+      cv: { "under-2": 165, "3-to-9": 275, "over-10": 460 },
+      linkedin: { "under-2": 165, "3-to-9": 275, "over-10": 400 },
+      "cover-letter": { "under-2": 125, "3-to-9": 165, "over-10": 240 },
+      "foreign-cv": { "under-2": 195, "3-to-9": 310, "over-10": 495 },
+      "cv-review": { "under-2": 95, "3-to-9": 135, "over-10": 185 },
+      consultation: { "under-2": 220, "3-to-9": 330, "over-10": 440 },
+    },
+    signature: {
+      cv: { "under-2": 275, "3-to-9": 535, "over-10": 895 },
+      linkedin: { "under-2": 275, "3-to-9": 495, "over-10": 715 },
+      "cover-letter": { "under-2": 200, "3-to-9": 275, "over-10": 405 },
+      "foreign-cv": { "under-2": 350, "3-to-9": 605, "over-10": 975 },
+      "cv-review": { "under-2": 135, "3-to-9": 195, "over-10": 265 },
+      consultation: { "under-2": 275, "3-to-9": 440, "over-10": 550 },
+    },
+  },
+  ca: {
+    essential: {
+      cv: { "under-2": 60, "3-to-9": 105, "over-10": 170 },
+      linkedin: { "under-2": 60, "3-to-9": 105, "over-10": 150 },
+      "cover-letter": { "under-2": 45, "3-to-9": 60, "over-10": 90 },
+      "foreign-cv": { "under-2": 70, "3-to-9": 115, "over-10": 180 },
+      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 65 },
+      consultation: { "under-2": 80, "3-to-9": 125, "over-10": 160 },
+    },
+    signature: {
+      cv: { "under-2": 100, "3-to-9": 195, "over-10": 330 },
+      linkedin: { "under-2": 100, "3-to-9": 180, "over-10": 260 },
+      "cover-letter": { "under-2": 75, "3-to-9": 100, "over-10": 150 },
+      "foreign-cv": { "under-2": 130, "3-to-9": 220, "over-10": 355 },
+      "cv-review": { "under-2": 45, "3-to-9": 70, "over-10": 95 },
+      consultation: { "under-2": 100, "3-to-9": 160, "over-10": 200 },
+    },
+  },
+  sg: {
+    essential: {
+      cv: { "under-2": 60, "3-to-9": 100, "over-10": 165 },
+      linkedin: { "under-2": 60, "3-to-9": 100, "over-10": 145 },
+      "cover-letter": { "under-2": 45, "3-to-9": 60, "over-10": 85 },
+      "foreign-cv": { "under-2": 70, "3-to-9": 115, "over-10": 175 },
+      "cv-review": { "under-2": 35, "3-to-9": 50, "over-10": 65 },
+      consultation: { "under-2": 80, "3-to-9": 120, "over-10": 160 },
+    },
+    signature: {
+      cv: { "under-2": 100, "3-to-9": 190, "over-10": 320 },
+      linkedin: { "under-2": 100, "3-to-9": 175, "over-10": 255 },
+      "cover-letter": { "under-2": 75, "3-to-9": 100, "over-10": 145 },
+      "foreign-cv": { "under-2": 130, "3-to-9": 215, "over-10": 345 },
+      "cv-review": { "under-2": 45, "3-to-9": 70, "over-10": 95 },
+      consultation: { "under-2": 100, "3-to-9": 160, "over-10": 200 },
+    },
+  },
+};
+
+export function getCountryServicePrice(
+  countryKey: string,
+  tier: TierId,
+  serviceId: ServiceId,
+  levelId: LevelId
+): number {
+  const table = MULTI_COUNTRY_PRICES[countryKey] || MULTI_COUNTRY_PRICES.com;
+  return table[tier]?.[serviceId]?.[levelId] ?? 0;
+}
+
+export function formatCountryAmount(amount: number, countryKey: string): string {
+  const c = INVOICE_COUNTRIES.find((item) => item.key === countryKey) || INVOICE_COUNTRIES[0];
+  if (c.currency === "LKR") return `LKR ${amount.toLocaleString("en-US")}`;
+  if (c.currency === "USD") return `$${amount.toLocaleString("en-US")}`;
+  if (c.currency === "GBP") return `£${amount.toLocaleString("en-US")}`;
+  if (c.currency === "EUR") return `€${amount.toLocaleString("en-US")}`;
+  if (c.currency === "AUD") return `A$${amount.toLocaleString("en-US")}`;
+  if (c.currency === "CAD") return `C$${amount.toLocaleString("en-US")}`;
+  if (c.currency === "AED") return `AED ${amount.toLocaleString("en-US")}`;
+  if (c.currency === "SGD") return `S$${amount.toLocaleString("en-US")}`;
+  return `${c.currency} ${amount.toLocaleString("en-US")}`;
+}
