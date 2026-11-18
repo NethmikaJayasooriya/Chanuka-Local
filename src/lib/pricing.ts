@@ -151,9 +151,9 @@ export const deliveries: Array<{
   surcharge: number;
   note: string;
 }> = [
-  { id: "normal", name: "Standard", window: "48 to 72 hours", surcharge: 0, note: "Included" },
-  { id: "fast", name: "Priority Express", window: "24 to 48 hours", surcharge: 0, note: "" },
-  { id: "ultra", name: "VIP 24-Hour Express", window: "Within 24 hours", surcharge: 0, note: "" },
+  { id: "normal", name: "Standard", window: "5 to 7 days", surcharge: 0, note: "Included" },
+  { id: "fast", name: "Priority Express", window: "1 to 3 days", surcharge: 0.2, note: "+20%" },
+  { id: "ultra", name: "VIP 24-Hour Express", window: "Within 24 hours", surcharge: 0.3, note: "+30%" },
 ];
 
 export function getPackageIncludes(pkg: Package, level: LevelId): ServiceId[] {

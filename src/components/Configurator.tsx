@@ -34,16 +34,21 @@ export function Configurator() {
   const [selectedServices, setSelectedServices] = useState<ServiceId[]>(["cv"]);
   const [delivery, setDelivery] = useState<DeliveryId>("normal");
   const [mounted, setMounted] = useState(false);
+  const [conflictAction, setConflictAction] = useState<{
+    target: ServiceId;
+    replace: ServiceId;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Ensure consultation is deselected if not in executive level
+  // Ensure consultation (if not over-10) and cv-review are deselected
   useEffect(() => {
-    if (level !== "over-10" && selectedServices.includes("consultation")) {
+    if (selectedServices.includes("cv-review") || (level !== "over-10" && selectedServices.includes("consultation"))) {
       setSelectedServices((prev) => {
-        const next = prev.filter((s) => s !== "consultation");
+        const next = prev.filter((s) => s !== "cv-review" && (level === "over-10" || s !== "consultation"));
         return next.length > 0 ? next : ["cv"];
       });
     }
@@ -54,6 +59,7 @@ export function Configurator() {
   const availableSingles = useMemo(() => {
     return singles.filter((p) => {
       const s = p.includes[0];
+      if (s === "cv-review") return false; // Removed CV Review option as requested
       if (s === "consultation" && level !== "over-10") return false;
       return true;
     });
@@ -61,6 +67,7 @@ export function Configurator() {
 
   const activeServices = useMemo(() => {
     const valid = selectedServices.filter((s) => {
+      if (s === "cv-review") return false;
       if (s === "consultation" && level !== "over-10") return false;
       return true;
     });
@@ -114,10 +121,10 @@ export function Configurator() {
 
   const completionDate = useMemo(() => {
     if (!mounted) {
-      return delivery === "ultra" ? "Within 24 Hours" : delivery === "fast" ? "24 to 48 Hours" : "48 to 72 Hours";
+      return delivery === "ultra" ? "Within 24 Hours" : delivery === "fast" ? "1 to 3 Days" : "5 to 7 Days";
     }
     const d = new Date();
-    const addDays = delivery === "ultra" ? 1 : delivery === "fast" ? 2 : 3;
+    const addDays = delivery === "ultra" ? 1 : delivery === "fast" ? 3 : 7;
     d.setDate(d.getDate() + addDays);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" });
   }, [delivery, mounted]);
@@ -142,14 +149,41 @@ export function Configurator() {
   };
 
   const handleToggleService = (serviceId: ServiceId) => {
-    setSelectedServices((prev) => {
-      const exists = prev.includes(serviceId);
-      if (exists) {
-        if (prev.length <= 1) return prev;
-        return prev.filter((s) => s !== serviceId);
+    // If user is unchecking an already selected service
+    if (selectedServices.includes(serviceId)) {
+      if (selectedServices.length <= 1) return; // Keep at least one service selected
+      setSelectedServices((prev) => prev.filter((s) => s !== serviceId));
+      if (conflictAction && (conflictAction.target === serviceId || conflictAction.replace === serviceId)) {
+        setConflictAction(null);
       }
-      return [...prev, serviceId];
-    });
+      setDone((d) => ({ ...d, 2: true }));
+      return;
+    }
+
+    // Mutual exclusivity check: ATS CV Writing ("cv") and Foreign Job CV ("foreign-cv")
+    if (serviceId === "foreign-cv" && selectedServices.includes("cv")) {
+      setConflictAction({
+        target: "foreign-cv",
+        replace: "cv",
+        message:
+          "Each package includes either a local ATS CV or an international CV. Would you like to switch to Foreign Job CV?",
+      });
+      return;
+    }
+
+    if (serviceId === "cv" && selectedServices.includes("foreign-cv")) {
+      setConflictAction({
+        target: "cv",
+        replace: "foreign-cv",
+        message:
+          "Each package includes either a local ATS CV or an international CV. Would you like to switch to ATS CV Writing?",
+      });
+      return;
+    }
+
+    // Normal valid selection
+    setConflictAction(null);
+    setSelectedServices((prev) => [...prev, serviceId]);
     setDone((d) => ({ ...d, 2: true }));
   };
 
@@ -351,6 +385,60 @@ export function Configurator() {
                         </span>
                       </div>
 
+                      {/* Option Guidance Notice */}
+                      {conflictAction && (
+                        <div className="rounded-2xl border border-brand/20 bg-brand-soft/50 p-3 sm:p-3.5 shadow-xs transition-all">
+                          <div className="flex items-start justify-between gap-2.5">
+                            <div className="flex items-start gap-2.5 min-w-0">
+                              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand mt-0.5">
+                                <svg viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5">
+                                  <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.5a1 1 0 110 2 1 1 0 010-2zM6.75 8a.75.75 0 01.75-.75h1a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-2.75h-.25A.75.75 0 016.75 8z" />
+                                </svg>
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[12.5px] font-bold text-ink block">
+                                  Select one CV format
+                                </span>
+                                <p className="mt-0.5 text-[11.5px] text-muted leading-relaxed">
+                                  {conflictAction.message}
+                                </p>
+                                <div className="mt-2.5 flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedServices((prev) =>
+                                        prev.map((s) => (s === conflictAction.replace ? conflictAction.target : s))
+                                      );
+                                      setConflictAction(null);
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-deep text-paper font-semibold text-[11.5px] transition-colors cursor-pointer shadow-xs"
+                                  >
+                                    <span>Switch to {services[conflictAction.target]?.name || "selected CV"}</span>
+                                    <span>→</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setConflictAction(null)}
+                                    className="px-2.5 py-1.5 rounded-xl text-muted hover:text-ink text-[11.5px] font-medium transition-colors cursor-pointer"
+                                  >
+                                    Keep current
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setConflictAction(null)}
+                              className="text-muted hover:text-ink text-sm p-0.5 -mt-0.5 shrink-0 cursor-pointer transition-colors"
+                              aria-label="Close notice"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Package Item Rows (Multi-select Checkboxes) */}
                       <div className="space-y-1.5">
                         {availableSingles.map((p) => {
@@ -358,6 +446,10 @@ export function Configurator() {
                           const isSelected = activeServices.includes(sId);
                           const name = services[sId]?.name || p.name;
                           const servicePrice = TIER_PRICES[tier][sId][level];
+
+                          const isConflicting =
+                            (!isSelected && sId === "foreign-cv" && activeServices.includes("cv")) ||
+                            (!isSelected && sId === "cv" && activeServices.includes("foreign-cv"));
 
                           return (
                             <button
@@ -369,6 +461,8 @@ export function Configurator() {
                               className={`w-full flex items-center justify-between p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
                                 isSelected
                                   ? "border-brand bg-brand-soft/70 ring-1 ring-brand text-ink"
+                                  : isConflicting
+                                  ? "border-line bg-surface/80 hover:border-brand/40 text-ink"
                                   : "border-line bg-surface hover:border-line-strong hover:bg-sand/40 text-ink"
                               }`}
                             >
@@ -377,6 +471,8 @@ export function Configurator() {
                                   className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${
                                     isSelected
                                       ? "border-brand bg-brand text-paper shadow-xs"
+                                      : isConflicting
+                                      ? "border-line-strong bg-sand/30"
                                       : "border-line-strong bg-paper"
                                   }`}
                                 >
@@ -393,9 +489,16 @@ export function Configurator() {
                                   )}
                                 </span>
                                 <div className="min-w-0">
-                                  <span className="text-[12.5px] font-bold text-ink block leading-tight">
-                                    {name}
-                                  </span>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[12.5px] font-bold text-ink block leading-tight">
+                                      {name}
+                                    </span>
+                                    {isConflicting && (
+                                      <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[9.5px] font-semibold bg-brand-soft/70 text-accent-deep border border-brand/15">
+                                        Pick 1 CV type
+                                      </span>
+                                    )}
+                                  </div>
                                   <span className="text-[10.5px] text-muted block leading-tight mt-0.5">
                                     {p.blurb || "Single service"}
                                   </span>
@@ -482,6 +585,7 @@ export function Configurator() {
                     <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-1.5">
                       {deliveries.map((d) => {
                         const isSelected = d.id === delivery;
+
                         return (
                           <button
                             key={d.id}
@@ -517,11 +621,19 @@ export function Configurator() {
                               </div>
                             </div>
 
-                            {d.note && (
-                              <span className="rounded bg-sand px-2 py-0.5 text-[10px] font-bold text-ink-soft">
-                                {d.note}
-                              </span>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {d.note && (
+                                <span
+                                  className={`rounded px-2 py-0.5 text-[10.5px] font-bold ${
+                                    d.surcharge > 0
+                                      ? "bg-accent/15 text-accent-deep border border-accent/25"
+                                      : "bg-sand text-ink-soft"
+                                  }`}
+                                >
+                                  {d.note}
+                                </span>
+                              )}
+                            </div>
                           </button>
                         );
                       })}
@@ -579,6 +691,14 @@ export function Configurator() {
                       <span className="font-bold text-ink">{formatLKR(item.price)}</span>
                     </div>
                   ))}
+                  {q.deliveryFee > 0 && (
+                    <div className="flex items-center justify-between py-1 border-b border-line/40 text-ink">
+                      <span className="font-normal text-ink-soft">
+                        {deliveryOption?.name} ({deliveryOption?.note})
+                      </span>
+                      <span className="font-bold text-ink">+{formatLKR(q.deliveryFee)}</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between py-1 text-[11.5px] text-muted">
                     <span>{tier === "signature" ? "Signature support" : "Revision round"}</span>
                     <span className="font-semibold text-emerald-600">{tier === "signature" ? "30 days" : "Included"}</span>

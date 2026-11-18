@@ -28,7 +28,7 @@ for (const [tier, matrix] of Object.entries(expected)) {
   for (const pkg of p.packages) for (const level of p.levels) for (const delivery of p.deliveries) {
     const q = p.quote(pkg, level.id, delivery.id, tier);
     const sum = q.includedServices.reduce((total, id) => total + p.TIER_PRICES[tier][id][level.id], 0);
-    assert.equal(q.total, sum);
+    assert.equal(q.total, sum + Math.round(sum * delivery.surcharge));
     const saved = p.resolveOrder(pkg.id, level.id, delivery.id, tier);
     assert.equal(saved.total_usd, q.total);
     assert.equal(saved.package_id, `${tier}:${pkg.id}`);

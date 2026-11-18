@@ -24,7 +24,7 @@ export function LocalExpertise() {
               ["Your writer", "Chanuka Jeewantha, CPRW, CPCC"],
               ["CV writing", `From ${formatLKR(BASE_PRICES.cv["under-2"])}`],
               ["LinkedIn optimization", `From ${formatLKR(BASE_PRICES.linkedin["under-2"])}`],
-              ["Delivery", "Standard: 48 to 72 hours; express options available"],
+              ["Delivery", "Standard: 5 to 7 days; express options available"],
               ["Coverage", "Online across Sri Lanka, including Colombo, Kandy and Galle"],
               ["Revisions", "One revision round included"],
             ].map(([label, value]) => <div key={label} className="py-3"><dt className="text-[12px] font-semibold uppercase tracking-wide text-muted">{label}</dt><dd className="mt-1 text-ink">{value}</dd></div>)}

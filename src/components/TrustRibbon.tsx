@@ -62,7 +62,7 @@ export const proofPoints = [
   },
   {
     title: "Delivery from 24 hours",
-    subtitle: "Standard 48-72h with express turnaround options",
+    subtitle: "Standard 5–7 days with express turnaround options",
     badge: "From 24h",
     href: "/#build",
     action: "View speeds",
