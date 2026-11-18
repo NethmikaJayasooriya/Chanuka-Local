@@ -1,0 +1,86 @@
+const { spawn } = require('child_process');
+const http = require('http');
+
+function getJson(url) {
+  return new Promise((resolve, reject) => {
+    http.get(url, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve(JSON.parse(data)));
+    }).on('error', reject);
+  });
+}
+
+class CDPClient {
+  constructor(wsUrl) {
+    this.ws = new WebSocket(wsUrl);
+    this.id = 1;
+    this.callbacks = new Map();
+    this.ready = new Promise((resolve, reject) => {
+      this.ws.onopen = resolve;
+      this.ws.onerror = reject;
+    });
+    this.ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.id && this.callbacks.has(msg.id)) {
+        const { resolve, reject } = this.callbacks.get(msg.id);
+        this.callbacks.delete(msg.id);
+        if (msg.error) reject(msg.error);
+        else resolve(msg.result);
+      }
+    };
+  }
+  send(method, params = {}) {
+    const id = this.id++;
+    return new Promise((resolve, reject) => {
+      this.callbacks.set(id, { resolve, reject });
+      this.ws.send(JSON.stringify({ id, method, params }));
+    });
+  }
+  close() { this.ws.close(); }
+}
+
+async function checkComputed() {
+  const port = 9341;
+  const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', [
+    '--headless=new',
+    `--remote-debugging-port=${port}`,
+    '--disable-gpu',
+    '--no-sandbox',
+    '--window-size=1440,850'
+  ]);
+  try {
+    await new Promise(r => setTimeout(r, 1200));
+    const versionInfo = await getJson(`http://127.0.0.1:${port}/json/version`);
+    const client = new CDPClient(versionInfo.webSocketDebuggerUrl);
+    await client.ready;
+    const targets = await getJson(`http://127.0.0.1:${port}/json/list`);
+    const pageTarget = targets.find(t => t.type === 'page');
+    const pageClient = new CDPClient(pageTarget.webSocketDebuggerUrl);
+    await pageClient.ready;
+    await pageClient.send('Page.enable');
+    await pageClient.send('Page.navigate', { url: 'http://localhost:3000' });
+    await new Promise(r => setTimeout(r, 2000));
+    const res = await pageClient.send('Runtime.evaluate', {
+      expression: `(() => {
+        const img = document.querySelector("section img");
+        const el = img ? img.parentElement : null;
+        if (!el) return { error: "No element found" };
+        const cs = window.getComputedStyle(el);
+        const imgCs = window.getComputedStyle(img);
+        const rect = img.getBoundingClientRect();
+        return {
+          maskImage: cs.maskImage,
+          webkitMaskImage: cs.webkitMaskImage,
+          imgRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+        };
+      })()`,
+      returnByValue: true
+    });
+    console.log('Computed info:', res.result.value);
+    pageClient.close(); client.close();
+  } finally {
+    chrome.kill();
+  }
+}
+checkComputed();

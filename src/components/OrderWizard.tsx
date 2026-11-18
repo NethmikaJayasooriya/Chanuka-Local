@@ -13,6 +13,7 @@ import {
   deliveries,
   levels,
   packages,
+  resolvePackage,
   getPackageDisplayName,
   quote,
   services,
@@ -119,7 +120,7 @@ export function OrderWizard({
   });
 
   const pkg = useMemo(
-    () => packages.find((p) => p.id === packageId) ?? packages[0],
+    () => resolvePackage(packageId) ?? packages[0],
     [packageId]
   );
   const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
@@ -202,6 +203,13 @@ Notes: ${details.notes || "-"}`;
     }
   };
 
+  const availablePackages = useMemo(() => {
+    if (pkg && !packages.some((p) => p.id === pkg.id)) {
+      return [pkg, ...packages];
+    }
+    return packages;
+  }, [pkg]);
+
   return (
     <div id="order-form" className="scroll-mt-16 sm:scroll-mt-20 grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
       <div className="card p-4 sm:p-6 sm:p-8 shadow-xs">
@@ -282,7 +290,7 @@ Notes: ${details.notes || "-"}`;
               <div>
                 <h2 className="text-[14.5px] sm:text-[15px] font-semibold text-ink">Confirm your package</h2>
                 <div className="mt-3.5 sm:mt-4 grid gap-2.5 sm:grid-cols-2">
-                  {packages.map((p) => (
+                  {availablePackages.map((p) => (
                     <button
                       key={p.id}
                       type="button"

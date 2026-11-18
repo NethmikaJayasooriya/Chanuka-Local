@@ -10,6 +10,7 @@ import {
   deliveries,
   levels,
   packages,
+  resolvePackage,
   usd,
   type DeliveryId,
   type LevelId,
@@ -213,7 +214,7 @@ export default async function CheckoutPage({
 
   // -------- Legacy / guest checkout (no account) --------
   const tier: TierId = params.tier === "signature" ? "signature" : "essential";
-  const pkg = packages.find((p) => p.id === params.package) ?? packages[4];
+  const pkg = resolvePackage(params.package) ?? packages[4];
   const level = (levels.find((l) => l.id === params.level)?.id ?? "3-to-9") as LevelId;
   const delivery = (deliveries.find((d) => d.id === params.delivery)?.id ?? "normal") as DeliveryId;
 

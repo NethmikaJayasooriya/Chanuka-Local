@@ -12,6 +12,10 @@ import {
   quote,
   formatLKR,
   getPackageDisplayName,
+  services,
+  type ServiceId,
+  TIER_PRICES,
+  type Package,
   type DeliveryId,
   type LevelId,
 } from "@/lib/pricing";
@@ -27,13 +31,23 @@ export function Configurator() {
   // Configuration state
   const [tier, setTier] = useState<TierId>("essential");
   const [level, setLevel] = useState<LevelId>("3-to-9");
-  const [packageId, setPackageId] = useState("ats-cv");
+  const [selectedServices, setSelectedServices] = useState<ServiceId[]>(["cv"]);
   const [delivery, setDelivery] = useState<DeliveryId>("normal");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Ensure consultation is deselected if not in executive level
+  useEffect(() => {
+    if (level !== "over-10" && selectedServices.includes("consultation")) {
+      setSelectedServices((prev) => {
+        const next = prev.filter((s) => s !== "consultation");
+        return next.length > 0 ? next : ["cv"];
+      });
+    }
+  }, [level, selectedServices]);
 
   const singles = useMemo(() => packages.filter((p) => p.includes.length === 1), []);
 
@@ -45,15 +59,58 @@ export function Configurator() {
     });
   }, [singles, level]);
 
-  const pkg = useMemo(
-    () => packages.find((p) => p.id === packageId) ?? packages[0],
-    [packageId]
-  );
+  const activeServices = useMemo(() => {
+    const valid = selectedServices.filter((s) => {
+      if (s === "consultation" && level !== "over-10") return false;
+      return true;
+    });
+    return valid.length > 0 ? valid : (["cv"] as ServiceId[]);
+  }, [selectedServices, level]);
+
+  const pkg: Package = useMemo(() => {
+    if (activeServices.length === 1) {
+      const matched = packages.find(
+        (p) => p.includes.length === 1 && p.includes[0] === activeServices[0]
+      );
+      if (matched) return matched;
+    }
+    if (activeServices.length === 2) {
+      const matched = packages.find((p) => {
+        if (p.id === "complete") return false;
+        return (
+          p.includes.length === 2 &&
+          p.includes.every((s) => activeServices.includes(s))
+        );
+      });
+      if (matched) return matched;
+    }
+
+    const shortNames = activeServices.map((s) => services[s]?.short || s);
+    const fullName = shortNames.join(" + ");
+    return {
+      id: `custom_${activeServices.join("_")}`,
+      name: fullName,
+      includes: activeServices,
+      blurb: `Custom package: ${shortNames.join(", ")}`,
+    };
+  }, [activeServices]);
+
   const q = useMemo(() => quote(pkg, level, delivery, tier), [pkg, level, delivery, tier]);
 
   const levelObj = levels.find((l) => l.id === level);
   const deliveryOption = deliveries.find((d) => d.id === delivery);
   const pkgDisplayName = getPackageDisplayName(pkg, level);
+
+  const step2Summary = useMemo(() => {
+    if (activeServices.length === 1) {
+      return `${services[activeServices[0]]?.name || "1 service"} · ${formatLKR(q.total)}`;
+    }
+    if (activeServices.length === 2) {
+      const names = activeServices.map((s) => services[s]?.short || s).join(" + ");
+      return `${names} · ${formatLKR(q.total)}`;
+    }
+    return `${activeServices.length} services selected · ${formatLKR(q.total)}`;
+  }, [activeServices, q.total]);
 
   const completionDate = useMemo(() => {
     if (!mounted) {
@@ -84,13 +141,16 @@ export function Configurator() {
     }
   };
 
-  const handleSelectPackage = (newPkgId: string) => {
-    setPackageId(newPkgId);
+  const handleToggleService = (serviceId: ServiceId) => {
+    setSelectedServices((prev) => {
+      const exists = prev.includes(serviceId);
+      if (exists) {
+        if (prev.length <= 1) return prev;
+        return prev.filter((s) => s !== serviceId);
+      }
+      return [...prev, serviceId];
+    });
     setDone((d) => ({ ...d, 2: true }));
-    // Smoothly progress to step 3 if step 2 was open
-    if (activeStep === 2) {
-      setActiveStep(3);
-    }
   };
 
   const handleSelectDelivery = (newDelivery: DeliveryId) => {
@@ -236,7 +296,7 @@ export function Configurator() {
                 </div>
 
                 {/* ------------------------------------------------------- */}
-                {/* STEP 2: PACKAGE OPTIONS */}
+                {/* STEP 2: PACKAGE OPTIONS (MULTI-SELECT) */}
                 {/* ------------------------------------------------------- */}
                 <div className="rounded-xl border border-line/70 bg-surface overflow-hidden transition-all shadow-xs">
                   <button
@@ -253,11 +313,9 @@ export function Configurator() {
                         <span className="text-[13px] font-bold text-ink block leading-tight">
                           Package options
                         </span>
-                        {pkg && (
-                          <span className="text-[11.5px] font-medium text-accent-deep truncate block">
-                            {pkgDisplayName} · {formatLKR(q.total)}
-                          </span>
-                        )}
+                        <span className="text-[11.5px] font-medium text-accent-deep truncate block">
+                          {step2Summary}
+                        </span>
                       </div>
                     </div>
 
@@ -283,23 +341,31 @@ export function Configurator() {
 
                   {activeStep === 2 && (
                     <div className="border-t border-line/60 p-2.5 sm:p-3 bg-sand/10 space-y-2.5">
-                      {/* Helper line */}
-                      <p className="px-1 text-[11px] text-muted">
-                        Pick one service on its own.
-                      </p>
+                      {/* Helper line with counter */}
+                      <div className="flex items-center justify-between px-1">
+                        <p className="text-[11px] text-muted">
+                          Select one or more services to customize your package:
+                        </p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-accent-deep bg-accent/10 border border-accent/25 px-2 py-0.5 rounded-full shrink-0 ml-2">
+                          {activeServices.length} selected
+                        </span>
+                      </div>
 
-                      {/* Package Item Rows (Single Services Only) */}
+                      {/* Package Item Rows (Multi-select Checkboxes) */}
                       <div className="space-y-1.5">
                         {availableSingles.map((p) => {
-                          const isSelected = p.id === packageId;
-                          const name = getPackageDisplayName(p, level);
-                          const rowQuote = quote(p, level, delivery, tier);
+                          const sId = p.includes[0] as ServiceId;
+                          const isSelected = activeServices.includes(sId);
+                          const name = services[sId]?.name || p.name;
+                          const servicePrice = TIER_PRICES[tier][sId][level];
 
                           return (
                             <button
                               key={p.id}
                               type="button"
-                              onClick={() => handleSelectPackage(p.id)}
+                              role="checkbox"
+                              aria-checked={isSelected}
+                              onClick={() => handleToggleService(sId)}
                               className={`w-full flex items-center justify-between p-2.5 sm:p-3 rounded-lg border text-left transition-all cursor-pointer ${
                                 isSelected
                                   ? "border-brand bg-brand-soft/70 ring-1 ring-brand text-ink"
@@ -308,15 +374,21 @@ export function Configurator() {
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
                                 <span
-                                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                                  className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors ${
                                     isSelected
-                                      ? "border-brand bg-brand text-paper"
+                                      ? "border-brand bg-brand text-paper shadow-xs"
                                       : "border-line-strong bg-paper"
                                   }`}
                                 >
                                   {isSelected && (
-                                    <svg viewBox="0 0 12 12" className="h-1.5 w-1.5 fill-current">
-                                      <circle cx="6" cy="6" r="3" />
+                                    <svg
+                                      viewBox="0 0 14 14"
+                                      fill="none"
+                                      className="h-3 w-3 stroke-current stroke-[2.5]"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <polyline points="2.5 7.5 5.5 10.5 11.5 3.5" />
                                     </svg>
                                   )}
                                 </span>
@@ -332,12 +404,29 @@ export function Configurator() {
 
                               <div className="flex shrink-0 items-center gap-2 ml-2">
                                 <span className="stat-number text-[13px] font-extrabold text-ink">
-                                  {formatLKR(rowQuote.total)}
+                                  {formatLKR(servicePrice)}
                                 </span>
                               </div>
                             </button>
                           );
                         })}
+                      </div>
+
+                      {/* Advance to next step footer */}
+                      <div className="pt-2 flex items-center justify-between border-t border-line/60">
+                        <span className="text-[11.5px] text-muted">
+                          {activeServices.length === 1
+                            ? "1 service selected"
+                            : `${activeServices.length} services selected`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveStep(3)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand text-paper text-[12px] font-semibold hover:bg-brand-deep transition-colors cursor-pointer"
+                        >
+                          <span>Next: Delivery time</span>
+                          <span>↓</span>
+                        </button>
                       </div>
                     </div>
                   )}
@@ -469,7 +558,9 @@ export function Configurator() {
                   {formatLKR(q.total)}
                 </div>
                 <p className="text-[11.5px] text-muted mt-1">
-                  Combined service total · No automatic discount
+                  {activeServices.length > 1
+                    ? `Combined total for ${activeServices.length} selected services · No hidden fees`
+                    : "Guaranteed fixed rate · No hidden fees"}
                 </p>
               </div>
 

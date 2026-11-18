@@ -46,10 +46,10 @@ export function pricingSummary(service: ServiceId = "cv"): string {
 
 export const BUNDLE_DISCOUNT: Record<number, number> = {
   1: 0,
-  2: 0.2,
-  3: 0.3,
-  4: 0.3,
-  5: 0.3,
+  2: 0,
+  3: 0,
+  4: 0,
+  5: 0,
 };
 
 export type Package = {
@@ -214,9 +214,30 @@ export function formatLKR(value: number): string {
   return `LKR ${value.toLocaleString("en-US")}`;
 }
 
+export function resolvePackage(packageId: unknown): Package | null {
+  if (typeof packageId !== "string") return null;
+  const standard = packages.find((item) => item.id === packageId);
+  if (standard) return standard;
+
+  if (packageId.startsWith("custom_") || packageId.startsWith("custom:")) {
+    const rawIds = packageId.replace(/^custom[_:]/, "").split(/[,_]/);
+    const validServices = rawIds.filter((id): id is ServiceId => id in services);
+    if (validServices.length === 0) return null;
+    const uniqueServices = Array.from(new Set(validServices));
+    const name = uniqueServices.map((s) => services[s]?.short || s).join(" + ");
+    return {
+      id: packageId,
+      name,
+      includes: uniqueServices,
+      blurb: `Custom selection of ${name}`,
+    };
+  }
+  return null;
+}
+
 /** Server-side selection validation. Never accept a customer-supplied price. */
 export function resolveOrder(packageId: unknown, levelId: unknown, deliveryId: unknown, tierId: unknown) {
-  const pkg = packages.find((item) => item.id === packageId);
+  const pkg = resolvePackage(packageId);
   const level = levels.find((item) => item.id === levelId);
   const delivery = deliveries.find((item) => item.id === deliveryId);
   const tier = tiers.find((item) => item.id === tierId);

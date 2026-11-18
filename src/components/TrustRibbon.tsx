@@ -93,35 +93,35 @@ export function ProofTiles({
   className?: string;
 }) {
   return (
-    <div className={`grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 ${className}`}>
+    <div className={`grid min-w-0 grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 ${className}`}>
       {proofPoints.map((item) => (
         <Link
           key={item.title}
           href={item.href}
           aria-label={`${item.title}: ${item.subtitle}. Click to learn more.`}
-          className={`group relative flex flex-col justify-between rounded-[20px] p-4 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+          className={`group relative flex flex-col justify-between rounded-[18px] p-3 sm:rounded-[20px] sm:p-4 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
             dark
               ? "border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-[#c5b59a]/40 shadow-xs hover:shadow-md"
-              : "border border-white/80 bg-white/70 hover:bg-white hover:border-brand/35 shadow-[0_4px_20px_-8px_rgb(23_53_92/0.08)] hover:shadow-[0_12px_28px_-10px_rgb(23_53_92/0.2)]"
+              : "border border-white/80 bg-white/70 hover:bg-white hover:border-brand/35 shadow-[0_4px_16px_-8px_rgb(23_53_92/0.08)] hover:shadow-[0_12px_28px_-10px_rgb(23_53_92/0.2)]"
           }`}
         >
-          {/* Top Row: Icon + Badge / Arrow */}
-          <div className="flex items-center justify-between gap-2">
+          {/* Top Row: Icon + Badge */}
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2">
             <div
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9 sm:rounded-xl transition-transform duration-200 group-hover:scale-105 ${
                 dark ? item.accent.darkIcon : item.accent.lightIcon
               }`}
             >
               {item.icon}
             </div>
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider transition-colors ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9.5px] sm:px-2.5 sm:text-[10.5px] font-bold uppercase tracking-wider transition-colors ${
                 dark ? item.accent.darkBadge : item.accent.lightBadge
               }`}
             >
-              <span>{item.badge}</span>
+              <span className="truncate max-w-[65px] sm:max-w-none">{item.badge}</span>
               <svg
-                className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                className="h-2.5 w-2.5 sm:h-3 sm:w-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 viewBox="0 0 16 16"
                 fill="none"
                 stroke="currentColor"
@@ -132,16 +132,16 @@ export function ProofTiles({
           </div>
 
           {/* Middle: Title & Subtitle */}
-          <div className="mt-3 min-w-0">
+          <div className="mt-2.5 min-w-0 sm:mt-3">
             <h4
-              className={`text-[13.5px] sm:text-[14px] font-bold leading-snug tracking-tight transition-colors ${
+              className={`text-[12.5px] sm:text-[14px] font-bold leading-tight sm:leading-snug tracking-tight transition-colors ${
                 dark ? "text-[#f0ece1] group-hover:text-accent" : "text-ink group-hover:text-brand"
               }`}
             >
               {item.title}
             </h4>
             <p
-              className={`mt-1 text-[11.5px] sm:text-[12px] leading-relaxed transition-colors ${
+              className={`mt-1 text-[11px] sm:text-[12px] leading-snug sm:leading-relaxed transition-colors line-clamp-2 ${
                 dark ? "text-[#a39c8e] group-hover:text-white/80" : "text-muted group-hover:text-ink/85"
               }`}
             >
@@ -149,16 +149,16 @@ export function ProofTiles({
             </p>
           </div>
 
-          {/* Bottom Action Cue */}
+          {/* Bottom Action Cue (Clean minimal on mobile, full action link on tablet/desktop) */}
           <div
-            className={`mt-3.5 pt-2.5 border-t flex items-center justify-between text-[11px] font-semibold tracking-wide transition-colors ${
+            className={`mt-2.5 pt-2 border-t hidden sm:flex items-center justify-between text-[11px] font-semibold tracking-wide transition-colors ${
               dark
                 ? "border-white/8 text-[#c5b59a] group-hover:text-white"
                 : "border-line/70 text-accent-deep group-hover:text-brand"
             }`}
           >
-            <span>{item.action}</span>
-            <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">
+            <span className="truncate">{item.action}</span>
+            <span className="shrink-0 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">
               →
             </span>
           </div>
@@ -177,13 +177,13 @@ export function TrustRibbon({
 }) {
   return (
     <div
-      className={`rounded-[26px] p-4.5 sm:p-6 backdrop-blur-md transition-all ${
+      className={`rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-6 backdrop-blur-md transition-all ${
         dark
           ? "border border-white/12 bg-white/[0.04] shadow-2xl"
           : "border border-white/90 bg-white/50 max-lg:bg-white/40 shadow-[0_24px_60px_-28px_rgb(14_26_43/0.25)]"
       } ${className}`}
     >
-      <div className="grid min-w-0 gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:items-stretch md:gap-7 lg:grid-cols-[220px_1px_minmax(0,1fr)]">
+      <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:items-stretch md:gap-7 lg:grid-cols-[220px_1px_minmax(0,1fr)]">
         <div className="flex flex-col justify-center">
           <GoogleBadge dark={dark} />
         </div>

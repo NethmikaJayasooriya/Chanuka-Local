@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { OrderWizard } from "@/components/OrderWizard";
 import { PageHeader } from "@/components/PageHeader";
-import { deliveries, levels, packages, type DeliveryId, type LevelId } from "@/lib/pricing";
+import { deliveries, levels, resolvePackage, type DeliveryId, type LevelId } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Start your order",
@@ -26,8 +26,9 @@ export default async function OrderPage({
   // Did the visitor arrive with a package already chosen (from the home
   // configurator or a country CTA)? If so, the wizard skips the re-selection
   // step and opens on "Your details".
-  const preconfigured = packages.some((p) => p.id === params.package);
-  const initialPackage = preconfigured ? (params.package as string) : "cv-linkedin";
+  const pkgObj = resolvePackage(params.package);
+  const preconfigured = !!pkgObj;
+  const initialPackage = pkgObj ? pkgObj.id : "cv-linkedin";
   const initialLevel = levels.some((l) => l.id === params.level)
     ? (params.level as LevelId)
     : "3-to-9";
