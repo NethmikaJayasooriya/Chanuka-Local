@@ -1315,10 +1315,15 @@ export function CustomizableInvoiceGenerator({
     return (
       <div
         id={elementId}
+        style={{
+          width: "794px",
+          minWidth: "794px",
+          boxSizing: "border-box",
+        }}
         className={
           isExport
-            ? "bg-white text-slate-900 p-10 w-[794px] box-border"
-            : `bg-white text-slate-900 rounded-2xl shadow-sm p-8 sm:p-12 border border-slate-200/90 print:border-none print:shadow-none print:rounded-none print:p-0 ${
+            ? "bg-white text-slate-900 p-10 w-[794px] min-w-[794px] box-border"
+            : `bg-white text-slate-900 p-10 w-[794px] min-w-[794px] min-h-[1123px] box-border print:border-none print:shadow-none print:rounded-none print:p-0 ${
                 isSticky ? "sticky top-6" : ""
               }`
         }
@@ -1331,7 +1336,7 @@ export function CustomizableInvoiceGenerator({
           >
             <span className="flex items-center gap-1.5 font-bold text-slate-600">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              LIVE EXACT OUTPUT PREVIEW
+              LIVE EXACT PDF OUTPUT PREVIEW (A4 · 794px)
             </span>
             <span>{invoiceNumber} · {currency}</span>
           </div>
@@ -2347,24 +2352,41 @@ export function CustomizableInvoiceGenerator({
             </div>
             {renderEditablePaper()}
           </div>
-          <div>
+          <div className="sticky top-4">
             <div className="mb-2.5 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
               <span className="flex items-center gap-1.5 text-slate-700">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>👁 Exact Live Output Preview</span>
+                <span>👁 Exact Live Output Preview (A4 · 794px)</span>
               </span>
-              <span className="text-[10.5px] font-mono text-emerald-600 font-semibold">Real-Time Vector Sync</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  100% PDF Scale
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">↕ ↔ Move Bars</span>
+              </div>
             </div>
-            {renderExactOutputPaper(true, "exact-preview-paper", false)}
+
+            {/* Scrollable Viewport with Vertical & Horizontal Move Bars */}
+            <div
+              className="rounded-2xl border-2 border-slate-300 bg-slate-200/90 shadow-inner overflow-x-auto overflow-y-auto max-h-[calc(100vh-120px)] p-3 sm:p-5"
+              style={{
+                scrollbarWidth: "auto",
+                scrollbarColor: "#94a3b8 #e2e8f0",
+              }}
+            >
+              <div className="w-[794px] min-w-[794px] mx-auto shadow-2xl bg-white">
+                {renderExactOutputPaper(false, "exact-preview-paper", false)}
+              </div>
+            </div>
           </div>
         </div>
       ) : viewMode === "preview" ? (
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <div className="mb-4 flex items-center justify-between rounded-xl bg-slate-900 text-white px-4 py-2.5 text-[12.5px] shadow-sm print:hidden">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-semibold">Exact Output Preview</span>
-              <span className="text-slate-400">· 100% clean vector representation</span>
+              <span className="font-semibold">Exact Output Preview (A4 · 794px × 1123px)</span>
+              <span className="text-slate-400">· 1:1 Vector Scale with Move Bars</span>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -2383,7 +2405,19 @@ export function CustomizableInvoiceGenerator({
               </button>
             </div>
           </div>
-          {renderExactOutputPaper(false, "exact-preview-paper", false)}
+
+          {/* Scrollable Viewport with Vertical & Horizontal Move Bars */}
+          <div
+            className="rounded-2xl border-2 border-slate-300 bg-slate-200/90 shadow-inner overflow-x-auto overflow-y-auto max-h-[calc(100vh-140px)] p-6 sm:p-8"
+            style={{
+              scrollbarWidth: "auto",
+              scrollbarColor: "#94a3b8 #e2e8f0",
+            }}
+          >
+            <div className="w-[794px] min-w-[794px] mx-auto shadow-2xl bg-white">
+              {renderExactOutputPaper(false, "exact-preview-paper", false)}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="mx-auto max-w-3xl">
