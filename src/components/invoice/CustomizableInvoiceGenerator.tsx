@@ -1009,7 +1009,8 @@ export function CustomizableInvoiceGenerator({
         </div>
       </div>
 
-      <table className="w-full text-left text-[13.5px]">
+      <div className="overflow-x-auto w-full">
+        <table className="w-full text-left text-[13.5px]">
         <thead>
           <tr className="border-b-2 border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400">
             <th className="py-2.5 pr-2 w-8 print:hidden"></th>
@@ -1064,7 +1065,7 @@ export function CustomizableInvoiceGenerator({
                           e.target.value = "";
                         }
                       }}
-                      className="text-[11px] text-blue-600 hover:text-blue-800 bg-blue-50/60 hover:bg-blue-100/80 border border-blue-200/70 rounded px-1.5 py-0.5 focus:outline-none cursor-pointer"
+                      className="text-[11px] max-w-[190px] truncate text-blue-600 hover:text-blue-800 bg-blue-50/60 hover:bg-blue-100/80 border border-blue-200/70 rounded px-1.5 py-0.5 focus:outline-none cursor-pointer"
                     >
                       <option value="" disabled>
                         Pick from {INVOICE_COUNTRIES.find((c) => c.key === selectedCountry)?.name} packages...
@@ -1124,6 +1125,7 @@ export function CustomizableInvoiceGenerator({
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Add Line Item */}
       <div className="pt-2 print:hidden flex items-center justify-between">
@@ -2344,38 +2346,40 @@ export function CustomizableInvoiceGenerator({
           MAIN INVOICE VIEW MODES (Split, Preview, or Edit)
          ------------------------------------------------------------- */}
       {viewMode === "split" ? (
-        <div className="mx-auto max-w-7xl grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-          <div>
-            <div className="mb-2.5 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
-              <span>✏️ Interactive Layout Canvas</span>
-              <span className="text-[10.5px] font-normal text-slate-400">Move, drag & space elements →</span>
-            </div>
-            {renderEditablePaper()}
-          </div>
-          <div className="sticky top-4">
-            <div className="mb-2.5 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
-              <span className="flex items-center gap-1.5 text-slate-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>👁 Exact Live Output Preview (A4 · 794px)</span>
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  100% PDF Scale
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium">↕ ↔ Move Bars</span>
+        <div className="mx-auto max-w-[1720px] w-full px-3 sm:px-6">
+          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-8 items-start min-w-0">
+            <div className="min-w-0 w-full overflow-hidden">
+              <div className="mb-2.5 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
+                <span>✏️ Interactive Layout Canvas</span>
+                <span className="text-[10.5px] font-normal text-slate-400">Move, drag & space elements →</span>
               </div>
+              {renderEditablePaper()}
             </div>
+            <div className="min-w-0 w-full 2xl:sticky 2xl:top-4 z-10">
+              <div className="mb-2.5 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
+                <span className="flex items-center gap-1.5 text-slate-700">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>👁 Exact Live Output Preview (A4 · 794px)</span>
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    100% PDF Scale
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium">↕ ↔ Move Bars</span>
+                </div>
+              </div>
 
-            {/* Scrollable Viewport with Vertical & Horizontal Move Bars */}
-            <div
-              className="rounded-2xl border-2 border-slate-300 bg-slate-200/90 shadow-inner overflow-x-auto overflow-y-auto max-h-[calc(100vh-120px)] p-3 sm:p-5"
-              style={{
-                scrollbarWidth: "auto",
-                scrollbarColor: "#94a3b8 #e2e8f0",
-              }}
-            >
-              <div className="w-[794px] min-w-[794px] mx-auto shadow-2xl bg-white">
-                {renderExactOutputPaper(false, "exact-preview-paper", false)}
+              {/* Scrollable Viewport with Vertical & Horizontal Move Bars (100% Opaque) */}
+              <div
+                className="rounded-2xl border-2 border-slate-300 bg-slate-200 shadow-xl overflow-x-auto overflow-y-auto max-h-[calc(100vh-120px)] p-3 sm:p-5 relative z-10 isolate"
+                style={{
+                  scrollbarWidth: "auto",
+                  scrollbarColor: "#94a3b8 #e2e8f0",
+                }}
+              >
+                <div className="w-[794px] min-w-[794px] mx-auto shadow-2xl bg-white">
+                  {renderExactOutputPaper(false, "exact-preview-paper", false)}
+                </div>
               </div>
             </div>
           </div>
@@ -2406,9 +2410,9 @@ export function CustomizableInvoiceGenerator({
             </div>
           </div>
 
-          {/* Scrollable Viewport with Vertical & Horizontal Move Bars */}
+          {/* Scrollable Viewport with Vertical & Horizontal Move Bars (100% Opaque) */}
           <div
-            className="rounded-2xl border-2 border-slate-300 bg-slate-200/90 shadow-inner overflow-x-auto overflow-y-auto max-h-[calc(100vh-140px)] p-6 sm:p-8"
+            className="rounded-2xl border-2 border-slate-300 bg-slate-200 shadow-xl overflow-x-auto overflow-y-auto max-h-[calc(100vh-140px)] p-6 sm:p-8 relative z-10 isolate"
             style={{
               scrollbarWidth: "auto",
               scrollbarColor: "#94a3b8 #e2e8f0",
