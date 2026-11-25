@@ -8,7 +8,7 @@ export const metadata: Metadata = pageMetadata({
   description: "CV guidance for a specific situation: changing career, returning after a break, first job, applying abroad, or after redundancy.",
   path: "/career-situations",
 });
-
+//adkajkd
 export default function CareerSituationsHub() {
   return (
     <DirectoryHub

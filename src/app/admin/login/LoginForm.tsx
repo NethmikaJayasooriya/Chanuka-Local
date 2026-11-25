@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-
+//makxmkaxa
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
